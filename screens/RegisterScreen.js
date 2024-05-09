@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect  } from 'react';
 import { View, Text, StyleSheet, Dimensions, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import LottieView from 'lottie-react-native';
@@ -12,10 +12,11 @@ import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { registerUser, loginUser } from '../utils/api';
 import { showToast } from '../components/Toast'; // Import the showToast function
+import LoadingIndicator from '../components/LoadingIndicator';
 
 
 export default function RegisterScreen() {
-
+  
 
   const navigation = useNavigation();
   const [rollNumber, setRollNumber] = useState('');
@@ -89,10 +90,10 @@ export default function RegisterScreen() {
     try {
       // Call the registerUser function with the input values
       const response = await registerUser(rollNumber, email, phone, password);
-      console.log('User registration successful:', response);
+      console.log('User registration successful:', response.user.sessionId);
       showToast('success', 'User registered successfully'); // Show success toast
       // Optionally, navigate to another screen upon successful registration
-      navigation.navigate('Home');
+      navigation.navigate('NavigationScreen');
     } catch (error) {
       console.error('User registration failed:', error);
       showToast('error', 'User registration failed'); // Show error toast
@@ -123,6 +124,7 @@ export default function RegisterScreen() {
     return null;
   }
   return (
+    
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled keyboardVerticalOffset={30}>
       <ScrollView>
         <View>
@@ -178,11 +180,7 @@ export default function RegisterScreen() {
           </View>
         </View>
       </ScrollView>
-      {loadingVisible && (
-        <View style={styles.loadingContainer}>
-          <LottieView style={{ width: 300, height: 300 }} source={require("../assets/lottie/Loading.json")} autoPlay loop />
-        </View>
-      )}
+      {loadingVisible && <LoadingIndicator />}
     </KeyboardAvoidingView>
 
   );

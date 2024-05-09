@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Image,
   View,
+  FlatList,
   Text,
   ImageBackground,
+  Animated,
   StyleSheet,
   TouchableOpacity,
+  Dimensions
 } from "react-native";
 import Spacing from "../utils/Spacing";
 import Iconicons from "@expo/vector-icons/Ionicons.js";
@@ -18,13 +21,7 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import HomeScreen from "./HomeScreen";
 // import { useNavigation } from "@react-navigation/native";
 // Define your tabs/screens
-const PhotosScreen = () => {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Photos Content</Text>
-    </View>
-  );
-};
+const screenHeight = Dimensions.get('window').height;
 
 const ReelsScreen = () => {
   return (
@@ -34,6 +31,112 @@ const ReelsScreen = () => {
   );
 };
 export default function ProfileScreen() {
+  const [scrollY, setScrollY] = useState(new Animated.Value(0));
+  const [scrollDirection, setScrollDirection] = useState("down");
+
+  const onScroll = (event) => {
+    const currentOffset = event.nativeEvent.contentOffset.y;
+    const direction =
+      currentOffset > 0 && currentOffset > scrollY ? "down" : "up";
+    setScrollDirection(direction);
+    setScrollY(currentOffset);
+  };
+
+  const translateY = scrollY.interpolate({
+    inputRange: [0, 600], // Adjust the inputRange according to your need
+    outputRange: [0, -300], // Adjust the outputRange according to your need
+    extrapolate: "clamp",
+  });
+  const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+
+  const PhotosScreen = () => {
+    // Image data
+    const images = [
+      {
+        id: 1,
+        source: require("../assets/photos/download.jpg"),
+        backgroundColor: "#ffcccc",
+      },
+      {
+        id: 2,
+        source: require("../assets/photos/dowload2.jpg"),
+        backgroundColor: "#ccffcc",
+      },
+      {
+        id: 3,
+        source: require("../assets/photos/download3.jpg"),
+        backgroundColor: "#ccccff",
+      },
+      {
+        id: 4,
+        source: require("../assets/photos/download4.jpg"),
+        backgroundColor: "#ffffcc",
+      },
+      {
+        id: 5,
+        source: require("../assets/photos/download4.jpg"),
+        backgroundColor: "#ffffcc",
+      },
+      {
+        id: 6,
+        source: require("../assets/photos/download4.jpg"),
+        backgroundColor: "#ffffcc",
+      },
+      {
+        id: 7,
+        source: require("../assets/photos/download4.jpg"),
+        backgroundColor: "#ffffcc",
+      },
+      {
+        id: 8,
+        source: require("../assets/photos/download4.jpg"),
+        backgroundColor: "#ffffcc",
+      },
+      {
+        id: 9,
+        source: require("../assets/photos/download4.jpg"),
+        backgroundColor: "#ffffcc",
+      },
+      {
+        id: 10,
+        source: require("../assets/photos/download4.jpg"),
+        backgroundColor: "#ffffcc",
+      },
+
+      // { id: 5, source: require('./assets/photos/download5.jpg'), backgroundColor: '#ffccff' },
+      // { id: 6, source: require('./assets/photos/download6.jpg'), backgroundColor: '#ccffff' },
+    ];
+
+    // Render item function for FlatList
+    const renderItem = ({ item }) => (
+      <View
+        style={[
+          styles.imageContainer,
+          { backgroundColor: item.backgroundColor },
+        ]}
+      >
+        <Image source={item.source} style={styles.image} />
+      </View>
+    );
+
+    return (
+      <View style={{ flex: 1 }}>
+        <Animated.FlatList
+        style={{flex: 1}}
+        // contentContainerStyle={{flex:1}}
+          data={images}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2} // 2 images per row
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true }
+          )}
+          scrollEventThrottle={16}
+        />
+      </View>
+    );
+  };
   const navigation = useNavigation();
 
   return (
@@ -44,37 +147,40 @@ export default function ProfileScreen() {
         flex: 1,
       }}
     >
-      <ScrollView
-        vertical
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1, }}
-        // contentContainerStyle={{flex: 1}}
+      <ImageBackground
+        source={require("../assets/images/background.jpg")}
+        style={{
+          height: Spacing * 18,
+          padding: 10,
+        }}
       >
-        <ImageBackground
-          source={require("../assets/images/background.jpg")}
-          style={{
-            height: Spacing * 18,
-            padding: 10,
-          }}
-        >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Iconicons
-              name="chevron-back"
-              style={{ color: "#fff" }}
-              size={Spacing * 3}
-            />
-          </TouchableOpacity>
-        </ImageBackground>
-
-        <View
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Iconicons
+            name="chevron-back"
+            style={{ color: "#fff" }}
+            size={Spacing * 3}
+          />
+        </TouchableOpacity>
+      </ImageBackground>
+      <View
+        style={{
+          flex: 1,
+        }}
+      >
+        <Animated.View
           style={{
             backgroundColor: "#fff",
             padding: Spacing,
             borderTopLeftRadius: Spacing * 4,
             borderTopRightRadius: Spacing * 4,
-            bottom: 25,
+            bottom: 100,
+            height: screenHeight, 
+
+            marginBottom: -100,
+            transform: [{ translateY }],
+            // transform: {translateY}
             flex: 1,
-            backgroundColor: 'red'
+            // backgroundColor: 'red'
           }}
         >
           <View
@@ -104,151 +210,132 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View
-              style={{
-                flexDirection: "row",
-              }}
-            >
-              <View>
-                <TouchableOpacity>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      borderRadius: Spacing * 8,
-                      borderWidth: 1,
-                      alignSelf: "flex-start", // Adjust to occupy its containing space
-                      padding: Spacing * 1,
-                      marginRight: Spacing * 1.2,
-                      marginBottom: Spacing * 1.2, // Add marginBottom for space between rows
-                      alignItems: "center",
-                    }}
-                  >
-                    <Image
-                      source={require("../assets/icons/cake.png")}
-                      style={{
-                        width: 20,
-                        height: 20,
-                        marginRight: Spacing * 0.5,
-                      }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: Spacing * 1.5,
-                        // fontFamily: 'Comfortaa',
-                        color: "#000",
-                      }}
-                    >
-                      Sep 2
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+          {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <TouchableOpacity>
+              <View
+                style={{
+                  flexDirection: "row",
+                  borderRadius: Spacing * 8,
+                  borderWidth: 1,
+                  padding: Spacing * 1,
+                  marginRight: Spacing * 1.2,
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={require("../assets/icons/cake.png")}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    marginRight: Spacing * 0.5,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: Spacing * 1.5,
+                    // fontFamily: 'Comfortaa',
+                    color: "#000",
+                  }}
+                >
+                  Sep 2
+                </Text>
               </View>
+            </TouchableOpacity>
 
-              <View>
-                <TouchableOpacity>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      borderRadius: Spacing * 8,
-                      borderWidth: 1,
-                      alignSelf: "flex-start", // Adjust to occupy its containing space
-                      padding: Spacing * 1,
-                      marginRight: Spacing * 1.2,
-                      marginBottom: Spacing * 1.2, // Add marginBottom for space between rows
-                      alignItems: "center",
-                    }}
-                  >
-                    <Image
-                      source={require("../assets/icons/openbook.png")}
-                      style={{
-                        width: 20,
-                        height: 20,
-                        marginRight: Spacing * 0.5,
-                      }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: Spacing * 1.5,
-                        // fontFamily: 'Comfortaa',
-                        color: "#000",
-                      }}
-                    >
-                      B.tech CSE
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+            <TouchableOpacity>
+              <View
+                style={{
+                  flexDirection: "row",
+                  borderRadius: Spacing * 8,
+                  borderWidth: 1,
+                  padding: Spacing * 1,
+                  marginRight: Spacing * 1.2,
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={require("../assets/icons/openbook.png")}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    marginRight: Spacing * 0.5,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: Spacing * 1.5,
+                    // fontFamily: 'Comfortaa',
+                    color: "#000",
+                  }}
+                >
+                  B.tech CSE
+                </Text>
               </View>
-              <View>
-                <TouchableOpacity>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      borderRadius: Spacing * 8,
-                      borderWidth: 1,
-                      alignSelf: "flex-start", // Adjust to occupy its containing space
-                      padding: Spacing * 1,
-                      marginRight: Spacing * 1.2,
-                      marginBottom: Spacing * 1.2, // Add marginBottom for space between rows
-                      alignItems: "center",
-                    }}
-                  >
-                    <Image
-                      source={require("../assets/icons/yearofstudy.png")}
-                      style={{
-                        width: 20,
-                        height: 20,
-                        marginRight: Spacing * 0.5,
-                      }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: Spacing * 1.5,
-                        // fontFamily: 'Comfortaa',
-                        color: "#000",
-                      }}
-                    >
-                      1st Year
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+            </TouchableOpacity>
+
+            <TouchableOpacity>
+              <View
+                style={{
+                  flexDirection: "row",
+                  borderRadius: Spacing * 8,
+                  borderWidth: 1,
+                  padding: Spacing * 1,
+                  marginRight: Spacing * 1.2,
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={require("../assets/icons/yearofstudy.png")}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    marginRight: Spacing * 0.5,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: Spacing * 1.5,
+                    // fontFamily: 'Comfortaa',
+                    color: "#000",
+                  }}
+                >
+                  1st Year
+                </Text>
               </View>
-              <View>
-                <TouchableOpacity>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      borderRadius: Spacing * 8,
-                      borderWidth: 1,
-                      alignSelf: "flex-start", // Adjust to occupy its containing space
-                      padding: Spacing * 1,
-                      marginRight: Spacing * 1.2,
-                      marginBottom: Spacing * 1.2, // Add marginBottom for space between rows
-                      alignItems: "center",
-                    }}
-                  >
-                    <Image
-                      source={require("../assets/icons/graduationcap.png")}
-                      style={{
-                        width: 20,
-                        height: 20,
-                        marginRight: Spacing * 0.5,
-                      }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: Spacing * 1.5,
-                        // fontFamily: 'Comfortaa',
-                        color: "#000",
-                      }}
-                    >
-                      JNTU 27
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+            </TouchableOpacity>
+
+            <TouchableOpacity>
+              <View
+                style={{
+                  flexDirection: "row",
+                  borderRadius: Spacing * 8,
+                  borderWidth: 1,
+                  padding: Spacing * 1,
+                  marginRight: Spacing * 1.2,
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={require("../assets/icons/graduationcap.png")}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    marginRight: Spacing * 0.5,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: Spacing * 1.5,
+                    // fontFamily: 'Comfortaa',
+                    color: "#000",
+                  }}
+                >
+                  JNTU 27
+                </Text>
               </View>
-            </View>
-          </ScrollView>
+            </TouchableOpacity>
+          </ScrollView> */}
+
           <View
             style={{
               flexDirection: "row",
@@ -461,23 +548,25 @@ export default function ProfileScreen() {
               :)
             </Text>
           </View>
-        </View>
-        <View style={{flex: 1}}>
-        <Tab.Navigator
-        tabBarOptions={{
-          labelStyle: { fontSize: 16, fontFamily: "ComfortaaBold" },
-          indicatorStyle: { backgroundColor: "#1e40bc" },
-          style: { backgroundColor: "#ffffff" },
-        }}
-      >
-        <Tab.Screen name="Photos" component={PhotosScreen} />
-        <Tab.Screen name="Activity" component={ReelsScreen} />
-      </Tab.Navigator>
-        </View>
-        
-      </ScrollView>
-      <View style={{flex: 1}}>
-      
+          <Animated.View
+            style={{
+              flex: 1,
+              height: "100%",
+              // transform: [{ translateY }],
+            }}
+          >
+            <Tab.Navigator
+              tabBarOptions={{
+                labelStyle: { fontSize: 16, fontFamily: "ComfortaaBold" },
+                indicatorStyle: { backgroundColor: "#1e40bc" },
+                style: { backgroundColor: "#ffffff" },
+              }}
+            >
+              <Tab.Screen name="Photos" component={PhotosScreen} />
+              <Tab.Screen name="Activity" component={ReelsScreen} />
+            </Tab.Navigator>
+          </Animated.View>
+        </Animated.View>
       </View>
     </View>
   );
@@ -509,5 +598,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
+  },
+  imageContainer: {
+    flex: 1,
+    aspectRatio: 1, // Ensure square aspect ratio for images
+    margin: 5,
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  image: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
 });

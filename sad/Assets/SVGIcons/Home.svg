@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="45" height="44" viewBox="0 0 25 24">
+  <g id="Home" transform="translate(-20 -93)">
+    <g id="Rectangle_2345" data-name="Rectangle 2345" transform="translate(20 93)" fill="none" stroke="#d7e1ba" stroke-width="1">
+      <rect width="25" height="24" rx="12" stroke="none"/>
+      <rect x="0.5" y="0.5" width="24" height="23" rx="11.5" fill="none"/>
+    </g>
+    <path id="Icon_material-home" data-name="Icon material-home" d="M8.6,16.4V12.2h2.8v4.2h3.5V10.8H17L10,4.5,3,10.8H5.1v5.6Z" transform="translate(23 93.5)" fill="#869658"/>
+  </g>
+</svg>

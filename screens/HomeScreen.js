@@ -2,7 +2,7 @@ import React from "react";
 import {
   View,
   Text,
-  SafeAreaView,
+  // SafeAreaView,
   Image,
   Dimensions,
   StyleSheet,
@@ -19,7 +19,7 @@ import TwitterIcons from "../components/TwitterIcons"
 import UserPost from "../components/UserPost";
 import currentUserProfilePic from "../assets/images/Avatar.png";
 import * as NavigationBar from 'expo-navigation-bar';
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import userProfilePic from "../assets/images/avatar2.png";
 import userPostPicture from "../assets/images/chicken.png";
 import HomeHeader from "../components/HomeHeader";
@@ -49,7 +49,9 @@ export default function HomeScreen() {
     return null;
   }
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{flex:1}}>
+
+<View style={{ flex: 1 }}>
       <View
         style={{
           flex: 1,
@@ -241,6 +243,8 @@ export default function HomeScreen() {
 
       {/* <BottomNavigationBar /> */}
     </View>
+    </SafeAreaView>
+    
   );
 }
 

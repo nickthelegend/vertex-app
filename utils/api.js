@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const baseURL = 'http://localhost:5001';
+const baseURL = 'https://peaceful-nicely-hermit.ngrok-free.app';
 
 export const registerUser = async (rollno, email, phone, password) => {
   try {

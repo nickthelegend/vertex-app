@@ -15,13 +15,14 @@ import ChatScreen from './screens/ChatScreen';
 import PostScreen from './screens/PostScreen';
 import NavigationScreen from './screens/NavigationScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import SendMessage from './screens/SendMessage'
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
     
-      <Stack.Navigator initialRouteName="NavigationScreen" screenOptions={({ route }) => ({
+      <Stack.Navigator initialRouteName="Register" screenOptions={({ route }) => ({
         headerShown: false,
         ...(route.name === 'CommunityScreen' || route.name === 'ServicesScreen' || route.name === 'ChatScreen' || route.name === 'PostScreen'
           ? { ...TransitionPresets.FadeFromBottomAndroid }
@@ -41,6 +42,7 @@ export default function App() {
         <Stack.Screen name="PostScreen" component={PostScreen} />
         <Stack.Screen name="NavigationScreen" component={NavigationScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="SendMessage" component={SendMessage} />
 
       </Stack.Navigator>
     </NavigationContainer>
