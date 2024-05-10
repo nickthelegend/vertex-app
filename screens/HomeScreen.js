@@ -55,7 +55,7 @@ export default function HomeScreen() {
       <View
         style={{
           flex: 1,
-          paddingHorizontal: SPACING * 2,
+          paddingHorizontal: SPACING * 1,
           paddingTop: SPACING * 1,
         }}
       >
