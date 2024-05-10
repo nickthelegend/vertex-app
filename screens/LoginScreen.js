@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import {
   View,
   Text,
@@ -18,16 +18,61 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Spacing from "../utils/Spacing";
 import CustomButton from "../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
-
+import LoadingIndicator from '../components/LoadingIndicator';
+import loginUser from '../utils/api.js'
 export default function LoginScreen() {
   const navigation = useNavigation();
+  const [rollNumber, setRollNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [rollNumberError, setRollNumberError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [loadingVisible, setLoadingVisible] = useState(false); // State to control loading animation visibility
+  const [registrationTriggered, setRegistrationTriggered] = useState(false); // New state variable to control registration trigger
 
   const handleCreateAccount = () => {
     navigation.navigate("Register");
   };
 
-  const hangleLogin = () => {
-    navigation.navigate("Register");
+  const hangleLogin = async() => {
+    setLoadingVisible(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    console.log("Login Clicked");
+    if (!rollNumber.trim()) {
+      setRollNumberError('Please enter Roll Number');
+      setRegistrationTriggered(true);
+      setLoadingVisible(false);
+      return;
+    } else {
+      setRollNumberError('');
+    }
+
+// Validate Password
+if (password.length < 6) {
+  setPasswordError('Password must be at least 6 characters long');
+  setRegistrationTriggered(true);
+  setLoadingVisible(false);
+  return;
+} else {
+  setPasswordError('');
+}
+try {
+  // Call the registerUser function with the input values
+  const response = await loginUser()
+  console.log('User registration successful:', response.user.sessionId);
+  showToast('success', 'User registered successfully'); // Show success toast
+  // Optionally, navigate to another screen upon successful registration
+  navigation.navigate('NavigationScreen');
+} catch (error) {
+  console.error('User registration failed:', error);
+  showToast('error', 'User registration failed'); // Show error toast
+}
+setLoadingVisible(false);
+
+
+console.log('Roll:', rollNumber);
+
+console.log('Password:', password);
   };
   const deviceWidth = Dimensions.get("window").width;
 
@@ -50,6 +95,7 @@ export default function LoginScreen() {
       enabled
       keyboardVerticalOffset={30}
     >
+
       <ScrollView>
         <View>
           <Animatable.View
@@ -93,6 +139,7 @@ export default function LoginScreen() {
                 drawableStart={
                   <AntDesign name="idcard" size={24} color="black" />
                 }
+                onChangeText={setRollNumber}
               />
 
               <CustomTextField
@@ -101,6 +148,7 @@ export default function LoginScreen() {
                 drawableStart={
                   <MaterialIcons name="password" size={24} color="black" />
                 }
+                onChangeText={setPassword}
               />
               <View
                 style={{ flexDirection: "row", justifyContent: "flex-end" }}
@@ -138,7 +186,10 @@ export default function LoginScreen() {
             </View>
           </View>
         </View>
+        
       </ScrollView>
+      {loadingVisible && <LoadingIndicator />}
+
     </KeyboardAvoidingView>
   );
 }
