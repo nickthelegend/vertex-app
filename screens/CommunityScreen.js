@@ -23,7 +23,16 @@ export default function CommunityScreen() {
     { id: "3", title: "Item 3", members: "534", description: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
     { id: "4", title: "Item 4", members: "434", description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." },
     { id: "5", title: "Item 5", members: "134", description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." },
-    
+    { id: "6", title: "Item 6", members: "342", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
+    { id: "7", title: "Item 7", members: "512", description: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
+    { id: "8", title: "Item 8", members: "653", description: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
+    { id: "9", title: "Item 9", members: "125", description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." },
+    { id: "10", title: "Item 10", members: "987", description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." },
+    { id: "11", title: "Item 11", members: "876", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
+    { id: "12", title: "Item 12", members: "543", description: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
+    { id: "13", title: "Item 13", members: "765", description: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
+    { id: "14", title: "Item 14", members: "432", description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." },
+    { id: "15", title: "Item 15", members: "321", description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." },
     // Add more items as needed
   ];
   
@@ -176,6 +185,8 @@ export default function CommunityScreen() {
               data={DATA}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
+              style={{ height: 400 }} // Change the height value as needed
+              showsVerticalScrollIndicator={false}
             />
           </View>
         </View>

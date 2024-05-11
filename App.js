@@ -1,6 +1,8 @@
 import 'react-native-gesture-handler';
 import 'expo-linear-gradient';
 import React from 'react';
+// import ImagePicker from 'react-native-image-crop-picker';
+
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import SplashScreen from './screens/SplashScreen';
@@ -16,13 +18,16 @@ import PostScreen from './screens/PostScreen';
 import NavigationScreen from './screens/NavigationScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SendMessage from './screens/SendMessage'
+import VerificationScreen from './screens/VerificationScreen';
+import VerifyYourAccount from './screens/VerifyYourAccount';
+import AccountDetails from './screens/AccountDetails';
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
     
-      <Stack.Navigator initialRouteName="NavigationScreen" screenOptions={({ route }) => ({
+      <Stack.Navigator initialRouteName="VerifyYourAccount" screenOptions={({ route }) => ({
         headerShown: false,
         ...(route.name === 'CommunityScreen' || route.name === 'ServicesScreen' || route.name === 'ChatScreen' || route.name === 'PostScreen'
           ? { ...TransitionPresets.FadeFromBottomAndroid }
@@ -43,6 +48,9 @@ export default function App() {
         <Stack.Screen name="NavigationScreen" component={NavigationScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="SendMessage" component={SendMessage} />
+        <Stack.Screen name="Verification" component={VerificationScreen}/>
+        <Stack.Screen name="VerifyYourAccount" component={VerifyYourAccount}/>
+        <Stack.Screen name="AccountDetails" component={AccountDetails}/>
 
       </Stack.Navigator>
     </NavigationContainer>
