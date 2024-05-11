@@ -1,14 +1,60 @@
-import React,{ useState }from "react";
-import { View, Text  } from "react-native";
+import React,{ useState,useEffect }from "react";
+import { View, Text, TouchableOpacity,Image } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { ProgressSteps, ProgressStep } from "react-native-progress-steps";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TextFieldPersonal from "../components/TextFieldPersonalInformation";
 import { Picker } from '@react-native-picker/picker';
-
+import VerificationScreen from "./VerificationScreen";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { Camera } from 'expo-camera';
 export default function AccountDetails() {
 
-
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [hasCameraPermission, setHasCameraPermission] = useState(null);
+    const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+  
+    useEffect(() => {
+      (async () => {
+        const cameraPermission = await Camera.requestCameraPermissionsAsync();
+        const galleryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  
+        setHasCameraPermission(cameraPermission.status === 'granted');
+        setHasGalleryPermission(galleryPermission.status === 'granted');
+      })();
+    }, []);
+  
+    const openCamera = async () => {
+      if (!hasCameraPermission) {
+        alert('Camera permission required!');
+        return;
+      }
+  
+      let result = await ImagePicker.launchCameraAsync({ allowsEditing: true,quality:1 });
+  
+      if (!result.canceled) {
+        setSelectedImage(result.assets[0].uri);
+      }
+    };
+  
+    const openPicker = async () => {
+      if (!hasGalleryPermission) {
+        alert('Gallery permission required!');
+        return;
+      }
+  
+      let result = await ImagePicker.launchImageLibraryAsync({ allowsEditing: true });
+  
+      if (!result.canceled) {
+        setSelectedImage(result.uri);
+      }
+    };
+  
+    useEffect(() => {
+      // This effect runs every time selectedImage changes
+      console.log(selectedImage);
+    }, [selectedImage]);
     const [department, setDepartment] = useState('');
   const [courseType, setCourseType] = useState('');
   const [yearOfStudy, setYearOfStudy] = useState('');
@@ -159,7 +205,7 @@ export default function AccountDetails() {
 
         {courseType === 'IDP/IDMP' && (
           <View>
-            <Text style={{ marginTop: 10 }}>Years of Study</Text>
+            <Text style={{ marginTop: 10 }}>Year of Study</Text>
             <Picker
               selectedValue={yearOfStudy}
               onValueChange={(itemValue) => handleYearOfStudyChange(itemValue)}
@@ -173,7 +219,7 @@ export default function AccountDetails() {
         )}
         {courseType === 'Regular' && (
           <View>
-            <Text style={{ marginTop: 10 }}>Years of Study</Text>
+            <Text style={{ marginTop: 10 }}>Year of Study</Text>
             <Picker
               selectedValue={yearOfStudy}
               onValueChange={(itemValue) => handleYearOfStudyChange(itemValue)}
@@ -211,9 +257,80 @@ export default function AccountDetails() {
             previousBtnStyle={previousBtnStyle}
             nextBtnStyle={nextBtnStyle}
           >
-            <View style={{ alignItems: "center" }}>
-              <Text>This is the content within step 3!</Text>
-            </View>
+              <View style={{ marginLeft: 20, paddingBottom: 10 }}>
+        <Text style={{ fontSize: 30 ,fontFamily: "Poppins-SemiBold"}}>Upload Document</Text>
+
+        <Text>Student ID Card</Text>
+
+        {selectedImage && <View>
+        
+        
+        <Image source={{ uri: selectedImage }} style={{ width: 300, height: 400, marginTop: 20,resizeMode:"contain" }}
+        
+        
+         />
+        </View>
+        }
+      {!selectedImage && <TouchableOpacity onPress={openCamera}>
+
+      <View style={{
+        borderWidth: 1,
+borderColor: '#bbbbbb', // Set border color to transparent
+borderStyle: 'dashed', // Set border style to dashed
+borderRadius: 0, // Set border radius to 0 for sharp edges
+padding: 10, // Optional: Set padding
+borderWidth:2,
+marginRight:20,
+marginTop:10,
+// paddingHorizontal:30,
+paddingHorizontal:30,
+paddingVertical:20,
+flexDirection:'row',
+justifyContent:'space-between'
+
+        }}
+        
+        
+        >
+
+        <Text style={{
+          fontSize:20,
+          color: '#868686',
+          // fontFamily:''
+        }}>Clear here to open camera</Text>
+        <MaterialCommunityIcons name="upload" size={24} color="#868686" />
+
+        </View>
+      </TouchableOpacity>}
+       {/* <View>
+
+        <Text style={{
+          color:'#0d0d0d'
+        }}>
+
+          JPG,
+        </Text>
+       </View> */}
+        {/* {selectedImage && <View>
+        
+        
+        <Image source={{ uri: selectedImage }} style={{ width: 300, height: 400, marginTop: 20,resizeMode:"contain" }}
+        
+        
+         />
+        <TouchableOpacity onPress={openCamera} style={{ alignItems:"center",marginTop:20 }}>
+          <View style={{ borderRadius: 20, padding: 20, backgroundColor: "#1d40bd" }}>
+            <Text style={{ color: "#fff", fontSize: 20 }}>Upload</Text>
+          </View>
+        </TouchableOpacity>
+        </View>
+        }
+        {!selectedImage && <TouchableOpacity onPress={openCamera} style={{ marginTop: 20 }}>
+          <View style={{ borderRadius: 20, padding: 20, backgroundColor: "#1d40bd" }}>
+            <Text style={{ color: "#fff", fontSize: 20 }}>Open Camera</Text>
+          </View>
+        </TouchableOpacity>} */}
+      </View>
           </ProgressStep>
         </ProgressSteps>
       </View>
