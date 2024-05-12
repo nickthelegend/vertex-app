@@ -21,6 +21,7 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import HomeScreen from "./HomeScreen";
 // import { useNavigation } from "@react-navigation/native";
 // Define your tabs/screens
+
 const screenHeight = Dimensions.get('window').height;
 
 const ReelsScreen = () => {
@@ -30,23 +31,56 @@ const ReelsScreen = () => {
     </View>
   );
 };
+
+const renderButton = (text, onPress, isActive) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={{
+      padding: Spacing * 1.5, // Adjust padding as needed
+      backgroundColor: isActive ? '#1F41BB' : 'transparent', // Change background color based on isActive
+      marginVertical: 20, // Adjust margin as needed
+      borderRadius: 8, // Adjust borderRadius as needed
+    }}
+  >
+    <Text
+      style={{
+        textAlign: 'center',
+        color: isActive ? '#fff' : '#000', // Change text color based on isActive
+        fontFamily: 'Poppins-SemiBold',
+        fontSize: 16, // Adjust fontSize as needed
+      }}
+    >
+      {text}
+    </Text>
+  </TouchableOpacity>
+);
 export default function ProfileScreen() {
+  const [activeButton, setActiveButton] = useState('inbox'); // State to track active button
+  const handlePosts= ()=>{
+    setActiveButton('posts')
+  }
+  const handleReels= ()=>{
+    setActiveButton('reels')
+  }
   const [scrollY, setScrollY] = useState(new Animated.Value(0));
   const [scrollDirection, setScrollDirection] = useState("down");
 
   const onScroll = (event) => {
     const currentOffset = event.nativeEvent.contentOffset.y;
-    const direction =
-      currentOffset > 0 && currentOffset > scrollY ? "down" : "up";
+    const direction = currentOffset > 0 && currentOffset > scrollY ? "down" : "up";
     setScrollDirection(direction);
     setScrollY(currentOffset);
   };
 
   const translateY = scrollY.interpolate({
-    inputRange: [0, 600], // Adjust the inputRange according to your need
-    outputRange: [0, -300], // Adjust the outputRange according to your need
+    inputRange: [0, 600],
+    outputRange: [0, -300],
     extrapolate: "clamp",
   });
+
+  // Adjust the value to increase the size of FlatList
+  const flatListSize = scrollDirection === "up" ? screenHeight + 300 : screenHeight;
+
   const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
   const PhotosScreen = () => {
@@ -122,16 +156,15 @@ export default function ProfileScreen() {
     return (
       <View style={{ flex: 1 }}>
         <Animated.FlatList
-        style={{flex: 1}}
+          style={{ flex: 1, height: flatListSize }}
         // contentContainerStyle={{flex:1}}
           data={images}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2} // 2 images per row
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: true }
-          )}
+          // onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+
+
           scrollEventThrottle={16}
         />
       </View>
@@ -177,7 +210,7 @@ export default function ProfileScreen() {
             height: screenHeight, 
 
             marginBottom: -100,
-            transform: [{ translateY }],
+            // transform: [{ translateY }],
             // transform: {translateY}
             flex: 1,
             // backgroundColor: 'red'
@@ -548,24 +581,19 @@ export default function ProfileScreen() {
               :)
             </Text>
           </View>
-          <Animated.View
-            style={{
-              flex: 1,
-              height: "100%",
-              // transform: [{ translateY }],
-            }}
-          >
-            <Tab.Navigator
-              tabBarOptions={{
-                labelStyle: { fontSize: 16, fontFamily: "ComfortaaBold" },
-                indicatorStyle: { backgroundColor: "#1e40bc" },
-                style: { backgroundColor: "#ffffff" },
-              }}
-            >
-              <Tab.Screen name="Photos" component={PhotosScreen} />
-              <Tab.Screen name="Activity" component={ReelsScreen} />
-            </Tab.Navigator>
-          </Animated.View>
+              
+              <View style={{backgroundColor:'red', flexDirection:'row'}}>
+
+              {renderButton('Posts', handlePosts, activeButton === 'posts')}
+              {renderButton('Reels', handleReels, activeButton === 'reels')}
+              
+              </View>
+              <View style={{flex:1,backgroundColor:'green'}}>
+              {activeButton == 'posts' ? <PhotosScreen/>:<ReelsScreen/>}
+              </View>
+              
+
+              
         </Animated.View>
       </View>
     </View>

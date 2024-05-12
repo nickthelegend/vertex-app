@@ -27,7 +27,7 @@ export default function App() {
   return (
     <NavigationContainer>
     
-      <Stack.Navigator initialRouteName="VerifyYourAccount" screenOptions={({ route }) => ({
+      <Stack.Navigator initialRouteName="ProfileScreen" screenOptions={({ route }) => ({
         headerShown: false,
         ...(route.name === 'CommunityScreen' || route.name === 'ServicesScreen' || route.name === 'ChatScreen' || route.name === 'PostScreen'
           ? { ...TransitionPresets.FadeFromBottomAndroid }
