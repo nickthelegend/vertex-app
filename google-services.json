@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "633150595201",
+    "project_id": "rnvertexapp",
+    "storage_bucket": "rnvertexapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633150595201:android:74ce6093effa2a71caad80",
+        "android_client_info": {
+          "package_name": "com.nickthelegend.MyProject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlPYY3pge98wcHgAOqpAGs0bTBzeyFvQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

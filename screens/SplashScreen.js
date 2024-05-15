@@ -4,6 +4,7 @@ import { useFonts } from "expo-font";
 import COLORS from "../utils/Colors.js";
 import SPACING from "../utils/Spacing.js";
 import * as Animatable from "react-native-animatable";
+// import ConnectionStatus from "../utils/FireBaseConfig.js";
 
 export default function SplashScreen({ navigation }) {
   // Load custom fonts
@@ -52,6 +53,7 @@ export default function SplashScreen({ navigation }) {
           <Text style={{ fontFamily: "Comfortaa", fontWeight: "condensed" }}>
             Where Paths Converge and Necessities Merge
           </Text>
+          {/* <ConnectionStatus/> */}
         </View>
       </View>
 

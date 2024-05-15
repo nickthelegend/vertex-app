@@ -88,6 +88,9 @@ export default function RegisterScreen() {
     setLoadingVisible(false);
 
     try {
+
+
+      
       // Call the registerUser function with the input values
       const response = await registerUser(rollNumber, email, phone, password);
       console.log('User registration successful:', response.user.sessionId);
