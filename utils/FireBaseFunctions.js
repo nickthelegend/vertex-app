@@ -2,7 +2,7 @@
 import uuid from 'react-native-uuid'; // Import uuid
 
 // Import Firebase database
-import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, query, where, getDocs } from 'firebase/firestore';
 import { app } from '../services/config'
 const database = getFirestore(app)
 // import { firebase } from '@react-native-firebase/firestore';
@@ -23,6 +23,22 @@ const database = getFirestore(app)
 // Define registerUser function
 export async function registerUser(userInfo) {
   try {
+    // Check if a user with the provided username already exists
+    const usernameQuery = query(collection(database, 'users'), where('username', '==', userInfo.username));
+    const usernameSnapshot = await getDocs(usernameQuery);
+
+    if (!usernameSnapshot.empty) {
+      throw new Error('Username already exists');
+    }
+
+    // Check if a user with the provided email already exists
+    const emailQuery = query(collection(database, 'users'), where('email', '==', userInfo.email));
+    const emailSnapshot = await getDocs(emailQuery);
+
+    if (!emailSnapshot.empty) {
+      throw new Error('Email already exists');
+    }
+
     // Generate unique user ID
     const userId = uuid.v4();
     
@@ -48,9 +64,44 @@ export async function registerUser(userInfo) {
     
     console.log('User registered successfully!');
   } catch (error) {
-    console.log('Database:', database);
+    console.error('Error registering user:', error.message);
+    
+    throw error; // Rethrow the error for handling in the calling code
+  }
+}
 
-    console.error('Error registering user:', error);
+
+export async function loginUser(username, password) {
+  try {
+    // Reference to the users collection
+    const usersCollection = collection(database, 'users');
+
+    // Create a query to find the document with the provided username
+    const userQuery = query(usersCollection, where('username', '==', username));
+    
+    // Get the documents that match the query
+    const querySnapshot = await getDocs(userQuery);
+    
+    // Check if a user with the provided username exists
+    if (querySnapshot.empty) {
+      throw new Error('User not found');
+    }
+    
+    // Since usernames are unique, there should be only one document
+    querySnapshot.forEach((doc) => {
+      // Retrieve user data
+      const userData = doc.data();
+      
+      // Check if the password matches
+      if (userData.password === password) {
+        console.log('Login successful!');
+        // You can return user data or perform any other actions here
+      } else {
+        throw new Error('Incorrect password');
+      }
+    });
+  } catch (error) {
+    console.error('Error logging in:', error.message);
     throw error; // Rethrow the error for handling in the calling code
   }
 }

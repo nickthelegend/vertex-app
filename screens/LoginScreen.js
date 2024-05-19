@@ -19,7 +19,7 @@ import Spacing from "../utils/Spacing";
 import CustomButton from "../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import LoadingIndicator from '../components/LoadingIndicator';
-import loginUser from '../utils/api.js'
+import { loginUser } from '../utils/FireBaseFunctions';
 export default function LoginScreen() {
   const navigation = useNavigation();
   const [rollNumber, setRollNumber] = useState('');
@@ -58,14 +58,16 @@ if (password.length < 6) {
 }
 try {
   // Call the registerUser function with the input values
-  const response = await loginUser()
-  console.log('User registration successful:', response.user.sessionId);
-  showToast('success', 'User registered successfully'); // Show success toast
+  await loginUser(rollNumber,password)
+  // console.log('User registration successful:', response.user.sessionId);
+  // showToast('success', 'User registered successfully'); // Show success toast
   // Optionally, navigate to another screen upon successful registration
   navigation.navigate('NavigationScreen');
 } catch (error) {
   console.error('User registration failed:', error);
-  showToast('error', 'User registration failed'); // Show error toast
+  // showToast('error', 'User registration failed'); // Show error toast
+  setLoadingVisible(false);
+
 }
 setLoadingVisible(false);
 
@@ -73,6 +75,9 @@ setLoadingVisible(false);
 console.log('Roll:', rollNumber);
 
 console.log('Password:', password);
+
+
+
   };
   const deviceWidth = Dimensions.get("window").width;
 
