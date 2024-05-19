@@ -10,10 +10,10 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Spacing from '../utils/Spacing';
 import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
-import { registerUser, loginUser } from '../utils/api';
+// import { registerUser, loginUser } from '../utils/api';
 import { showToast } from '../components/Toast'; // Import the showToast function
 import LoadingIndicator from '../components/LoadingIndicator';
-
+import { registerUser } from '../utils/FireBaseFunctions';
 
 export default function RegisterScreen() {
   
@@ -92,8 +92,16 @@ export default function RegisterScreen() {
 
       
       // Call the registerUser function with the input values
-      const response = await registerUser(rollNumber, email, phone, password);
-      console.log('User registration successful:', response.user.sessionId);
+
+      const newUser = {
+        username: rollNumber,
+        password: password,
+        email: email,
+        phonenumber: phone,
+        // Additional optional fields can be provided here
+      };
+      await registerUser(newUser);
+      // console.log('User registration successful:', response.user.sessionId);
       showToast('success', 'User registered successfully'); // Show success toast
       // Optionally, navigate to another screen upon successful registration
       navigation.navigate('NavigationScreen');

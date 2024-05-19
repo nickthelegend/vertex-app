@@ -4,6 +4,7 @@ import { useFonts } from "expo-font";
 import COLORS from "../utils/Colors.js";
 import SPACING from "../utils/Spacing.js";
 import * as Animatable from "react-native-animatable";
+import SignupComponent from "../components/SignupComponent.js";
 // import ConnectionStatus from "../utils/FireBaseConfig.js";
 
 export default function SplashScreen({ navigation }) {
@@ -55,6 +56,7 @@ export default function SplashScreen({ navigation }) {
           </Text>
           {/* <ConnectionStatus/> */}
         </View>
+        <SignupComponent/>
       </View>
 
       {/* Footer

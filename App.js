@@ -21,6 +21,7 @@ import SendMessage from './screens/SendMessage'
 import VerificationScreen from './screens/VerificationScreen';
 import VerifyYourAccount from './screens/VerifyYourAccount';
 import AccountDetails from './screens/AccountDetails';
+import 'react-native-get-random-values'
 
 const Stack = createStackNavigator();
 
