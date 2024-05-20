@@ -85,7 +85,6 @@ export default function RegisterScreen() {
       setPasswordError('');
     }
 
-    setLoadingVisible(false);
 
     try {
 
@@ -105,9 +104,24 @@ export default function RegisterScreen() {
       // showToast('success', 'User registered successfully'); // Show success toast
       // Optionally, navigate to another screen upon successful registration
       navigation.navigate('NavigationScreen');
+      setLoadingVisible(false);
+
     } catch (error) {
       console.error('User registration failed:', error);
-      setEmailError(error.message)
+
+      if(error.message == "Email already exists"){
+
+        setEmailError(error.message)
+
+      }
+
+      if(error.message == "Username already exists"){
+
+        setRollNumberError(error.message)
+
+      }
+      setLoadingVisible(false);
+
       // showToast('error', 'User registration failed'); // Show error toast
     }
 
