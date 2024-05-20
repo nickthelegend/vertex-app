@@ -117,7 +117,7 @@ export default function RegisterScreen() {
 
       if(error.message == "Username already exists"){
 
-        setRollNumberError(error.message)
+        setRollNumberError(error.message);
 
       }
       setLoadingVisible(false);

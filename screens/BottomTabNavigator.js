@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, PixelRatio, Dimensions,Image } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 import { useFonts } from "expo-font";
-
+import { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import NextScreen from '../screens/NextScreen';
 import CommunityScreen from '../screens/CommunityScreen';
@@ -13,11 +13,25 @@ import PostScreen from '../screens/PostScreen';
 import HomeScreen from './HomeScreen';
 import scaleSize from '../utils/ScaleSize';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
-
+// import BottomSheetModal from '../components/BottomModalSheet';
+import CreatePostModal from '../components/BottomModalSheet';
 const Tab = createBottomTabNavigator();
 const CustomTabBarButton = ({ children, onPress }) => { // Add curly braces here
-    return ( // Add return statement here
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handlePress = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+
+    return (
+       // Add return statement here
+       <>
       <TouchableOpacity
         style={{
           top: scaleSize(-30),
@@ -25,7 +39,7 @@ const CustomTabBarButton = ({ children, onPress }) => { // Add curly braces here
           alignItems: "center",
           ...styles.shadow,
         }}
-        onPress={onPress}
+        onPress={handlePress}
       >
         <View
           style={{
@@ -40,6 +54,9 @@ const CustomTabBarButton = ({ children, onPress }) => { // Add curly braces here
           {children}
         </View>
       </TouchableOpacity>
+      <CreatePostModal visible={modalVisible} onClose={closeModal} />
+
+      </>
     ); // Add closing parenthesis here
   } // Add closing curly brace here
   
@@ -144,7 +161,7 @@ export default function BottomTabNavigator() {
 />
   <Tab.Screen
     name="Post"
-    component={PostScreen}
+    component={HomeScreen}
     options={{
       tabBarIcon: ({ color, size }) => (
           <Image
