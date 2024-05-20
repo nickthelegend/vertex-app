@@ -103,7 +103,7 @@ export default function RegisterScreen() {
       // console.log('User registration successful:', response.user.sessionId);
       // showToast('success', 'User registered successfully'); // Show success toast
       // Optionally, navigate to another screen upon successful registration
-      navigation.navigate('NavigationScreen');
+      navigation.navigate('VerifyYourAccount');
       setLoadingVisible(false);
 
     } catch (error) {

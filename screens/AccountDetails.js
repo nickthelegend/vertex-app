@@ -161,12 +161,12 @@ export default function AccountDetails() {
 
       <View style={{ marginTop: 10 }}>
 
-      <Text style={styles.subtitle}>Course Type</Text>
+      <Text style={styles.subtitle}>Course</Text>
         <Picker
           selectedValue={courseType}
           onValueChange={(itemValue) => handleCourseTypeChange(itemValue)}
         >
-          <Picker.Item label="Select Course Type" value="" />
+          <Picker.Item label="Select Course" value="" />
           
           <Picker.Item label="B.Tech" value="B.Tech" />
           <Picker.Item label="M.Tech" value="M.Tech" />
@@ -175,7 +175,7 @@ export default function AccountDetails() {
           <Picker.Item label="MBA (Master of Business Administration)" value="MBA" />
           
         </Picker>
-        <Text>Department</Text>
+        <Text style={styles.subtitle}>Department</Text>
         <Picker
           selectedValue={department}
           onValueChange={(itemValue) => handleDepartmentChange(itemValue)}
@@ -193,7 +193,7 @@ export default function AccountDetails() {
           {/* Add more departments as needed */}
         </Picker>
 
-        <Text style={{ marginTop: 10 }}>Course Type</Text>
+        <Text style={{ marginTop: 10,...styles.subtitle }}>Course Type</Text>
         <Picker
           selectedValue={courseType}
           onValueChange={(itemValue) => handleCourseTypeChange(itemValue)}
@@ -205,7 +205,7 @@ export default function AccountDetails() {
 
         {courseType === 'IDP/IDMP' && (
           <View>
-            <Text style={{ marginTop: 10 }}>Year of Study</Text>
+            <Text style={{ marginTop: 10,...styles.subtitle }}>Year of Study</Text>
             <Picker
               selectedValue={yearOfStudy}
               onValueChange={(itemValue) => handleYearOfStudyChange(itemValue)}
@@ -219,7 +219,7 @@ export default function AccountDetails() {
         )}
         {courseType === 'Regular' && (
           <View>
-            <Text style={{ marginTop: 10 }}>Year of Study</Text>
+            <Text style={{ marginTop: 10,...styles.subtitle }}>Year of Study</Text>
             <Picker
               selectedValue={yearOfStudy}
               onValueChange={(itemValue) => handleYearOfStudyChange(itemValue)}
@@ -231,7 +231,7 @@ export default function AccountDetails() {
             </Picker>
           </View>
         )}
-        <Text style={{ marginTop: 10 }}>Graduation Year</Text>
+        <Text style={{ marginTop: 10,...styles.subtitle }}>Graduation Year</Text>
         <Picker
           selectedValue={graduationYear}
           onValueChange={(itemValue) => handleGraduationYearChange(itemValue)}
@@ -262,7 +262,7 @@ export default function AccountDetails() {
 
         <Text>Student ID Card</Text>
 
-        {selectedImage && <View>
+        {selectedImage && <View style={{justifyContent:"center",alignItems:"center"}}>
         
         
         <Image source={{ uri: selectedImage }} style={{ width: 300, height: 400, marginTop: 20,resizeMode:"contain" }}
@@ -302,6 +302,39 @@ justifyContent:'space-between'
 
         </View>
       </TouchableOpacity>}
+
+      {selectedImage&& <TouchableOpacity onPress={openCamera}>
+
+<View style={{
+  borderWidth: 1,
+// borderColor: '#bbbbbb', // Set border color to transparent
+// borderStyle: 'dashed', // Set border style to dashed
+borderRadius: 20, // Set border radius to 0 for sharp edges
+// padding: 10, // Optional: Set padding
+// borderWidth:2,
+marginRight:20,
+marginTop:10,
+backgroundColor: '#1e41be',
+// paddingHorizontal:30,
+paddingHorizontal:30,
+paddingVertical:20,
+// justifyContent:'space-between'
+
+  }}
+  
+  
+  >
+
+  <Text style={{
+    fontSize:20,
+    color: '#fff',
+    // fontFamily:''
+    textAlign:'center'
+  }}>Retake</Text>
+  {/* <MaterialCommunityIcons name="upload" size={24} color="#868686" /> */}
+
+  </View>
+</TouchableOpacity>}
        {/* <View>
 
         <Text style={{

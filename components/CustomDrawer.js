@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons'; // Import FontAwesome icon set from Expo
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for icons
+import { logoutUser } from "../utils/FireBaseFunctions";
 
 const CustomDrawer = (props) => {
     const navigation = useNavigation();
@@ -122,7 +123,12 @@ const CustomDrawer = (props) => {
          
         
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={async()=>{
+        await logoutUser().then(()=>navigation.reset({
+      index: 0, // Set the index of the screen to navigate to
+      routes: [{ name: 'Login' }], // Set the route to navigate to (Login screen)
+    }));
+      }}>
       <View style={{flexDirection: "row",alignItems: "center",marginBottom: Spacing*2}}>
       <Ionicons name="log-out" color={'black'} size={24} />
          <Text style={{fontFamily: 'Comfortaa',marginLeft: 10}}> Sign Out</Text>

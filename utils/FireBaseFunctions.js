@@ -3,6 +3,7 @@ import uuid from 'react-native-uuid'; // Import uuid
 
 // Import Firebase database
 import { getFirestore, collection, doc, setDoc, query, where, getDocs } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { app } from '../services/config'
 const database = getFirestore(app)
 // import { firebase } from '@react-native-firebase/firestore';
@@ -49,7 +50,7 @@ export async function registerUser(userInfo) {
     const userDoc = doc(usersCollection, userId);
     
     // Set user information in the document
-    await setDoc(userDoc, {
+    const registrationResult = await setDoc(userDoc, {
       userId,
       username: userInfo.username,
       password: userInfo.password,
@@ -59,10 +60,32 @@ export async function registerUser(userInfo) {
       friendsList: [], // Initialize empty array for friends list
       is_verified: userInfo.is_verified || false, // Default to false if not provided
       profilepic: userInfo.profilepic || '', // Default to empty string if not provided
-      verifyDocument: userInfo.verifyDocument || '' // Default to empty string if not provided
-    });
+      verifyDocument: userInfo.verifyDocument || '', // Default to empty string if not provided
+      fullName : userInfo.fullname || '',
+      streetAddress: userInfo.streetAddress || '',
+      city: userInfo.city || '',
+      state: userInfo.state || '',
+      postalCode: userInfo.postalCode || '',
+      course: '',
+      courseDepartment: '',
+      courseType: '',
+      yearOfStudy: '',
+      graduationYear: '',
+      posts: [],
+      bio: '',
+
+
+    })
+    console.log(registrationResult)
     
-    console.log('User registered successfully!');
+      // If registration was successful, save user information to AsyncStorage
+      await AsyncStorage.setItem('user', JSON.stringify(registrationResult));
+      console.log( JSON.stringify(userInfo))
+      // console.log('User registered successfully!');
+    // } else {
+    //   console.error('Error registering user:', 'Registration failed');
+    //   throw new Error('Registration failed'); 
+    // }
   } catch (error) {
     console.error('Error registering user:', error.message);
     
@@ -95,6 +118,8 @@ export async function loginUser(username, password) {
       // Check if the password matches
       if (userData.password === password) {
         console.log('Login successful!');
+        AsyncStorage.setItem('user', JSON.stringify(userData));
+        return userData;
         // You can return user data or perform any other actions here
       } else {
         throw new Error('Incorrect password');
@@ -103,5 +128,29 @@ export async function loginUser(username, password) {
   } catch (error) {
     console.error('Error logging in:', error.message);
     throw error; // Rethrow the error for handling in the calling code
+  }
+}
+
+
+export async function checkUserLoggedIn() {
+  try {
+    const userData = await AsyncStorage.getItem('user');
+    if (userData) {
+      return JSON.parse(userData);
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error checking login state:', error.message);
+    return null;
+  }
+}
+
+export async function logoutUser() {
+  try {
+    await AsyncStorage.removeItem('user');
+    console.log('User logged out');
+  } catch (error) {
+    console.error('Error logging out:', error.message);
   }
 }
