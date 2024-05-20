@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, PixelRatio, Dimensions,Image } from 'react-native';
+import { View, Text, StyleSheet, PixelRatio, Dimensions,Image,Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 import { useFonts } from "expo-font";
@@ -16,8 +16,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 // import BottomSheetModal from '../components/BottomModalSheet';
 import CreatePostModal from '../components/BottomModalSheet';
 const Tab = createBottomTabNavigator();
-const CustomTabBarButton = ({ children, onPress }) => { // Add curly braces here
-
+const CustomTabBarButton = ({ children, onPress }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handlePress = () => {
@@ -28,38 +27,50 @@ const CustomTabBarButton = ({ children, onPress }) => { // Add curly braces here
     setModalVisible(false);
   };
 
-
-    return (
-       // Add return statement here
-       <>
+  return (
+    <>
       <TouchableOpacity
         style={{
-          top: scaleSize(-30),
-          justifyContent: "center",
-          alignItems: "center",
+          top: -30,
+          justifyContent: 'center',
+          alignItems: 'center',
           ...styles.shadow,
         }}
         onPress={handlePress}
       >
         <View
           style={{
-            width: scaleSize(70),
-            height: scaleSize(70),
-            borderRadius: scaleSize(35),
-            backgroundColor: "#1d40bd",
-            alignItems: "center",
-            justifyContent: "center",
+            width: 70,
+            height: 70,
+            borderRadius: 35,
+            backgroundColor: '#1d40bd',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {children}
         </View>
       </TouchableOpacity>
-      <CreatePostModal visible={modalVisible} onClose={closeModal} />
 
-      </>
-    ); // Add closing parenthesis here
-  } // Add closing curly brace here
-  
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={closeModal}
+        >
+          <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
+            <CreatePostModal visible={modalVisible} onClose={closeModal} />
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+    </>
+  );
+};
 export default function BottomTabNavigator() {
     const isFocused = useIsFocused(); // Check if the screen is focused
     const [fontsLoaded] = useFonts({

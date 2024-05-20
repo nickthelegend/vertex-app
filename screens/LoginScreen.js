@@ -68,6 +68,8 @@ try {
   // showToast('error', 'User registration failed'); // Show error toast
   setLoadingVisible(false);
 
+  setPasswordError('Incorrect Password')
+
 }
 setLoadingVisible(false);
 
@@ -147,14 +149,8 @@ console.log('Password:', password);
                 onChangeText={setRollNumber}
               />
 
-              <CustomTextField
-                hint="Password"
-                secureTextEntry={true}
-                drawableStart={
-                  <MaterialIcons name="password" size={24} color="black" />
-                }
-                onChangeText={setPassword}
-              />
+<CustomTextField hint="Password" secureTextEntry={true} value={password} onChangeText={setPassword} drawableStart={<MaterialIcons name="password" size={24} color="black" />} />
+              {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}
               <View
                 style={{ flexDirection: "row", justifyContent: "flex-end" }}
               >

@@ -40,7 +40,11 @@ const CreatePostModal = ({ visible, onClose }) => {
       animationType="none"
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPress={onClose}
+      >
         <Animated.View style={[styles.modalContainer, { transform: [{ translateY: slideAnim }] }]}>
           <Text style={styles.modalText}>Create Post</Text>
           <TouchableOpacity onPress={() => { onClose(); /* Navigate to Create Post Publicly screen */ }} style={styles.optionButton}>
@@ -49,14 +53,12 @@ const CreatePostModal = ({ visible, onClose }) => {
           <TouchableOpacity onPress={() => { onClose(); /* Navigate to Create Post in Community screen */ }} style={styles.optionButton}>
             <Text style={styles.optionButtonText}>Inside a Community</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Cancel</Text>
-          </TouchableOpacity>
         </Animated.View>
-      </View>
+      </TouchableOpacity>
     </Modal>
   );
 };
+
 
 const styles = StyleSheet.create({
   modalOverlay: {
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 16,
-    color: 'blue',
+    color: 'white',
   },
 });
 
