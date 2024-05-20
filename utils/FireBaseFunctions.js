@@ -2,7 +2,7 @@
 import uuid from 'react-native-uuid'; // Import uuid
 
 // Import Firebase database
-import { getFirestore, collection, doc, setDoc, query, where, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, query, where, getDocs,updateDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { app } from '../services/config'
 const database = getFirestore(app)
@@ -76,11 +76,10 @@ export async function registerUser(userInfo) {
 
 
     })
-    console.log(registrationResult)
+    // console.log(registrationResult)
     
       // If registration was successful, save user information to AsyncStorage
-      await AsyncStorage.setItem('user', JSON.stringify(registrationResult));
-      console.log( JSON.stringify(userInfo))
+      await AsyncStorage.setItem('user', JSON.stringify(userInfo));
       // console.log('User registered successfully!');
     // } else {
     //   console.error('Error registering user:', 'Registration failed');
@@ -100,7 +99,7 @@ export async function loginUser(username, password) {
     const usersCollection = collection(database, 'users');
 
     // Create a query to find the document with the provided username
-    const userQuery = query(usersCollection, where('username', '==', username));
+      
     
     // Get the documents that match the query
     const querySnapshot = await getDocs(userQuery);
@@ -154,3 +153,54 @@ export async function logoutUser() {
     console.error('Error logging out:', error.message);
   }
 }
+
+export async function updateUserInfo  (userInfo) {
+  try {
+    // Retrieve the current logged-in user's username from AsyncStorage
+    const userDataString = await AsyncStorage.getItem('user');
+    if (!userDataString) {
+      console.error('User data not found in AsyncStorage');
+      return;
+    }
+    const userData = JSON.parse(userDataString);
+    const username = userData.username;
+
+    // Find the user in the Firestore collection
+    const usersCollection = collection(database, 'users');
+    const userQuery = query(usersCollection, where('username', '==', username));
+    const querySnapshot = await getDocs(userQuery);
+
+    if (querySnapshot.empty) {
+      console.error('User not found in database');
+      return;
+    }
+
+    querySnapshot.forEach(async (doc) => {
+      const userId = doc.id;
+      // Update user's information
+      await updateDoc(doc.ref, {
+        password: userInfo.password || doc.data().password,
+        email: userInfo.email || doc.data().email,
+        phonenumber: userInfo.phonenumber || doc.data().phonenumber,
+        is_verified: userInfo.is_verified || doc.data().is_verified || false,
+        profilepic: userInfo.profilepic || doc.data().profilepic || '',
+        verifyDocument: userInfo.verifyDocument || doc.data().verifyDocument || '',
+        fullName: userInfo.fullName || doc.data().fullName || '',
+        streetAddress: userInfo.streetAddress || doc.data().streetAddress || '',
+        city: userInfo.city || doc.data().city || '',
+        state: userInfo.state || doc.data().state || '',
+        postalCode: userInfo.postalCode || doc.data().postalCode || '',
+        course: userInfo.course || '',
+        courseDepartment: userInfo.courseDepartment || '',
+        courseType: userInfo.courseType || '',
+        yearOfStudy: userInfo.yearOfStudy || '',
+        graduationYear: userInfo.graduationYear || '',
+        bio: userInfo.bio || doc.data().bio || '',
+      });
+    });
+
+    console.log('User information updated successfully');
+  } catch (error) {
+    console.error('Error updating user information:', error);
+  }
+};

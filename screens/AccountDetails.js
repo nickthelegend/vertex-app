@@ -9,6 +9,8 @@ import VerificationScreen from "./VerificationScreen";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
+import { updateUserInfo } from "../utils/FireBaseFunctions";
+
 export default function AccountDetails() {
 
     const [selectedImage, setSelectedImage] = useState(null);
@@ -24,7 +26,7 @@ export default function AccountDetails() {
         setHasGalleryPermission(galleryPermission.status === 'granted');
       })();
     }, []);
-  
+    
     const openCamera = async () => {
       if (!hasCameraPermission) {
         alert('Camera permission required!');
@@ -55,7 +57,14 @@ export default function AccountDetails() {
       // This effect runs every time selectedImage changes
       console.log(selectedImage);
     }, [selectedImage]);
+
+    const [fullName, setFullName] = useState('');
+    const [streetAddress, setStreetAddress] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [postalCode, setPostalCode] = useState('');  
     const [department, setDepartment] = useState('');
+    const [course, setCourse] = useState('');
   const [courseType, setCourseType] = useState('');
   const [yearOfStudy, setYearOfStudy] = useState('');
   const [graduationYear, setGraduationYear] = useState('');
@@ -63,7 +72,9 @@ export default function AccountDetails() {
   const handleDepartmentChange = (value) => {
     setDepartment(value);
   };
-
+  const handleCourseChange = (value) => {
+    setCourse(value);
+  };
   const handleCourseTypeChange = (value) => {
     setCourseType(value);
   };
@@ -75,6 +86,78 @@ export default function AccountDetails() {
   const handleGraduationYearChange = (value) => {
     setGraduationYear(value);
   };
+
+
+  const submitData = async()=> {
+
+    const isNotEmpty = (value) => value.trim() !== '';
+  const isAlphaNumeric = (value) => /^[a-zA-Z0-9\s]*$/.test(value);
+
+  // if (!isNotEmpty(fullName)) {
+  //   console.error('Full Name is required');
+  //   return false;
+  // }
+  // if (!isNotEmpty(streetAddress)) {
+  //   console.error('Street Address is required');
+  //   return false;
+  // }
+  // if (!isNotEmpty(city)) {
+  //   console.error('City is required');
+  //   return false;
+  // }
+  // if (!isNotEmpty(state)) {
+  //   console.error('State is required');
+  //   return false;
+  // }
+  // if (!isNotEmpty(postalCode)) {
+  //   console.error('Postal Code is required');
+  //   return false;
+  // }
+
+  // if (!isAlphaNumeric(department)) {
+  //   console.error('Department should be alphanumeric');
+  //   return false;
+  // }
+  // if (!isAlphaNumeric(course)) {
+  //   console.error('Course should be alphanumeric');
+  //   return false;
+  // }
+  // if (!isAlphaNumeric(courseType)) {
+  //   console.error('Course Type should be alphanumeric');
+  //   return false;
+  // }
+  // if (!isAlphaNumeric(yearOfStudy)) {
+  //   console.error('Year of Study should be alphanumeric');
+  //   return false;
+  // }
+  // if (!isAlphaNumeric(graduationYear)) {
+  //   console.error('Graduation Year should be alphanumeric');
+  //   return false;
+  // }
+
+  const userInfo = {
+    fullName,
+    streetAddress,
+    city,
+    state,
+    postalCode,
+    department,
+    course,
+    courseType,
+    yearOfStudy,
+    graduationYear,
+    // Add other fields as needed
+  };
+
+  try {
+    // Call the updateUserInfo function to update the user's information in the database
+    await updateUserInfo(userInfo);
+    console.log('User information updated successfully');
+  } catch (error) {
+    console.error('Error updating user information:', error);
+  }
+
+  }
 
   const buttonTextStyle = {
     color: "#fff",
@@ -131,11 +214,11 @@ export default function AccountDetails() {
 
               <View style={{ marginTop: 10 }}>
 
-              <TextFieldPersonal text={"Full Name"}/ >
-              <TextFieldPersonal text={"Street Address"}/ >
-              <TextFieldPersonal text={"City"}/ >
-              <TextFieldPersonal text={"State"}/ >
-              <TextFieldPersonal text={"Postal Code"}/ >
+              <TextFieldPersonal text={"Full Name"} onChange={setFullName} />
+      <TextFieldPersonal text={"Street Address"} onChange={setStreetAddress} />
+      <TextFieldPersonal text={"City"} onChange={setCity} />
+      <TextFieldPersonal text={"State"} onChange={setState} />
+      <TextFieldPersonal text={"Postal Code"} onChange={setPostalCode} />
             <Text style={{marginTop:20,
                 fontStyle:"italic"
             }}>By continuing, you acknowledge that Vertex will handle your information as set out in the <Text style={{textDecorationLine :'underline',color: 'blue',}}>Privacy Policy</Text> including why we collect it, how we use it and your rights.</Text>
@@ -163,8 +246,8 @@ export default function AccountDetails() {
 
       <Text style={styles.subtitle}>Course</Text>
         <Picker
-          selectedValue={courseType}
-          onValueChange={(itemValue) => handleCourseTypeChange(itemValue)}
+          selectedValue={course}
+          onValueChange={(itemValue) => handleCourseChange(itemValue)}
         >
           <Picker.Item label="Select Course" value="" />
           
@@ -256,6 +339,7 @@ export default function AccountDetails() {
             labelFontSize={20} // Increase font size here
             previousBtnStyle={previousBtnStyle}
             nextBtnStyle={nextBtnStyle}
+            onSubmit={submitData}
           >
               <View style={{ marginLeft: 20, paddingBottom: 10 }}>
         <Text style={{ fontSize: 30 ,fontFamily: "Poppins-SemiBold"}}>Upload Document</Text>
