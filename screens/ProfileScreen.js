@@ -55,7 +55,7 @@ const renderButton = (text, onPress, isActive) => (
   </TouchableOpacity>
 );
 export default function ProfileScreen() {
-  const [activeButton, setActiveButton] = useState('inbox'); // State to track active button
+  const [activeButton, setActiveButton] = useState('posts'); // State to track active button
   const handlePosts= ()=>{
     setActiveButton('posts')
   }
@@ -582,13 +582,13 @@ export default function ProfileScreen() {
             </Text>
           </View>
               
-              <View style={{backgroundColor:'red', flexDirection:'row'}}>
+              <View style={{backgroundColor:'transparent', flexDirection:'row'}}>
 
               {renderButton('Posts', handlePosts, activeButton === 'posts')}
               {renderButton('Reels', handleReels, activeButton === 'reels')}
               
               </View>
-              <View style={{flex:1,backgroundColor:'green'}}>
+              <View style={{flex:1,backgroundColor:'transparent'}}>
               {activeButton == 'posts' ? <PhotosScreen/>:<ReelsScreen/>}
               </View>
               
