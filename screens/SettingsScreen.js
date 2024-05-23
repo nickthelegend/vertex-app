@@ -11,7 +11,7 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
         {/* <Image source={require('./assets/logo.png')} style={styles.logo} /> */}
-        <MaterialCommunityIcons name="menu" size={24} color="black" style={styles.menuIcon} onPress={()=>{            navigation.openDrawer()}}/>
+        <MaterialCommunityIcons name="arrow-left" size={30} color="black" style={styles.menuIcon} onPress={()=>{            navigation.goBack()}}/>
         <Text style={styles.headerText}>Settings</Text>
 
       </View>
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems:'center',
     marginBottom: 10,
+    // alignContent:'center'
   },
   headerText: {
     fontSize: 30,
