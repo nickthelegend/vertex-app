@@ -10,6 +10,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
 import { updateUserInfo } from "../utils/FireBaseFunctions";
+import VerificationDialogueBox from "../components/VerificationDialogueBox";
 
 export default function AccountDetails() {
 
@@ -68,7 +69,15 @@ export default function AccountDetails() {
   const [courseType, setCourseType] = useState('');
   const [yearOfStudy, setYearOfStudy] = useState('');
   const [graduationYear, setGraduationYear] = useState('');
+    const [verifyDialogueBox,setVerifyDialogueBox] = useState('');
+    const openModal = () => {
+      setVerifyDialogueBox(true)
 
+    };
+  
+    const closeModal = () => {
+setVerifyDialogueBox(false)
+    };
   const handleDepartmentChange = (value) => {
     setDepartment(value);
   };
@@ -88,11 +97,17 @@ export default function AccountDetails() {
   };
 
 
+
+  const onClickSubmitButton = ()=>{
+    setVerifyDialogueBox(true);
+  }
   const submitData = async()=> {
 
     const isNotEmpty = (value) => value.trim() !== '';
   const isAlphaNumeric = (value) => /^[a-zA-Z0-9\s]*$/.test(value);
+    
 
+  
   // if (!isNotEmpty(fullName)) {
   //   console.error('Full Name is required');
   //   return false;
@@ -339,7 +354,7 @@ export default function AccountDetails() {
             labelFontSize={20} // Increase font size here
             previousBtnStyle={previousBtnStyle}
             nextBtnStyle={nextBtnStyle}
-            onSubmit={submitData}
+            onSubmit={onClickSubmitButton}
           >
               <View style={{ marginLeft: 20, paddingBottom: 10 }}>
         <Text style={{ fontSize: 30 ,fontFamily: "Poppins-SemiBold"}}>Upload Document</Text>
@@ -419,6 +434,14 @@ paddingVertical:20,
 
   </View>
 </TouchableOpacity>}
+
+<VerificationDialogueBox
+        visible={verifyDialogueBox}
+        onClose={closeModal}
+        title="Verification"
+        message="Are you sure the provided details are correct and complete?"
+        onPressYes={submitData}
+      />
        {/* <View>
 
         <Text style={{
