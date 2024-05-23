@@ -60,15 +60,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
   menuIcon: {
     marginRight: 10,
   },
   headerText: {
-    fontSize: 20,
+    fontSize: 30,
     fontFamily: 'Poppins-SemiBold',
     color: '#333',
   },
