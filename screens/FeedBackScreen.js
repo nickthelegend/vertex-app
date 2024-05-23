@@ -32,8 +32,9 @@ export default function FeedbackScreen() {
       <View style={styles.headerContainer}>
         {/* <Image source={require('./assets/logo.png')} style={styles.logo} /> */}
         <MaterialCommunityIcons name="menu" size={24} color="black" style={styles.menuIcon} onPress={()=>{            navigation.openDrawer()}}/>
+        <Text style={styles.headerText}>Send us your feedback!</Text>
+
       </View>
-      <Text style={styles.headerText}>Send us your feedback!</Text>
       <Text style={styles.subHeaderText}>We value your input and would love to hear from you.</Text>
       <AirbnbRating
         count={5}
@@ -63,13 +64,13 @@ export default function FeedbackScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 20,
+    paddingVertical: 5,
     paddingHorizontal: 20,
     backgroundColor: '#f5f5f5',
   },
   headerContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems:'center',
     marginBottom: 10,
   },
   logo: {
@@ -77,14 +78,12 @@ const styles = StyleSheet.create({
     height: 50, // Set the height of the logo
     marginRight: 10, // Add some space between the logo and the menu icon
   },
-  menuIcon: {
-    marginRight: 'auto', // Push the icon to the right edge of the container
-  },
   headerText: {
     fontSize: 30,
     fontFamily: "Poppins-SemiBold",
     color: '#333',
-    marginBottom: 10,
+    marginLeft:10
+    // marginBottom: 10,
   },
   subHeaderText: {
     fontSize: 16,

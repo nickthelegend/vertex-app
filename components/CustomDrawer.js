@@ -115,7 +115,7 @@ const CustomDrawer = (props) => {
         </View>
       </DrawerContentScrollView>
       <View style={styles.footer}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={()=>{navigation.navigate("Settings")}}>
       <View style={{flexDirection: "row",alignItems: "center",marginBottom: Spacing*2}}>
       <Ionicons name="settings" color={'black'} size={24} />
          <Text style={{fontFamily: 'Comfortaa',marginLeft: 10}}> Settings</Text>

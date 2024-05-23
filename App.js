@@ -22,6 +22,7 @@ import VerificationScreen from './screens/VerificationScreen';
 import VerifyYourAccount from './screens/VerifyYourAccount';
 import AccountDetails from './screens/AccountDetails';
 import 'react-native-get-random-values'
+import SettingsScreen from './screens/SettingsScreen';
 
 const Stack = createStackNavigator();
 
@@ -53,7 +54,8 @@ export default function App() {
         <Stack.Screen name="Verification" component={VerificationScreen}/>
         <Stack.Screen name="VerifyYourAccount" component={VerifyYourAccount}/>
         <Stack.Screen name="AccountDetails" component={AccountDetails}/>
-        
+        <Stack.Screen name="Settings" component={SettingsScreen}/>
+
       </Stack.Navigator>
     </NavigationContainer>
   );
