@@ -48,9 +48,7 @@ export async function registerUser(userInfo) {
     
     // Create a document reference for the new user
     const userDoc = doc(usersCollection, userId);
-    
-    // Set user information in the document
-    const registrationResult = await setDoc(userDoc, {
+    const userDataObject = {
       userId,
       username: userInfo.username,
       password: userInfo.password,
@@ -75,11 +73,13 @@ export async function registerUser(userInfo) {
       bio: '',
 
 
-    })
+    }
+    // Set user information in the document
+    const registrationResult = await setDoc(userDoc,userDataObject )
     // console.log(registrationResult)
     
       // If registration was successful, save user information to AsyncStorage
-      await AsyncStorage.setItem('user', JSON.stringify(userInfo));
+      await AsyncStorage.setItem('user', JSON.stringify(userDataObject));
       // console.log('User registered successfully!');
     // } else {
     //   console.error('Error registering user:', 'Registration failed');
@@ -134,8 +134,36 @@ export async function loginUser(username, password) {
 export async function checkUserLoggedIn() {
   try {
     const userData = await AsyncStorage.getItem('user');
-    if (userData) {
-      return JSON.parse(userData);
+
+
+    const jsonObj = JSON.parse(userData)
+    console.log(jsonObj.userId)
+
+    if (jsonObj.userId) {
+      const usersCollection = collection(database, 'users');
+      const userQuery = query(usersCollection, where('userId', '==', jsonObj.userId));
+      const querySnapshot = await getDocs(userQuery);
+
+      if (!querySnapshot.empty) {
+        // Assuming there is only one document for the userId
+        const userDoc = querySnapshot.docs[0];
+        const firebaseUserData = userDoc.data();
+
+        // Step 5: Update the is_verified field to true in the Firebase user data
+        // firebaseUserData.is_verified = true;
+
+        // Optional: Update the user document in Firebase if necessary
+        // await setDoc(userDoc.ref, firebaseUserData);
+
+        // Step 6: Store the updated data back into AsyncStorage
+        await AsyncStorage.setItem('user', JSON.stringify(firebaseUserData));
+
+        console.log('User verification status updated successfully');
+        return firebaseUserData;
+      } else {
+        console.log('No user data found in Firebase for the given userId');
+        return null;
+      }
     } else {
       return null;
     }
@@ -163,6 +191,11 @@ export async function updateUserInfo  (userInfo) {
       return;
     }
     const userData = JSON.parse(userDataString);
+    userData.is_verified="true";
+    const updatedUser = JSON.stringify(userData);
+
+    await AsyncStorage.setItem('user', updatedUser);
+
     const username = userData.username;
 
     // Find the user in the Firestore collection
@@ -175,14 +208,16 @@ export async function updateUserInfo  (userInfo) {
       return;
     }
 
+    
+
+
     querySnapshot.forEach(async (doc) => {
-      const userId = doc.id;
-      // Update user's information
-      await updateDoc(doc.ref, {
+
+      const updatedData = {
         password: userInfo.password || doc.data().password,
         email: userInfo.email || doc.data().email,
         phonenumber: userInfo.phonenumber || doc.data().phonenumber,
-        is_verified: userInfo.is_verified || doc.data().is_verified || false,
+        is_verified: true,
         profilepic: userInfo.profilepic || doc.data().profilepic || '',
         verifyDocument: userInfo.verifyDocument || doc.data().verifyDocument || '',
         fullName: userInfo.fullName || doc.data().fullName || '',
@@ -196,7 +231,12 @@ export async function updateUserInfo  (userInfo) {
         yearOfStudy: userInfo.yearOfStudy || '',
         graduationYear: userInfo.graduationYear || '',
         bio: userInfo.bio || doc.data().bio || '',
-      });
+      }
+      
+      const userId = doc.id;
+      console.log(userId)
+      // Update user's information
+      await updateDoc(doc.ref, updatedData );
     });
 
     console.log('User information updated successfully');

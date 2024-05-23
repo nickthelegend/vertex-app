@@ -17,7 +17,7 @@ export default function SplashScreen({ navigation }) {
     const timer = setTimeout(async () => {
       // After 3 seconds, check the login status
       const loggedInUser = await checkUserLoggedIn();
-      if (loggedInUser) {
+      if (loggedInUser.is_verified) {
         console.log(loggedInUser)
         // If user is logged in, navigate to HomeScreen
         navigation.reset({
