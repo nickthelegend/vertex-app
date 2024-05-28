@@ -3,7 +3,9 @@ import { View, Text,StyleSheet,Modal,TouchableOpacity } from 'react-native';
 
 export default function LogoutModal({ isVisible, onClose, onLogout }) {
     return (
-      <Modal isVisible={isVisible} onBackdropPress={onClose}>
+      <Modal isVisible={isVisible} transparent={true}
+      animationType="slide"
+      onRequestClose={onClose}>
         <View style={styles.modalContainer}>
           <Text style={styles.title}>Logout</Text>
           <Text style={styles.message}>Are you sure you want to logout?</Text>

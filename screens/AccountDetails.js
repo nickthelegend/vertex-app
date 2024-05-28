@@ -11,9 +11,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
 import { updateUserInfo } from "../utils/FireBaseFunctions";
 import VerificationDialogueBox from "../components/VerificationDialogueBox";
+import { useNavigation } from "@react-navigation/native";
 
 export default function AccountDetails() {
-
+    const navigation = useNavigation()
     const [selectedImage, setSelectedImage] = useState(null);
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
     const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
@@ -168,6 +169,7 @@ setVerifyDialogueBox(false)
     // Call the updateUserInfo function to update the user's information in the database
     await updateUserInfo(userInfo);
     console.log('User information updated successfully');
+    navigation.navigate("NavigationScreen")
   } catch (error) {
     console.error('Error updating user information:', error);
   }

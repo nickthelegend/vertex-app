@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import { View, Image, Text, ImageBackground, StyleSheet } from "react-native";
 import {
   DrawerContentScrollView,
@@ -14,8 +14,10 @@ import { FontAwesome } from '@expo/vector-icons'; // Import FontAwesome icon set
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for icons
 import { logoutUser } from "../utils/FireBaseFunctions";
+import LogoutModal from "./LogoutModal";
 
 const CustomDrawer = (props) => {
+  
     const navigation = useNavigation();
     const handlePress = () => {
         // Navigate to the ProfileScreen within the stack navigator
@@ -23,6 +25,7 @@ const CustomDrawer = (props) => {
       };
   return (
     <View style={{ flex: 1 }}>
+    
       <DrawerContentScrollView
         {...props}
         contentContainerStyle={styles.drawerContent}
@@ -110,6 +113,7 @@ const CustomDrawer = (props) => {
             </View>
           </TouchableOpacity> */}
         </View>
+        
         <View style={styles.drawerItemsContainer}>
           <DrawerItemList {...props} />
         </View>
@@ -137,7 +141,9 @@ const CustomDrawer = (props) => {
         
       </TouchableOpacity>
         <Text style={styles.footerText}>Made With ❤️ In JNTU</Text>
+        
       </View>
+      
     </View>
   );
 };

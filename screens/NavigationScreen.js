@@ -1,6 +1,6 @@
 // NavigationScreen.js
 
-import React from "react";
+import React,{useState} from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -14,9 +14,20 @@ import AboutScreen from "./AboutScreen";
 import FeedbackScreen from "./FeedBackScreen";
 import ContactUsScreen from "./ContactUsScreen";
 import TermsOfServiceScreen from './TermsOfServiceScreen'
+import LogoutModal from "../components/LogoutModal";
 const Drawer = createDrawerNavigator();
 
 function NavigationScreen() {
+
+  const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
+
+  const toggleLogoutModal = () => {
+    setIsLogoutModalVisible(!isLogoutModalVisible);
+  };
+
+  const handleLogout = () =>{
+
+  }
   return (
       <Drawer.Navigator
         screenOptions={{
@@ -83,7 +94,7 @@ function NavigationScreen() {
           }}
         />
       
-        
+
       </Drawer.Navigator>
   );
 }

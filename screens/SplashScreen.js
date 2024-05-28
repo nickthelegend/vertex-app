@@ -16,19 +16,28 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(async () => {
       // After 3 seconds, check the login status
-      const loggedInUser = await checkUserLoggedIn();
-      if (loggedInUser.is_verified) {
-        console.log(loggedInUser)
-        // If user is logged in, navigate to HomeScreen
+      try {
+        const loggedInUser = await checkUserLoggedIn();
+        if (loggedInUser && loggedInUser.is_verified) {
+          console.log(loggedInUser);
+          // If user is logged in and verified, navigate to HomeScreen
+          navigation.reset({
+            index: 0, // Set the index of the screen to navigate to
+            routes: [{ name: 'NavigationScreen' }], // Set the route to navigate to (Home screen)
+          });
+        } else {
+          // If user is not verified, navigate to OnBoardingScreen
+          navigation.reset({
+            index: 0, // Set the index of the screen to navigate to
+            routes: [{ name: 'OnBoarding' }], // Set the route to navigate to (OnBoarding screen)
+          });
+        }
+      } catch (error) {
+        // If there's an error (e.g., user is not logged in), navigate to OnBoardingScreen
+        console.error("Error checking user login status:", error);
         navigation.reset({
           index: 0, // Set the index of the screen to navigate to
-          routes: [{ name: 'NavigationScreen' }], // Set the route to navigate to (Login screen)
-        });
-      } else {
-        // If user is not logged in, navigate to OnBoardingScreen
-        navigation.reset({
-          index: 0, // Set the index of the screen to navigate to
-          routes: [{ name: 'OnBoarding' }], // Set the route to navigate to (Login screen)
+          routes: [{ name: 'OnBoarding' }], // Set the route to navigate to (OnBoarding screen)
         });
       }
     }, 3000); // 3000 milliseconds = 3 seconds
