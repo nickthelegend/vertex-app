@@ -99,7 +99,7 @@ export async function loginUser(username, password) {
     const usersCollection = collection(database, 'users');
 
     // Create a query to find the document with the provided username
-      
+    const userQuery = query(usersCollection, where('username', '==', username));
     
     // Get the documents that match the query
     const querySnapshot = await getDocs(userQuery);
@@ -110,20 +110,18 @@ export async function loginUser(username, password) {
     }
     
     // Since usernames are unique, there should be only one document
-    querySnapshot.forEach((doc) => {
-      // Retrieve user data
-      const userData = doc.data();
-      
-      // Check if the password matches
-      if (userData.password === password) {
-        console.log('Login successful!');
-        AsyncStorage.setItem('user', JSON.stringify(userData));
-        return userData;
-        // You can return user data or perform any other actions here
-      } else {
-        throw new Error('Incorrect password');
-      }
-    });
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data();
+    
+    // Check if the password matches
+    if (userData.password === password) {
+      console.log('Login successful!');
+      await AsyncStorage.setItem('user', JSON.stringify(userData));
+      return userData;
+      // You can return user data or perform any other actions here
+    } else {
+      throw new Error('Incorrect password');
+    }
   } catch (error) {
     console.error('Error logging in:', error.message);
     throw error; // Rethrow the error for handling in the calling code
@@ -133,38 +131,47 @@ export async function loginUser(username, password) {
 
 export async function checkUserLoggedIn() {
   try {
+    // Step 1: Retrieve user data from AsyncStorage
     const userData = await AsyncStorage.getItem('user');
 
+    // Step 2: Check if userData is not null and parse it
+    if (userData) {
+      const jsonObj = JSON.parse(userData);
+      console.log(jsonObj);
 
-    const jsonObj = JSON.parse(userData)
-    console.log(jsonObj.userId)
+      // Step 3: Check if jsonObj has a valid userId
+      if (jsonObj.userId) {
+        const usersCollection = collection(database, 'users');
+        const userQuery = query(usersCollection, where('userId', '==', jsonObj.userId));
+        const querySnapshot = await getDocs(userQuery);
 
-    if (jsonObj.userId) {
-      const usersCollection = collection(database, 'users');
-      const userQuery = query(usersCollection, where('userId', '==', jsonObj.userId));
-      const querySnapshot = await getDocs(userQuery);
+        // Step 4: Check if user data exists in Firebase
+        if (!querySnapshot.empty) {
+          // Assuming there is only one document for the userId
+          const userDoc = querySnapshot.docs[0];
+          const firebaseUserData = userDoc.data();
 
-      if (!querySnapshot.empty) {
-        // Assuming there is only one document for the userId
-        const userDoc = querySnapshot.docs[0];
-        const firebaseUserData = userDoc.data();
+          // Step 5: Optionally update the is_verified field in Firebase user data
+          // firebaseUserData.is_verified = true;
 
-        // Step 5: Update the is_verified field to true in the Firebase user data
-        // firebaseUserData.is_verified = true;
+          // Optional: Update the user document in Firebase if necessary
+          // await setDoc(userDoc.ref, firebaseUserData);
 
-        // Optional: Update the user document in Firebase if necessary
-        // await setDoc(userDoc.ref, firebaseUserData);
+          // Step 6: Store the updated data back into AsyncStorage
+          await AsyncStorage.setItem('user', JSON.stringify(firebaseUserData));
 
-        // Step 6: Store the updated data back into AsyncStorage
-        await AsyncStorage.setItem('user', JSON.stringify(firebaseUserData));
-
-        console.log('User verification status updated successfully');
-        return firebaseUserData;
+          console.log('User verification status updated successfully');
+          return firebaseUserData;
+        } else {
+          console.log('No user data found in Firebase for the given userId');
+          return null;
+        }
       } else {
-        console.log('No user data found in Firebase for the given userId');
+        console.log('No valid userId found in the stored user data');
         return null;
       }
     } else {
+      console.log('No user data found in AsyncStorage');
       return null;
     }
   } catch (error) {
