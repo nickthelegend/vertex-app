@@ -23,10 +23,32 @@ import VerifyYourAccount from './screens/VerifyYourAccount';
 import AccountDetails from './screens/AccountDetails';
 import 'react-native-get-random-values'
 import SettingsScreen from './screens/SettingsScreen';
+import { useFonts } from "expo-font";
 
 const Stack = createStackNavigator();
 
 export default function App() {
+
+  const [fontsLoaded] = useFonts({
+    AudioWideFont: require("./fonts/Audiowide-Regular.ttf"),
+    Comfortaa: require("./fonts/Comfortaa-VariableFont_wght.ttf"),
+    ComfortaaBold: require("./fonts/Comfortaa-Bold.ttf"),
+    Montserrat: require("./fonts/Montserrat-Bold.ttf"),
+    "Poppins-SemiBold": require("./fonts/Poppins-SemiBold.ttf"),
+    Baumans: require('./fonts/Baumans/Baumans-Regular.ttf'),
+    'Lato-Bold': require('./fonts/Lato/Lato-Bold.ttf'),
+    'Lato-Regular': require('./fonts/Lato/Lato-Regular.ttf'),
+    NotoSansGrantha: require('./fonts/Noto_Sans_Grantha/NotoSansGrantha-Regular.ttf'),
+    NotoSansKawi: require('./fonts/Noto_Sans_Kawi/NotoSansKawi-VariableFont_wght.ttf')
+
+
+
+  });
+
+  if (!fontsLoaded) {
+    // Return a loading indicator or null until fonts are loaded
+    return null;
+  }
   return (
     <NavigationContainer>
     
