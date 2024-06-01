@@ -24,6 +24,7 @@ import AccountDetails from './screens/AccountDetails';
 import 'react-native-get-random-values'
 import SettingsScreen from './screens/SettingsScreen';
 import { useFonts } from "expo-font";
+import CommunityPage from './screens/CommunityPage';
 
 const Stack = createStackNavigator();
 
@@ -52,7 +53,7 @@ export default function App() {
   return (
     <NavigationContainer>
     
-      <Stack.Navigator initialRouteName="Splash" screenOptions={({ route }) => ({
+      <Stack.Navigator initialRouteName="CommunityPage" screenOptions={({ route }) => ({
         headerShown: false,
         ...(route.name === 'CommunityScreen' || route.name === 'ServicesScreen' || route.name === 'ChatScreen' || route.name === 'PostScreen'
           ? { ...TransitionPresets.FadeFromBottomAndroid }
@@ -77,7 +78,7 @@ export default function App() {
         <Stack.Screen name="VerifyYourAccount" component={VerifyYourAccount}/>
         <Stack.Screen name="AccountDetails" component={AccountDetails}/>
         <Stack.Screen name="Settings" component={SettingsScreen}/>
-
+        <Stack.Screen name="CommunityPage" component={CommunityPage}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
