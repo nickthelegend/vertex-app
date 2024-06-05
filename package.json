@@ -59,7 +59,8 @@
     "react-native-scrollable-tab-view": "^1.0.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.2.0",
-    "react-native-uuid": "^2.0.2"
+    "react-native-uuid": "^2.0.2",
+    "react-native-maps": "1.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

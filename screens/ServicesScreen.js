@@ -13,11 +13,11 @@ import campus from '../images/campus.png';
 // import other images as needed
 
 const servicesData = [
-  { id: '1', title: 'University Map', uri: mapImage },
-  { id: '2', title: 'Order Food', uri: deliveryMan },
-  { id: '3', title: 'Opportunities', uri: opportunity },
-  { id: '4', title: 'Classifieds', uri: ads },
-  { id: '5', title: 'Alumni Connection', uri: campus },
+  { id: '1', title: 'University Map', uri: mapImage,route: "UniversityMap" },
+  { id: '2', title: 'Order Food', uri: deliveryMan , route: "OrderFood" },
+  { id: '3', title: 'Opportunities', uri: opportunity, route: "Opportunities" },
+  { id: '4', title: 'Classifieds', uri: ads, route: "Classifides" },
+  { id: '5', title: 'Alumni Connection', uri: campus , route: "Alumini"},
 ];
 
 export default function ServicesScreen() {
