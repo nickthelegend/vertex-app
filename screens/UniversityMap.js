@@ -490,6 +490,7 @@ longitudeDelta: 0.00080, // or any smaller value
     coordinate={marker.coordinate}
     title={marker.title}
     description={marker.description}
+    onPress={(e)=>onMarkerPress(e)}
   >
     <Animated.View style={{ alignItems: "center" }}>
       <Animated.Image
@@ -498,12 +499,12 @@ longitudeDelta: 0.00080, // or any smaller value
       />
       <Text style={{ fontSize: 12, textAlign: "center" }}>{marker.shortCut}</Text>
     </Animated.View>
-    <Callout>
+    {/* <Callout>
       <View style={styles.callout}>
         <Text style={styles.calloutTitle}>{marker.title}</Text>
         <Text>{marker.description}</Text>
       </View>
-    </Callout>
+    </Callout> */}
   </Marker>
 
 
