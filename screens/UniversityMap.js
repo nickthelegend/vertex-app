@@ -1,18 +1,11 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState,useEffect } from "react";
 import MapView from "react-native-maps";
-import {
-  StyleSheet,
-  View,
-  Image,
-  Text,
-  Dimensions,
-  Platform,
-} from "react-native";
+import { StyleSheet, View, Image, Text, Dimensions,Platform } from "react-native";
 import { Marker, Callout } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { Animated } from "react-native";
+import { Animated } from 'react-native';
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
@@ -151,7 +144,7 @@ const markers = [
       longitude: 78.39155620052485,
     },
     title: "Auditorium",
-    shortCut: "Auditorium",
+    shortCut : "Auditorium",
     description: "This is a Auditorium",
   },
   {
@@ -160,7 +153,7 @@ const markers = [
       longitude: 78.39123143495418,
     },
     title: "Classroom Complex",
-    shortCut: "CRC",
+    shortCut : "CRC",
     description: "This is classroom for all the first years",
   },
   {
@@ -169,43 +162,43 @@ const markers = [
       longitude: 78.39035603931258,
     },
     title: "Civil Department",
-    shortCut: "Civil",
+    shortCut : "Civil",
     description: "This is Civil Department",
   },
   {
     coordinate: {
       latitude: 17.49444038944259,
-      longitude: 78.39116207230877,
+      longitude:  78.39116207230877,
     },
     title: "Mechanical Department",
-    shortCut: "Mechanical Department",
+    shortCut : "Mechanical Department",
     description: "This is Mechanical Department",
   },
   {
     coordinate: {
       latitude: 17.493648919184682,
-      longitude: 78.39239755800763,
+      longitude:  78.39239755800763,
     },
     title: "Electrical and Electronics Communication Department",
-    shortCut: "ECE",
+    shortCut : "ECE",
     description: "This is ECE Department",
   },
   {
     coordinate: {
       latitude: 17.494645205773796,
-      longitude: 78.39221232141526,
+      longitude:  78.39221232141526,
     },
     title: "School of Information Technology",
-    shortCut: "SIT",
+    shortCut : "SIT",
     description: "This is School of Information Technology",
   },
   {
     coordinate: {
       latitude: 17.49548793324025,
-      longitude: 78.39137668305989,
+      longitude:  78.39137668305989,
     },
     title: "Library",
-    shortCut: "Library",
+    shortCut : "Library",
     description: "This is Library",
   },
   {
@@ -214,72 +207,74 @@ const markers = [
       longitude: 78.39245290193816,
     },
     title: "Administration Department",
-    shortCut: "Administration Department",
+    shortCut : "Administration Department",
     description: "This is Administartion Department",
   },
   {
     coordinate: {
       latitude: 17.495842240036183,
-      longitude: 78.39173944110695,
+      longitude:  78.39173944110695,
     },
     title: "Metalurgy",
-    shortCut: "Metalurgy",
+    shortCut : "Metalurgy",
     description: "This is Metalurgy Department",
   },
   {
     coordinate: {
       latitude: 17.495982456319314,
-      longitude: 78.39220224592374,
+      longitude:  78.39220224592374,
     },
     title: "Examination Branch",
-    shortCut: "Examination Branch",
+    shortCut : "Examination Branch",
     description: "This is Examination Branch",
   },
   {
     coordinate: {
       latitude: 17.495804488013018,
-      longitude: 78.39331284907593,
+      longitude:  78.39331284907593,
     },
     title: "UGC",
-    shortCut: "UGC",
+    shortCut : "UGC",
     description: "This is UGC",
   },
   {
     coordinate: {
       latitude: 17.495147437680277,
-      longitude: 78.39117747987686,
+      longitude:  78.39117747987686,
     },
     title: "EEE",
-    shortCut: "EEE",
+    shortCut : "EEE",
     description: "This is EEE Department",
   },
   {
     coordinate: {
       latitude: 17.4936196040711,
-      longitude: 78.3931051692599,
+      longitude:  78.3931051692599,
     },
     title: "JHUB",
-    shortCut: "JHUB",
+    shortCut : "JHUB",
     description: "This is JHUB",
   },
+  
 ];
+
 
 const healthMarker = [
   {
     coordinate: {
       latitude: 17.491595492579705,
-      longitude: 78.39096090442793,
+      longitude: 78.39096090442793
     },
     title: "JNTU Health Care Center",
     shortCut: "Health Care Center",
     description: "This is JNTU Healthcare center",
   },
-];
+]
 const hostelMarker = [
   {
     coordinate: {
       latitude: 17.49175821828631,
-      longitude: 78.38850247961263,
+      longitude: 78.38850247961263
     },
     title: "Gowthami Boys Hostel",
     shortCut: "Gowthami Boys Hostel",
@@ -289,7 +284,7 @@ const hostelMarker = [
   {
     coordinate: {
       latitude: 17.491196318907352,
-      longitude: 78.38820862861242,
+      longitude: 78.38820862861242
     },
     title: "Manjeera Boys Hostel",
     shortCut: "Manjeera Boys Hostel",
@@ -298,7 +293,7 @@ const hostelMarker = [
   {
     coordinate: {
       latitude: 17.49037770592337,
-      longitude: 78.38836526014047,
+      longitude: 78.38836526014047
     },
     title: "Kinnera Boys Hostel",
     shortCut: "Kinnera Boys Hostel",
@@ -307,7 +302,7 @@ const hostelMarker = [
   {
     coordinate: {
       latitude: 17.49019288986208,
-      longitude: 78.38935324767853,
+      longitude: 78.38935324767853
     },
     title: "International Students Hostel",
     shortCut: "International Students Hostel",
@@ -316,7 +311,7 @@ const hostelMarker = [
   {
     coordinate: {
       latitude: 17.48992200043257,
-      longitude: 78.38963067891845,
+      longitude: 78.38963067891845
     },
     title: "RSQ2 Hostel",
     shortCut: "RSQ2 Hostel",
@@ -325,15 +320,15 @@ const hostelMarker = [
   {
     coordinate: {
       latitude: 17.494861459228897,
-      longitude: 78.39365736880102,
+      longitude: 78.39365736880102
     },
     title: "Kamala & Gayathri Girls Hostel",
     shortCut: "Kamala & Gayathri Girls Hostel",
     description: "This is Kamala & Gayathri Girls Hostel",
   },
-];
+]
 
-const allMarkers = [...markers, ...healthMarker, ...hostelMarker];
+const allMarkers = [...markers,...healthMarker,...hostelMarker]
 
 const getImageForMarker = (marker) => {
   if (marker.hasOwnProperty("shortCut")) {
@@ -353,7 +348,7 @@ const getImageForMarker = (marker) => {
 export default function UniversityMap() {
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
-  useEffect(async () => {
+  useEffect(() => {
     mapAnimation.addListener(({ value }) => {
       let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
       if (index >= allMarkers.length) {
@@ -366,14 +361,14 @@ export default function UniversityMap() {
       clearTimeout(regionTimeout);
 
       const regionTimeout = setTimeout(() => {
-        if (mapIndex !== index) {
+        if( mapIndex !== index ) {
           mapIndex = index;
           const { coordinate } = allMarkers[index];
           _map.current.animateToRegion(
             {
               ...coordinate,
-              latitudeDelta: 0.0008, // or any smaller value
-              longitudeDelta: 0.0008, // or any smaller value
+              latitudeDelta: 0.00080, // or any smaller value
+longitudeDelta: 0.00080, // or any smaller value
             },
             350
           );
@@ -386,13 +381,13 @@ export default function UniversityMap() {
     const inputRange = [
       (index - 1) * CARD_WIDTH,
       index * CARD_WIDTH,
-      (index + 1) * CARD_WIDTH,
+      ((index + 1) * CARD_WIDTH),
     ];
 
     const scale = mapAnimation.interpolate({
       inputRange,
       outputRange: [1, 1.5, 1],
-      extrapolate: "clamp",
+      extrapolate: "clamp"
     });
 
     return { scale };
@@ -401,18 +396,18 @@ export default function UniversityMap() {
   const onMarkerPress = (mapEventData) => {
     const markerID = mapEventData._targetInst.return.key;
 
-    let x = markerID * CARD_WIDTH + markerID * 20;
-    if (Platform.OS === "ios") {
+    let x = (markerID * CARD_WIDTH) + (markerID * 20); 
+    if (Platform.OS === 'ios') {
       x = x - SPACING_FOR_CARD_INSET;
     }
 
-    _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
-  };
+    _scrollView.current.scrollTo({x: x, y: 0, animated: true});
+  }
 
   const _map = React.useRef(null);
   const _scrollView = React.useRef(null);
 
-  const mapRef = useRef(null);
+  // const mapRef = useRef(null);
   const [region, setRegion] = useState({
     latitude: 17.493504, // Center point within your boundaries
     longitude: 78.391198, // Center point within your boundaries
@@ -430,10 +425,10 @@ export default function UniversityMap() {
     setRegion(adjustedRegion);
 
     try {
-      const boundaries = await mapRef.current.getMapBoundaries();
+      const boundaries = await _map.current.getMapBoundaries();
       // Perform any checks or logic here if needed with the boundaries
 
-      await mapRef.current.setMapBoundaries(northEast, southWest);
+      await _map.current.setMapBoundaries(northEast, southWest);
     } catch (error) {
       console.error(error);
     }
@@ -449,6 +444,7 @@ export default function UniversityMap() {
           borderBottomLeftRadius: 40,
           borderBottomRightRadius: 40,
           // justifyContent: "space-between",
+
         }}
       >
         <TouchableOpacity>
@@ -486,48 +482,51 @@ export default function UniversityMap() {
         maxZoomLevel={35}
         onRegionChangeComplete={onRegionChangeComplete}
         customMapStyle={mapStyle}
+        
       >
         {allMarkers.map((marker, index) => (
-          <Marker
-            key={index}
-            coordinate={marker.coordinate}
-            title={marker.title}
-            description={marker.description}
-          >
-            <Animated.View style={{ alignItems: "center" }}>
-              <Animated.Image
-                source={getImageForMarker(marker)}
-                style={styles.marker}
-              />
-              <Text style={{ fontSize: 12, textAlign: "center" }}>
-                {marker.shortCut}
-              </Text>
-            </Animated.View>
-            <Callout>
-              <View style={styles.callout}>
-                <Text style={styles.calloutTitle}>{marker.title}</Text>
-                <Text>{marker.description}</Text>
-              </View>
-            </Callout>
-          </Marker>
-        ))}
+  <Marker
+    key={index}
+    coordinate={marker.coordinate}
+    title={marker.title}
+    description={marker.description}
+  >
+    <Animated.View style={{ alignItems: "center" }}>
+      <Animated.Image
+        source={getImageForMarker(marker)}
+        style={styles.marker}
+      />
+      <Text style={{ fontSize: 12, textAlign: "center" }}>{marker.shortCut}</Text>
+    </Animated.View>
+    <Callout>
+      <View style={styles.callout}>
+        <Text style={styles.calloutTitle}>{marker.title}</Text>
+        <Text>{marker.description}</Text>
+      </View>
+    </Callout>
+  </Marker>
+
+
+))}
+
+        
       </MapView>
       <View style={styles.searchBox}>
-        <TextInput
+        <TextInput 
           placeholder="Search here"
           placeholderTextColor="#000"
           autoCapitalize="none"
-          style={{ flex: 1, padding: 0 }}
+          style={{flex:1,padding:0}}
         />
         <Image
-          source={require("../assets/icons/search.png")}
-          style={{
-            width: 24,
-            height: 24,
-            resizeMode: "contain",
-            tintColor: "black",
-          }}
-        />
+                source={require("../assets/icons/search.png")}
+                style={{
+                  width: 24,
+                  height: 24,
+                  resizeMode: "contain",
+                  tintColor: "black",
+                }}
+              />
       </View>
 
       <Animated.ScrollView
@@ -543,11 +542,10 @@ export default function UniversityMap() {
           top: 0,
           left: SPACING_FOR_CARD_INSET,
           bottom: 0,
-          right: SPACING_FOR_CARD_INSET,
+          right: SPACING_FOR_CARD_INSET
         }}
         contentContainerStyle={{
-          paddingHorizontal:
-            Platform.OS === "android" ? SPACING_FOR_CARD_INSET : 0,
+          paddingHorizontal: Platform.OS === 'android' ? SPACING_FOR_CARD_INSET : 0
         }}
         onScroll={Animated.event(
           [
@@ -555,55 +553,42 @@ export default function UniversityMap() {
               nativeEvent: {
                 contentOffset: {
                   x: mapAnimation,
-                },
+                }
               },
             },
           ],
-          { useNativeDriver: true }
+          {useNativeDriver: true}
         )}
       >
-        {allMarkers.map((marker, index) => (
+        {allMarkers.map((marker, index) =>(
           <View style={styles.card} key={index}>
-            <Image
+            <Image 
               source={marker.image}
               style={styles.cardImage}
               resizeMode="cover"
             />
             <View style={styles.textContent}>
-              <Text numberOfLines={1} style={styles.cardtitle}>
-                {marker.title}
-              </Text>
+              <Text numberOfLines={1} style={styles.cardtitle}>{marker.title}</Text>
               {/* <StarRating ratings={marker.rating} reviews={marker.reviews} /> */}
-              <Text numberOfLines={1} style={styles.cardDescription}>
-                {marker.description}
-              </Text>
+              <Text numberOfLines={1} style={styles.cardDescription}>{marker.description}</Text>
               <View style={styles.button}>
                 <TouchableOpacity
                   onPress={() => {}}
-                  style={[
-                    styles.signIn,
-                    {
-                      borderColor: "#FF6347",
-                      borderWidth: 1,
-                    },
-                  ]}
+                  style={[styles.signIn, {
+                    borderColor: '#FF6347',
+                    borderWidth: 1
+                  }]}
                 >
-                  <Text
-                    style={[
-                      styles.textSign,
-                      {
-                        color: "#FF6347",
-                      },
-                    ]}
-                  >
-                    Order Now
-                  </Text>
+                  <Text style={[styles.textSign, {
+                    color: '#FF6347'
+                  }]}>Order Now</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         ))}
       </Animated.ScrollView>
+    
     </SafeAreaView>
   );
 }
@@ -613,15 +598,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchBox: {
-    position: "absolute",
-    marginTop: 100,
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    width: "90%",
-    alignSelf: "center",
+    position:'absolute', 
+    marginTop: 100, 
+    flexDirection:"row",
+    backgroundColor: '#fff',
+    width: '90%',
+    alignSelf:'center',
     borderRadius: 5,
     padding: 10,
-    shadowColor: "#ccc",
+    shadowColor: '#ccc',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
@@ -641,6 +626,7 @@ const styles = StyleSheet.create({
   marker: {
     width: 30,
     height: 30,
+    
   },
   scrollView: {
     position: "absolute",
@@ -689,26 +675,26 @@ const styles = StyleSheet.create({
   markerWrap: {
     alignItems: "center",
     justifyContent: "center",
-    width: 50,
-    height: 50,
+    width:50,
+    height:50,
   },
   marker: {
     width: 30,
     height: 30,
   },
   button: {
-    alignItems: "center",
-    marginTop: 5,
+    alignItems: 'center',
+    marginTop: 5
   },
   signIn: {
-    width: "100%",
-    padding: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 3,
+      width: '100%',
+      padding:5,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 3
   },
   textSign: {
-    fontSize: 14,
-    fontWeight: "bold",
-  },
+      fontSize: 14,
+      fontWeight: 'bold'
+  }
 });
