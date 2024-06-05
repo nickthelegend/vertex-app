@@ -266,7 +266,81 @@ const healthMarker = [
     description: "This is JNTU Healthcare center",
   },
 ]
+const hostelMarker = [
+  {
+    coordinate: {
+      latitude: 17.49175821828631,
+      longitude: 78.38850247961263
+    },
+    title: "Gowthami Boys Hostel",
+    shortCut: "Gowthami Boys Hostel",
+    description: "This is Gowthami Boys Hostel",
+  },
 
+  {
+    coordinate: {
+      latitude: 17.491196318907352,
+      longitude: 78.38820862861242
+    },
+    title: "Manjeera Boys Hostel",
+    shortCut: "Manjeera Boys Hostel",
+    description: "This is Manjeera Boys Hostel",
+  },
+  {
+    coordinate: {
+      latitude: 17.49037770592337,
+      longitude: 78.38836526014047
+    },
+    title: "Kinnera Boys Hostel",
+    shortCut: "Kinnera Boys Hostel",
+    description: "This is Kinnera Boys Hostel",
+  },
+  {
+    coordinate: {
+      latitude: 17.49019288986208,
+      longitude: 78.38935324767853
+    },
+    title: "International Students Hostel",
+    shortCut: "International Students Hostel",
+    description: "This is International Students Hostel",
+  },
+  {
+    coordinate: {
+      latitude: 17.48992200043257,
+      longitude: 78.38963067891845
+    },
+    title: "RSQ2 Hostel",
+    shortCut: "RSQ2 Hostel",
+    description: "This is RSQ2 Hostel",
+  },
+  {
+    coordinate: {
+      latitude: 17.494861459228897,
+      longitude: 78.39365736880102
+    },
+    title: "Kamala & Gayathri Girls Hostel",
+    shortCut: "Kamala & Gayathri Girls Hostel",
+    description: "This is Kamala & Gayathri Girls Hostel",
+  },
+]
+
+const allMarkers = [...markers,...healthMarker,...hostelMarker]
+
+const getImageForMarker = (marker) => {
+  if (marker.hasOwnProperty("shortCut")) {
+    switch (true) {
+      case marker.shortCut.includes("Health Care Center"):
+        return require("../assets/map_health_marker.png");
+      case marker.shortCut.includes("Hostel"):
+        return require("../assets/map_hostel_marker.png");
+      // Add more cases for other marker types as needed
+      default:
+        return require("../assets/map_marker.png"); // Default marker image
+    }
+  } else {
+    return require("../assets/map_marker.png"); // Default marker image
+  }
+};
 export default function UniversityMap() {
   const mapRef = useRef(null);
   const [region, setRegion] = useState({
@@ -344,64 +418,29 @@ export default function UniversityMap() {
         onRegionChangeComplete={onRegionChangeComplete}
         customMapStyle={mapStyle}
       >
-        {markers.map((marker, index) => (
-          <Marker
-            key={index}
-            coordinate={marker.coordinate}
-            title={marker.title}
-            description={marker.description}
-          >
+        {allMarkers.map((marker, index) => (
+  <Marker
+    key={index}
+    coordinate={marker.coordinate}
+    title={marker.title}
+    description={marker.description}
+  >
+    <View style={{ alignItems: "center" }}>
+      <Image
+        source={getImageForMarker(marker)}
+        style={styles.marker}
+      />
+      <Text style={{ fontSize: 12, textAlign: "center" }}>{marker.shortCut}</Text>
+    </View>
+    <Callout>
+      <View style={styles.callout}>
+        <Text style={styles.calloutTitle}>{marker.title}</Text>
+        <Text>{marker.description}</Text>
+      </View>
+    </Callout>
+  </Marker>
+))}
 
-            <View style={{alignItems:"center"}}>
-
-            <Image
-              source={require("../assets/map_marker.png")}
-              style={styles.marker}
-              
-            />
-
-            
-            <Text style={{fontSize:12,textAlign:"center"}}>{marker.shortCut}</Text>
-
-            </View>
-           
-            <Callout>
-              <View style={styles.callout}>
-                <Text style={styles.calloutTitle}>{marker.title}</Text>
-                <Text>{marker.description}</Text>
-              </View>
-            </Callout>
-          </Marker>
-        ))}
-        {healthMarker.map((marker, index) => (
-          <Marker
-            key={index}
-            coordinate={marker.coordinate}
-            title={marker.title}
-            description={marker.description}
-          >
-
-            <View style={{alignItems:"center"}}>
-
-            <Image
-              source={require("../assets/map_health_marker.png")}
-              style={styles.marker}
-              
-            />
-
-            
-            <Text style={{fontSize:12,textAlign:"center"}}>{marker.shortCut}</Text>
-
-            </View>
-           
-            <Callout>
-              <View style={styles.callout}>
-                <Text style={styles.calloutTitle}>{marker.title}</Text>
-                <Text>{marker.description}</Text>
-              </View>
-            </Callout>
-          </Marker>
-        ))}
         
       </MapView>
     </SafeAreaView>
