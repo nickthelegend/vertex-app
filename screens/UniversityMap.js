@@ -131,7 +131,7 @@ const mapStyle = [
 
 
 
-const allMarkers = [...markers,...healthMarker,...hostelMarker]
+// const allMarkers = [...markers,...healthMarker,...hostelMarker]
 
 const getImageForMarker = (marker) => {
   if (marker.hasOwnProperty("shortCut")) {
@@ -154,8 +154,8 @@ export default function UniversityMap() {
   useEffect(() => {
     mapAnimation.addListener(({ value }) => {
       let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
-      if (index >= allMarkers.length) {
-        index = allMarkers.length - 1;
+      if (index >= markers.length) {
+        index = markers.length - 1;
       }
       if (index <= 0) {
         index = 0;
@@ -166,7 +166,7 @@ export default function UniversityMap() {
       const regionTimeout = setTimeout(() => {
         if( mapIndex !== index ) {
           mapIndex = index;
-          const { coordinate } = allMarkers[index];
+          const { coordinate } = markers[index];
           _map.current.animateToRegion(
             {
               ...coordinate,
@@ -176,11 +176,11 @@ longitudeDelta: 0.00080, // or any smaller value
             1000
           );
         }
-      }, 200);
+      }, 500);
     });
   });
 
-  const interpolations = allMarkers.map((marker, index) => {
+  const interpolations = markers.map((marker, index) => {
     const inputRange = [
       (index - 1) * CARD_WIDTH,
       index * CARD_WIDTH,
@@ -287,7 +287,7 @@ longitudeDelta: 0.00080, // or any smaller value
         customMapStyle={mapStyle}
         
       >
-        {allMarkers.map((marker, index) => (
+        {markers.map((marker, index) => (
   <Marker
     key={index}
     coordinate={marker.coordinate}
@@ -364,7 +364,7 @@ longitudeDelta: 0.00080, // or any smaller value
           {useNativeDriver: true}
         )}
       >
-        {allMarkers.map((marker, index) =>(
+        {markers.map((marker, index) =>(
           <View style={styles.card} key={index}>
             <Image 
               source={marker.image}
@@ -446,8 +446,7 @@ const styles = StyleSheet.create({
     // padding: 10,
     elevation: 2,
     backgroundColor: "#FFF",
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
+    borderRadius:20,
     marginHorizontal: 10,
     shadowColor: "#000",
     shadowRadius: 5,

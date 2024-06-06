@@ -9,6 +9,7 @@ import deliveryMan from '../images/delivery-man.png';
 import opportunity from '../images/opportunity.png';
 import ads from '../images/ads.png';
 import campus from '../images/campus.png';
+import { useNavigation } from "@react-navigation/native";
 
 // import other images as needed
 
@@ -21,6 +22,8 @@ const servicesData = [
 ];
 
 export default function ServicesScreen() {
+
+  const navigation = useNavigation();
   const renderItem = ({ item }) => (
     <TouchableOpacity 
       style={{ 
@@ -31,6 +34,9 @@ export default function ServicesScreen() {
         height: 110, 
         justifyContent: 'flex-end', 
         padding: 10 
+      }}
+      onPress={()=>{
+        navigation.navigate(item.route)
       }}
     >
       <Text style={{ alignSelf: 'flex-start', marginBottom: 10 }}>{item.title}</Text>

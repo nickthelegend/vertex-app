@@ -1,3 +1,9 @@
+
+const Images = [
+    { image: require("../assets/map_pics/cse.png") },
+];
+
+
 export const markers = [
     {
       coordinate: {
@@ -6,6 +12,7 @@ export const markers = [
       },
       title: "Computer Science Department",
       shortCut: "CSE",
+      image: Images[0].image,
       description: "This is Our Department",
     },
     {
@@ -125,7 +132,53 @@ export const markers = [
       shortCut : "JHUB",
       description: "This is JHUB",
     },
+    {
+        coordinate: {
+          latitude: 17.49175821828631,
+          longitude: 78.38850247961263
+        },
+        title: "Gowthami Boys Hostel",
+        shortCut: "Gowthami Boys Hostel",
+        description: "This is Gowthami Boys Hostel",
+      },
     
+      {
+        coordinate: {
+          latitude: 17.491196318907352,
+          longitude: 78.38820862861242
+        },
+        title: "Manjeera Boys Hostel",
+        shortCut: "Manjeera Boys Hostel",
+        description: "This is Manjeera Boys Hostel",
+      },
+      {
+  
+        coordinate: {
+          latitude: 17.490371114696714,
+          longitude: 78.38841395108149
+        },
+        title: "Kinnera Boys Hostel",
+        shortCut: "Kinnera Boys Hostel",
+        description: "This is Kinnera Boys Hostel",
+      },
+      {
+        coordinate: {
+          latitude: 17.490179068812814,
+          longitude: 78.38926053297001
+        },
+        title: "International Students Hostel",
+        shortCut: "International Students Hostel",
+        description: "This is International Students Hostel",
+      },
+      {
+        coordinate: {
+          latitude: 17.48988646114701,
+          longitude: 78.38966029073153
+        },
+        title: "RSQ2 Hostel",
+        shortCut: "RSQ2 Hostel",
+        description: "This is RSQ2 Hostel",
+      },
   ];
   
   
@@ -141,59 +194,5 @@ export const markers = [
     },
   ]
   export const hostelMarker = [
-    {
-      coordinate: {
-        latitude: 17.49175821828631,
-        longitude: 78.38850247961263
-      },
-      title: "Gowthami Boys Hostel",
-      shortCut: "Gowthami Boys Hostel",
-      description: "This is Gowthami Boys Hostel",
-    },
-  
-    {
-      coordinate: {
-        latitude: 17.491196318907352,
-        longitude: 78.38820862861242
-      },
-      title: "Manjeera Boys Hostel",
-      shortCut: "Manjeera Boys Hostel",
-      description: "This is Manjeera Boys Hostel",
-    },
-    {
-      coordinate: {
-        latitude: 17.49037770592337,
-        longitude: 78.38836526014047
-      },
-      title: "Kinnera Boys Hostel",
-      shortCut: "Kinnera Boys Hostel",
-      description: "This is Kinnera Boys Hostel",
-    },
-    {
-      coordinate: {
-        latitude: 17.49019288986208,
-        longitude: 78.38935324767853
-      },
-      title: "International Students Hostel",
-      shortCut: "International Students Hostel",
-      description: "This is International Students Hostel",
-    },
-    {
-      coordinate: {
-        latitude: 17.48992200043257,
-        longitude: 78.38963067891845
-      },
-      title: "RSQ2 Hostel",
-      shortCut: "RSQ2 Hostel",
-      description: "This is RSQ2 Hostel",
-    },
-    {
-      coordinate: {
-        latitude: 17.494861459228897,
-        longitude: 78.39365736880102
-      },
-      title: "Kamala & Gayathri Girls Hostel",
-      shortCut: "Kamala & Gayathri Girls Hostel",
-      description: "This is Kamala & Gayathri Girls Hostel",
-    },
+    
   ]
