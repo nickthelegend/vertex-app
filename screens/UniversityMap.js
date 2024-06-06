@@ -370,10 +370,10 @@ export default function UniversityMap() {
               latitudeDelta: 0.00080, // or any smaller value
 longitudeDelta: 0.00080, // or any smaller value
             },
-            350
+            1000
           );
         }
-      }, 10);
+      }, 200);
     });
   });
 
