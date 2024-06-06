@@ -26,6 +26,7 @@ import SettingsScreen from './screens/SettingsScreen';
 import { useFonts } from "expo-font";
 import CommunityPage from './screens/CommunityPage';
 import UniversityMap from './screens/UniversityMap';
+import OrderFood from './screens/OrderFood';
 
 const Stack = createStackNavigator();
 
@@ -54,7 +55,7 @@ export default function App() {
   return (
     <NavigationContainer>
     
-      <Stack.Navigator initialRouteName="Splash" screenOptions={({ route }) => ({
+      <Stack.Navigator initialRouteName="ServicesScreen" screenOptions={({ route }) => ({
         headerShown: false,
         ...(route.name === 'CommunityScreen' || route.name === 'ServicesScreen' || route.name === 'ChatScreen' || route.name === 'PostScreen'
           ? { ...TransitionPresets.FadeFromBottomAndroid }
@@ -81,7 +82,7 @@ export default function App() {
         <Stack.Screen name="Settings" component={SettingsScreen}/>
         <Stack.Screen name="CommunityPage" component={CommunityPage}/>
         <Stack.Screen name="UniversityMap" component={UniversityMap}/>
-        
+        <Stack.Screen name="OrderFood" component={OrderFood}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

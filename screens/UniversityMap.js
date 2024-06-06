@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { Animated } from 'react-native';
 import { markers,hostelMarker,healthMarker } from "../model/mapData";
+import { useNavigation } from "@react-navigation/native";
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
@@ -149,6 +150,8 @@ const getImageForMarker = (marker) => {
   }
 };
 export default function UniversityMap() {
+
+  const navigation = useNavigation()
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
   useEffect(() => {
@@ -243,16 +246,21 @@ longitudeDelta: 0.00080, // or any smaller value
         style={{
           flexDirection: "row",
           alignItems: "center",
-          paddingBottom: 10,
+          // paddingBottom: 10,
           borderBottomLeftRadius: 40,
           borderBottomRightRadius: 40,
+          padding: 15,
+          borderBottomWidth: 1,
+    borderBottomColor: '#dddddd',
           // justifyContent: "space-between",
 
         }}
       >
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>{navigation.goBack()}}>
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
+
+        <View style={{alignItems:"center",flex:1}}>
         <Text
           style={{
             fontSize: 10 * 2.5,
@@ -262,6 +270,8 @@ longitudeDelta: 0.00080, // or any smaller value
         >
           University Map
         </Text>
+        </View>
+        
         {/* <TouchableOpacity
               style={{
                 marginRight: 10 * 2,
