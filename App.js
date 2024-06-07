@@ -28,6 +28,7 @@ import CommunityPage from './screens/CommunityPage';
 import UniversityMap from './screens/UniversityMap';
 import OrderFood from './screens/OrderFood';
 import FoodDetail from './screens/FoodDetail';
+import CartScreen from './screens/CartScreen';
 
 const Stack = createStackNavigator();
 
@@ -56,7 +57,7 @@ export default function App() {
   return (
     <NavigationContainer>
     
-      <Stack.Navigator initialRouteName="ServicesScreen" screenOptions={({ route }) => ({
+      <Stack.Navigator initialRouteName="OrderFood" screenOptions={({ route }) => ({
         headerShown: false,
         ...(route.name === 'CommunityScreen' || route.name === 'ServicesScreen' || route.name === 'ChatScreen' || route.name === 'PostScreen'
           ? { ...TransitionPresets.FadeFromBottomAndroid }
@@ -85,6 +86,8 @@ export default function App() {
         <Stack.Screen name="UniversityMap" component={UniversityMap}/>
         <Stack.Screen name="OrderFood" component={OrderFood}/>
         <Stack.Screen name="FoodDetail" component={FoodDetail}/>
+        <Stack.Screen name="CartScreen" component={CartScreen} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

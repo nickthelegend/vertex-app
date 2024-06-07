@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Image,
   Dimensions,
   ImageBackground,
+  Alert,
 } from "react-native";
 import {
   ScrollView,
@@ -14,6 +15,7 @@ import {
 } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
 const screenWidth = Dimensions.get("window").width;
@@ -76,11 +78,48 @@ export default function OrderFood({ navigation }) {
 
   // Chunk the items into arrays of two
   const itemsInRows = chunkArray(itemsToDisplay, 2);
-  // const navigation = useNavigation()
+  const [cartItemCount, setCartItemCount] = useState(0);
+
+  useEffect(() => {
+    getCartItemCount();
+  }, []);
+
+  const getCartItemCount = async () => {
+    try {
+      const cart = await AsyncStorage.getItem("cart");
+      const cartItems = cart ? JSON.parse(cart) : [];
+      const totalCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+      setCartItemCount(totalCount);
+      console.log(totalCount)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const addToCart = async (item) => {
+    try {
+      const cartItems = await AsyncStorage.getItem("cart");
+      let cart = cartItems ? JSON.parse(cartItems) : [];
+      console.log(cartItems)
+      const index = cart.findIndex((cartItem) => cartItem.name === item.name);
+      if (index !== -1) {
+        cart[index].quantity += 1;
+      } else {
+        cart.push({ ...item, quantity: 1 });
+      }
+
+      await AsyncStorage.setItem("cart", JSON.stringify(cart));
+      Alert.alert("Success", "Item added to cart");
+      getCartItemCount();
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Failed to add item to cart");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.container}>
-        <View style={styles.header}>
+    <View style={styles.header}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}
@@ -89,10 +128,12 @@ export default function OrderFood({ navigation }) {
           </TouchableOpacity>
           <Text style={styles.headerText}>Order Food</Text>
 
-          <TouchableOpacity style={{}}>
+          <TouchableOpacity style={{}} onPress={()=>navigation.navigate("CartScreen")}>
             <Ionicons name="cart-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
+      <ScrollView style={styles.container}>
+        
         <View
           style={{
             flex: 1,
@@ -205,13 +246,13 @@ export default function OrderFood({ navigation }) {
                     >
                       <Ionicons name="heart-outline" size={21} color="white" />
                     </TouchableOpacity>
-                    {/* Rest of your content */}
                   </ImageBackground>
                   <Text style={styles.itemText}>{item.name}</Text>
                   <Text style={styles.itemPrice}>₹{item.price}</Text>
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       style={[styles.button, styles.addToCartButton]}
+                      onPress={() => addToCart(item)}
                     >
                       <Text style={styles.buttonText}>Add to Cart</Text>
                     </TouchableOpacity>
@@ -234,7 +275,6 @@ export default function OrderFood({ navigation }) {
               style={{
                 flexDirection: "row",
                 padding: 10,
-                // elevation:1,
                 borderRadius: 20,
                 borderWidth: 1,
                 marginRight: 20,
@@ -249,10 +289,10 @@ export default function OrderFood({ navigation }) {
               </View>
               <View style={{ marginLeft: 20 }}>
                 <Text style={{ fontFamily: "ComfortaaBold", fontSize: 18 }}>
-                  Paneer TIkka
+                  Paneer Tikka
                 </Text>
                 <Text style={{ fontFamily: "Montserrat", color: "#1c40bd" }}>
-                  ₹80
+                  ₹150
                 </Text>
               </View>
             </TouchableOpacity>
@@ -261,7 +301,6 @@ export default function OrderFood({ navigation }) {
               style={{
                 flexDirection: "row",
                 padding: 10,
-                // elevation:1,
                 borderRadius: 20,
                 borderWidth: 1,
                 marginRight: 20,
@@ -341,7 +380,6 @@ const styles = StyleSheet.create({
   },
   rowContainer: {
     flexDirection: "row",
-    // justifyContent: 'space-around',
     marginBottom: 10,
   },
   itemContainer: {
@@ -351,7 +389,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: "center",
     marginHorizontal: 5,
-    elevation: 10, // Adjust the elevation as needed for the desired shadow effect
+    elevation: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -367,7 +405,6 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 40,
     resizeMode: "cover",
-    // flex:1,
     flexDirection: "row",
   },
   itemText: {
@@ -405,9 +442,8 @@ const styles = StyleSheet.create({
   favoriteButton: {
     position: "absolute",
     bottom: 10,
-    // : 10,
-    backgroundColor: "rgba(0, 0, 0, 0.6)", // Adjust the background color and opacity as needed
-    borderRadius: 50, // Makes the button round
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    borderRadius: 50,
     padding: 10,
   },
 });

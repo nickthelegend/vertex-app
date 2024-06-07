@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function FoodDetail({ route }) {
   const { item } = route.params;
@@ -20,6 +21,28 @@ export default function FoodDetail({ route }) {
     }
   };
 
+  const addToCart = async () => {
+    try {
+      const cart = await AsyncStorage.getItem('cart');
+      let cartItems = cart ? JSON.parse(cart) : [];
+      
+      const existingItemIndex = cartItems.findIndex(cartItem => cartItem.name === item.name);
+      if (existingItemIndex > -1) {
+        // If the item already exists in the cart, update its quantity
+        cartItems[existingItemIndex].quantity += quantity;
+      } else {
+        // If the item is not in the cart, add it
+        cartItems.push({ ...item, quantity });
+      }
+
+      await AsyncStorage.setItem('cart', JSON.stringify(cartItems));
+      Alert.alert('Success', 'Item added to cart');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'An error occurred while adding the item to the cart');
+    }
+  };
+  
   return (
     <SafeAreaView style={{flex:1}}>
       <View style={styles.header}>
@@ -27,7 +50,7 @@ export default function FoodDetail({ route }) {
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Food</Text>
-        <TouchableOpacity style={{}}>
+        <TouchableOpacity style={{}} onPress={() => navigation.navigate("CartScreen")}>
           <Ionicons name="cart-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
@@ -75,24 +98,11 @@ export default function FoodDetail({ route }) {
       </ScrollView>
 
       <TouchableOpacity 
-  style={{
-    backgroundColor:"#1c40bd", 
-    paddingVertical: 20, 
-    paddingHorizontal: 20, 
-    position:'absolute', 
-    bottom: 15, 
-    left: 0, 
-    right: 0,
-    alignItems: 'center', 
-    justifyContent: 'center',
-    borderRadius: 15, // Adjust the borderRadius as needed
-    marginHorizontal:10
-  }}
->
-  <Text style={{color:'#fff', fontSize: 21, fontFamily:'Poppins-SemiBold'}}>Add to cart</Text>
-</TouchableOpacity>
-
-
+        style={styles.addButton}
+        onPress={addToCart}
+      >
+        <Text style={styles.addButtonText}>Add to cart</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -130,11 +140,8 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 35,
-    // fontWeight: 'bold',
-    marginBottom: 10,
     color: '#333',
     fontFamily:'Poppins-SemiBold'
-    // textAlign: 'center',
   },
   price: {
     fontSize: 35,
@@ -142,8 +149,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: '600',
     fontFamily: "Montserrat",
-
-    // textAlign: 'center',
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -155,7 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     padding: 10,
     alignSelf: 'center',
-    backgroundColor: '#fff', // Ensure the background color is white for better shadow visibility
+    backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,
@@ -179,4 +184,21 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: 'justify',
   },
+  addButton: {
+    backgroundColor:"#1c40bd", 
+    padding: 15,
+    position:'absolute', 
+    bottom: 15, 
+    left: 0, 
+    right: 0,
+    alignItems: 'center', 
+    justifyContent: 'center',
+    borderRadius: 15,
+    marginHorizontal:20
+  },
+  addButtonText: {
+    color:'#fff', 
+    fontSize: 21, 
+    fontFamily:'Poppins-SemiBold'
+  }
 });
