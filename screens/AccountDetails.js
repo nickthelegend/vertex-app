@@ -207,7 +207,8 @@ setVerifyDialogueBox(false)
 
   try {
     // Call the updateUserInfo function to update the user's information in the database
-    await updateUserInfo(userInfo);
+    await updateUserInfo(selectedImage,userInfo);
+    
     console.log('User information updated successfully');
     navigation.navigate("NavigationScreen")
   } catch (error) {

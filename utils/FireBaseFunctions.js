@@ -3,8 +3,12 @@ import uuid from 'react-native-uuid'; // Import uuid
 
 // Import Firebase database
 import { getFirestore, collection, doc, setDoc, query, where, getDocs,updateDoc } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { app } from '../services/config'
+
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 const database = getFirestore(app)
 // import { firebase } from '@react-native-firebase/firestore';
 // const firebaseConfig = {
@@ -189,9 +193,26 @@ export async function logoutUser() {
   }
 }
 
-export async function updateUserInfo  (userInfo) {
+export async function updateUserInfo  (uri,userInfo) {
   try {
     // Retrieve the current logged-in user's username from AsyncStorage
+    const storage = getStorage(app);
+
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    // Generate a unique ID for the image
+    const uniqueId = uuid.v4();
+
+    // Reference to the storage path
+    const storageRef = ref(storage, `verificationDocuments/${uniqueId}.jpg`);
+    
+    // Upload the image
+    await uploadBytes(storageRef, blob);
+    
+    // Get the download URL
+    const downloadURL = await getDownloadURL(storageRef);
+    console.log(downloadURL)
     const userDataString = await AsyncStorage.getItem('user');
     if (!userDataString) {
       console.error('User data not found in AsyncStorage');
@@ -199,6 +220,8 @@ export async function updateUserInfo  (userInfo) {
     }
     const userData = JSON.parse(userDataString);
     userData.is_verified="true";
+    userData.verifyDocument=downloadURL;
+
     const updatedUser = JSON.stringify(userData);
 
     await AsyncStorage.setItem('user', updatedUser);
@@ -226,7 +249,7 @@ export async function updateUserInfo  (userInfo) {
         phonenumber: userInfo.phonenumber || doc.data().phonenumber,
         is_verified: true,
         profilepic: userInfo.profilepic || doc.data().profilepic || '',
-        verifyDocument: userInfo.verifyDocument || doc.data().verifyDocument || '',
+        verifyDocument:  userData.verifyDocument || doc.data().verifyDocument || '',
         fullName: userInfo.fullName || doc.data().fullName || '',
         streetAddress: userInfo.streetAddress || doc.data().streetAddress || '',
         city: userInfo.city || doc.data().city || '',
@@ -251,3 +274,6 @@ export async function updateUserInfo  (userInfo) {
     console.error('Error updating user information:', error);
   }
 };
+
+
+
