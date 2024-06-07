@@ -27,6 +27,7 @@ import { useFonts } from "expo-font";
 import CommunityPage from './screens/CommunityPage';
 import UniversityMap from './screens/UniversityMap';
 import OrderFood from './screens/OrderFood';
+import FoodDetail from './screens/FoodDetail';
 
 const Stack = createStackNavigator();
 
@@ -83,6 +84,7 @@ export default function App() {
         <Stack.Screen name="CommunityPage" component={CommunityPage}/>
         <Stack.Screen name="UniversityMap" component={UniversityMap}/>
         <Stack.Screen name="OrderFood" component={OrderFood}/>
+        <Stack.Screen name="FoodDetail" component={FoodDetail}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
