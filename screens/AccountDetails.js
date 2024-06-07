@@ -12,13 +12,15 @@ import { Camera } from 'expo-camera';
 import { updateUserInfo } from "../utils/FireBaseFunctions";
 import VerificationDialogueBox from "../components/VerificationDialogueBox";
 import { useNavigation } from "@react-navigation/native";
+import { CheckBox } from 'react-native-elements';
 
 export default function AccountDetails() {
     const navigation = useNavigation()
     const [selectedImage, setSelectedImage] = useState(null);
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
     const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
-  
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+
     useEffect(() => {
       (async () => {
         const cameraPermission = await Camera.requestCameraPermissionsAsync();
@@ -57,6 +59,12 @@ export default function AccountDetails() {
   
     useEffect(() => {
       // This effect runs every time selectedImage changes
+
+      if (selectedImage) {
+        setIsSubmitDisabled(false);
+      } else {
+        setIsSubmitDisabled(true);
+      }
       console.log(selectedImage);
     }, [selectedImage]);
 
@@ -65,17 +73,49 @@ export default function AccountDetails() {
     const [city, setCity] = useState('');
     const [state, setState] = useState('');
     const [postalCode, setPostalCode] = useState('');  
+    const [isNextBtnDisabled, setIsNextBtnDisabled] = useState(true);
+
+    const validateFields = () => {
+      if (fullName && streetAddress && city && state && postalCode) {
+        setIsNextBtnDisabled(false);
+      } else {
+        setIsNextBtnDisabled(true);
+      }
+    };
+    useEffect(() => {
+      validateFields();
+    }, [fullName, streetAddress, city, state, postalCode]);
+  
     const [department, setDepartment] = useState('');
     const [course, setCourse] = useState('');
   const [courseType, setCourseType] = useState('');
   const [yearOfStudy, setYearOfStudy] = useState('');
   const [graduationYear, setGraduationYear] = useState('');
     const [verifyDialogueBox,setVerifyDialogueBox] = useState('');
+    const [isNextBtnDisabledCourse, setIsNextBtnDisabledCourse] = useState(true);
+
+
+    useEffect(() => {
+      validateCourseFields();
+    }, [course, department, courseType, yearOfStudy, graduationYear]);
+  
+
+    const validateCourseFields = () => {
+      if (course && department && courseType && yearOfStudy && graduationYear) {
+        setIsNextBtnDisabledCourse(false);
+      } else {
+        setIsNextBtnDisabledCourse(true);
+      }
+    };
     const openModal = () => {
       setVerifyDialogueBox(true)
 
     };
-  
+    const [checked, setChecked] = useState(false);
+
+  const handleCheckBoxToggle = () => {
+    setChecked(!checked);
+  };
     const closeModal = () => {
 setVerifyDialogueBox(false)
     };
@@ -179,6 +219,8 @@ setVerifyDialogueBox(false)
   const buttonTextStyle = {
     color: "#fff",
   };
+
+  
   const progressStepsStyle = {
     activeLabelFontSize: 15,
     labelFontSize: 15,
@@ -191,7 +233,7 @@ setVerifyDialogueBox(false)
     // isComplete: true
   };
     const nextBtnStyle= {
-    backgroundColor:'#1e41bc',
+    backgroundColor:  '#1e41bc',
     // padding:20,
     paddingHorizontal:50,
     padding: 20,
@@ -219,6 +261,8 @@ setVerifyDialogueBox(false)
             previousBtnTextStyle={buttonTextStyle}
             labelFontSize={20}
             nextBtnStyle={nextBtnStyle}
+            nextBtnDisabled={isNextBtnDisabled} // Disable next button if validation fails
+
             // Increase font size here
           >
             <View style={{ marginLeft: 20, paddingBottom:10}}>
@@ -231,11 +275,12 @@ setVerifyDialogueBox(false)
 
               <View style={{ marginTop: 10 }}>
 
-              <TextFieldPersonal text={"Full Name"} onChange={setFullName} />
-      <TextFieldPersonal text={"Street Address"} onChange={setStreetAddress} />
-      <TextFieldPersonal text={"City"} onChange={setCity} />
-      <TextFieldPersonal text={"State"} onChange={setState} />
-      <TextFieldPersonal text={"Postal Code"} onChange={setPostalCode} />
+              <TextFieldPersonal text="Full Name" value={fullName} onChange={setFullName} />
+          <TextFieldPersonal text="Street Address" value={streetAddress} onChange={setStreetAddress} />
+          <TextFieldPersonal text="City" value={city} onChange={setCity} />
+          <TextFieldPersonal text="State" value={state} onChange={setState} />
+          <TextFieldPersonal text="Postal Code" value={postalCode} onChange={setPostalCode} />
+
             <Text style={{marginTop:20,
                 fontStyle:"italic"
             }}>By continuing, you acknowledge that Vertex will handle your information as set out in the <Text style={{textDecorationLine :'underline',color: 'blue',}}>Privacy Policy</Text> including why we collect it, how we use it and your rights.</Text>
@@ -252,6 +297,8 @@ setVerifyDialogueBox(false)
             previousBtnStyle={previousBtnStyle}
             nextBtnStyle={nextBtnStyle}
             labelFontSize={20} // Increase font size here
+            nextBtnDisabled={isNextBtnDisabledCourse} // Disable next button if validation fails
+
           >
             <View style={{ marginLeft: 20, paddingBottom: 10 }}>
       <Text style={{ fontSize: 30, fontFamily: "Poppins-SemiBold" }}>
@@ -349,14 +396,37 @@ setVerifyDialogueBox(false)
       </View>
     </View>
           </ProgressStep>
+
           <ProgressStep
-            label="Step 3"
+      label="Step 3"
+      nextBtnTextStyle={buttonTextStyle}
+      previousBtnTextStyle={buttonTextStyle}
+      previousBtnStyle={previousBtnStyle}
+      nextBtnStyle={nextBtnStyle}
+      labelFontSize={20} // Increase font size here
+      nextBtnDisabled={!checked} // Disable next button if checkbox is not checked
+    >
+      <View style={styles.container}>
+        <Text>Are you willing to become a student delivery agent?</Text>
+        <CheckBox
+          title="Yes, I agree"
+          checked={checked}
+          onPress={handleCheckBoxToggle}
+          containerStyle={styles.checkBoxContainer}
+          textStyle={styles.checkBoxText}
+        />
+      </View>
+    </ProgressStep>
+          <ProgressStep
+            label="Step 4"
             nextBtnTextStyle={buttonTextStyle}
             previousBtnTextStyle={buttonTextStyle}
             labelFontSize={20} // Increase font size here
             previousBtnStyle={previousBtnStyle}
             nextBtnStyle={nextBtnStyle}
             onSubmit={onClickSubmitButton}
+            nextBtnDisabled={isSubmitDisabled} // Disable next button if no image is selected
+
           >
               <View style={{ marginLeft: 20, paddingBottom: 10 }}>
         <Text style={{ fontSize: 30 ,fontFamily: "Poppins-SemiBold"}}>Upload Document</Text>
@@ -490,5 +560,19 @@ const styles = {
     marginTop: 10,
     fontSize: 16,
     fontWeight: 'bold'
-  }
+  },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  checkBoxContainer: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    marginTop: 20,
+  },
+  checkBoxText: {
+    fontSize: 16,
+  },
 };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput } from 'react-native';
 
-export default function TextFieldPersonal({ text, onChange }) {
+export default function TextFieldPersonal({ text, onChange,value }) {
   return (
     <View style={{ marginTop: 10 }}>
       <Text style={{ fontFamily: "ComfortaaBold" }}>{text}</Text>
@@ -21,7 +21,8 @@ export default function TextFieldPersonal({ text, onChange }) {
             fontSize: 18,
             // padding:0.5
           }}
-          onChangeText={(value) => onChange(value)} // Call onChange prop when text changes
+          onChangeText={(value) => onChange(value)} 
+          value={value}// Call onChange prop when text changes
         />
       </View>
     </View>
