@@ -16,8 +16,8 @@ import { useNavigation } from "@react-navigation/native";
 const servicesData = [
   { id: '1', title: 'University Map', uri: mapImage,route: "UniversityMap" },
   { id: '2', title: 'Order Food', uri: deliveryMan , route: "OrderFood" },
-  { id: '3', title: 'Opportunities', uri: opportunity, route: "Opportunities" },
-  { id: '4', title: 'Classifieds', uri: ads, route: "Classifides" },
+  { id: '3', title: 'Opportunities', uri: opportunity, route: "OpportunitiesScreen" },
+  { id: '4', title: 'Marketplace', uri: ads, route: "Marketplace" },
   { id: '5', title: 'Alumni Connection', uri: campus , route: "Alumini"},
 ];
 
