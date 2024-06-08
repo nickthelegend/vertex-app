@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -23,7 +23,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import userProfilePic from "../assets/images/avatar2.png";
 import userPostPicture from "../assets/images/chicken.png";
 import HomeHeader from "../components/HomeHeader";
+import { checkUserLoggedIn } from "../utils/FireBaseFunctions.js";
+
 export default function HomeScreen() {
+
+  const [userFullName,setUserFullName]= useState('');
   NavigationBar.setBackgroundColorAsync('#ffffff00');
 
   const deviceWidth = Dimensions.get("window").width;
@@ -48,6 +52,18 @@ export default function HomeScreen() {
     // Return a loading indicator or null until fonts are loaded
     return null;
   }
+
+console.log(userFullName)
+  useEffect(() => {
+    const fetchLoggedInUser = async () => {
+      const loggedInUser = await checkUserLoggedIn();
+      console.log(loggedInUser);
+      setUserFullName(loggedInUser.fullName)
+    };
+    
+    fetchLoggedInUser();
+  
+  }, []);
   return (
     <SafeAreaView style={{flex:1}}>
 
@@ -60,7 +76,7 @@ export default function HomeScreen() {
         }}
       >
 
-      <HomeHeader userFullName={"Nihal"} userProfilePic={currentUserProfilePic}/>
+      <HomeHeader userFullName={userFullName} userProfilePic={currentUserProfilePic}/>
         {/* <View
           style={{
             flexDirection: "row",

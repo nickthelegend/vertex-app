@@ -47,10 +47,14 @@ export default function HomeHeader({userFullName, userProfilePic}) {
             </TouchableOpacity>
 
             <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
               style={{
                 fontSize: SPACING * 2.7,
                 color: "#1e40bc",
                 fontFamily: "ComfortaaBold",
+                width: 300, // Adjust the width of the text container
+
               }}
             >
               Hello, {userFullName}
