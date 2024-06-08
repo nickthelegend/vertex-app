@@ -30,6 +30,7 @@ import OrderFood from './screens/OrderFood';
 import FoodDetail from './screens/FoodDetail';
 import CartScreen from './screens/CartScreen';
 import OpportunitiesScreen from './screens/OpportunitiesScreen';
+import MarketPlace from './screens/MarketPlace';
 
 const Stack = createStackNavigator();
 
@@ -89,6 +90,7 @@ export default function App() {
         <Stack.Screen name="FoodDetail" component={FoodDetail}/>
         <Stack.Screen name="CartScreen" component={CartScreen} />
         <Stack.Screen name="OpportunitiesScreen" component={OpportunitiesScreen}/>
+        <Stack.Screen name="MarketPlace" component={MarketPlace}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

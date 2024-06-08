@@ -17,8 +17,8 @@ const servicesData = [
   { id: '1', title: 'University Map', uri: mapImage,route: "UniversityMap" },
   { id: '2', title: 'Order Food', uri: deliveryMan , route: "OrderFood" },
   { id: '3', title: 'Opportunities', uri: opportunity, route: "OpportunitiesScreen" },
-  { id: '4', title: 'Marketplace', uri: ads, route: "Marketplace" },
-  { id: '5', title: 'Alumni Connection', uri: campus , route: "Alumini"},
+  { id: '4', title: 'Marketplace', uri: ads, route: "MarketPlace" },
+  // { id: '5', title: 'Alumni Connection', uri: campus , route: "Alumini"},
 ];
 
 export default function ServicesScreen() {
