@@ -20,6 +20,12 @@ export default function BuyGetComponent() {
       image: require("../assets/temp/electric_guitar.jpg"),
       price: 150,
       condition: "Okay Condition",
+      user: 'Batu Honey Vardhan',
+      address: 'Kinnera Hostel',
+      category:'',
+      subCatYear:'',
+      subCatBranch: '',
+
     },
     {
       name: "Algorithms Set of 3 Books",
@@ -65,7 +71,7 @@ export default function BuyGetComponent() {
 
           <Text style={styles.categoryHeader}>Categories</Text>
           <View style={styles.categoriesContainer}>
-            <TouchableOpacity style={[styles.categoryButton, styles.firstCategory]}>
+            <TouchableOpacity style={[styles.categoryButton, styles.firstCategory]} onPress={()=>{navigation.navigate("CategoryBooks")}}>
               <Ionicons name="book-outline" size={24} color="#333" />
               <Text style={styles.categoryText}>Books</Text>
             </TouchableOpacity>
@@ -97,7 +103,7 @@ export default function BuyGetComponent() {
                   <TouchableOpacity
                     key={index}
                     style={styles.itemContainer}
-                    onPress={() => navigation.navigate("FoodDetail", { item })}
+                    onPress={() => navigation.navigate("AdDetail", { item })}
                   >
                     <ImageBackground
                       source={item.image}

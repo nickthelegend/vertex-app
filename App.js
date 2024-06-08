@@ -31,6 +31,9 @@ import FoodDetail from './screens/FoodDetail';
 import CartScreen from './screens/CartScreen';
 import OpportunitiesScreen from './screens/OpportunitiesScreen';
 import MarketPlace from './screens/MarketPlace';
+import AdDetails from './screens/AdDetails';
+import CategoryBooks from './screens/CategoryBooks';
+import FilterScreen from './screens/FilterScreen';
 
 const Stack = createStackNavigator();
 
@@ -91,6 +94,10 @@ export default function App() {
         <Stack.Screen name="CartScreen" component={CartScreen} />
         <Stack.Screen name="OpportunitiesScreen" component={OpportunitiesScreen}/>
         <Stack.Screen name="MarketPlace" component={MarketPlace}/>
+        <Stack.Screen name="AdDetail" component={AdDetails}/>
+        <Stack.Screen name="CategoryBooks" component={CategoryBooks}/>
+        <Stack.Screen name="FilterScreen" component={FilterScreen}/>
+
       </Stack.Navigator>
     </NavigationContainer>
   );
