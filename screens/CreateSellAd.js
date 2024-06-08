@@ -23,7 +23,7 @@ export default function CreateSellAd() {
   const [hostel, setHostel] = useState('');
 
   const handleNext = () => {
-    if (step === 1 && category && year && branch) {
+    if (step === 1 && category) {
       setStep(2);
     } else if (step === 2 && productName && description && (price || giveaway) && condition) {
       setStep(3);
@@ -42,9 +42,8 @@ export default function CreateSellAd() {
   };
 
   const handleYearClick = (selectedYear) => {
-  setYear(selectedYear);
-};
-
+    setYear(selectedYear);
+  };
 
   const handleBranchClick = (branch) => {
     setBranch(branch);
@@ -61,6 +60,7 @@ export default function CreateSellAd() {
       setImages([...images, ...result.assets.slice(0, 3 - images.length)]);
     }
   };
+
   const handleCategoryClick = (selectedCategory) => {
     if (selectedCategory === 'Resources') {
       setCategory('Books'); // Set category to 'Books' for 'Resources'
@@ -68,6 +68,23 @@ export default function CreateSellAd() {
       setCategory(selectedCategory);
     }
   };
+
+  const isNextDisabled = () => {
+    if (step === 1) {
+      if (category === 'Misc' || category === 'Gadgets') {
+        return !category;
+      }
+      return !(category && year && branch);
+    }
+    if (step === 2) {
+      return !(productName && description && (price || giveaway) && condition);
+    }
+    if (step === 3) {
+      return !(userName && hostel);
+    }
+    return false;
+  };
+
   const departments = ['Civil', 'Computer Science', 'Electrical', 'Electronics & Communications', 'Mechanical'];
   const hostels = [
     'Kinnera Hostel', 'Manjeera Hostel', 'Gowthami Hostel', 'International Students Hostel', 'Kamala Nehru Hostel', 'Gayathri Girls Hostel'
@@ -84,59 +101,57 @@ export default function CreateSellAd() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-      {step === 1 && (
-  <>
-    <Text style={styles.stepTitle}>Step 1: Product Category</Text>
+        {step === 1 && (
+          <>
+            <Text style={styles.stepTitle}>Step 1: Product Category</Text>
 
-    <View style={styles.categoryContainer}>
-      {['Books', 'Gadgets', 'Resources', 'Misc'].map((cat) => (
-        <TouchableOpacity
-          key={cat}
-          style={[styles.categoryButton, category === cat && styles.selectedCategoryButton]}
-          onPress={() => setCategory(cat)}
-        >
-          <Text style={styles.categoryText}>{cat}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
+            <View style={styles.categoryContainer}>
+              {['Books', 'Gadgets', 'Resources', 'Misc'].map((cat) => (
+                <TouchableOpacity
+                  key={cat}
+                  style={[styles.categoryButton, category === cat && styles.selectedCategoryButton]}
+                  onPress={() => setCategory(cat)}
+                >
+                  <Text style={styles.categoryText}>{cat}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
-    {["Books", "Resources"].includes(category) && (
-      <>
-        <Text style={styles.sectionTitle}>Select Year</Text>
-        <View style={styles.yearContainer}>
-          {[1, 2, 3, 4, 5].map((selectedYear) => (
-            <TouchableOpacity
-              key={selectedYear}
-              style={[styles.yearButton, year === selectedYear && styles.selectedYearButton]}
-              onPress={() => handleYearClick(selectedYear)}
-            >
-              <Text style={styles.yearText}>{`${selectedYear} Year`}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+            {["Books", "Resources"].includes(category) && (
+              <>
+                <Text style={styles.sectionTitle}>Select Year</Text>
+                <View style={styles.yearContainer}>
+                  {[1, 2, 3, 4, 5].map((selectedYear) => (
+                    <TouchableOpacity
+                      key={selectedYear}
+                      style={[styles.yearButton, year === selectedYear && styles.selectedYearButton]}
+                      onPress={() => handleYearClick(selectedYear)}
+                    >
+                      <Text style={styles.yearText}>{`${selectedYear} Year`}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
 
-        <Text style={styles.sectionTitle}>Select Branch</Text>
-        <View style={styles.branchContainer}>
-          {departments.map((dept) => (
-            <TouchableOpacity
-              key={dept}
-              style={[styles.branchButton, branch === dept && styles.selectedBranchButton]}
-              onPress={() => handleBranchClick(dept)}
-            >
-              <Text style={styles.branchText}>{dept}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </>
-    )}
+                <Text style={styles.sectionTitle}>Select Branch</Text>
+                <View style={styles.branchContainer}>
+                  {departments.map((dept) => (
+                    <TouchableOpacity
+                      key={dept}
+                      style={[styles.branchButton, branch === dept && styles.selectedBranchButton]}
+                      onPress={() => handleBranchClick(dept)}
+                    >
+                      <Text style={styles.branchText}>{dept}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
+            )}
 
-    {["Gadgets",'Misc'].includes(category) && (
-      // Render your UI for "Resources" and "Misc" categories here
-      <Text style={styles.sectionTitle}>No additional options required for {category} category</Text>
-    )}
-  </>
-)}
-
+            {["Gadgets",'Misc'].includes(category) && (
+              <Text style={styles.sectionTitle}>No additional options required for {category} category</Text>
+            )}
+          </>
+        )}
 
         {step === 2 && (
           <>
@@ -231,9 +246,9 @@ export default function CreateSellAd() {
           <Ionicons name="arrow-back" size={30} color="white" />
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.nextButton, step === 1 && !(category && year && branch) && styles.disabledButton, step === 2 && !(productName && description && (price || giveaway) && condition) && styles.disabledButton, step === 3 && !(userName && hostel) && styles.disabledButton]}
+          style={[styles.nextButton, isNextDisabled() && styles.disabledButton]}
           onPress={handleNext}
-          disabled={(step === 1 && !(category && year && branch)) || (step === 2 && !(productName && description && (price || giveaway) && condition)) || (step === 3 && !(userName && hostel))}
+          disabled={isNextDisabled()}
         >
           <Text style={styles.nextButtonText}>{step === 3 ? 'Submit' : 'Next: Product Details'}</Text>
         </TouchableOpacity>
