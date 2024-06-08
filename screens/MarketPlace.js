@@ -78,7 +78,7 @@ export default function MarketPlace({ navigation }) {
           onPress={() => handleTabPress("shortlist")}
         >
           <Ionicons
-            name="bookmark-outline"
+            name="heart-outline"
             size={24}
             color={activeTab === "shortlist" ? "#007bff" : "#333"}
           />
@@ -120,8 +120,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignItems: "center",
   },
   tabsContainer: {
     flexDirection: "row",
