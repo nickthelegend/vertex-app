@@ -40,7 +40,7 @@ export default function MarketPlace({ navigation }) {
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
             <Text>Sell/Give Content</Text>
-            <TouchableOpacity style={styles.floatingButton}>
+            <TouchableOpacity style={styles.floatingButton} onPress={()=>{navigation.navigate("CreateSellAd")}}>
               <Ionicons name="add" size={32} color="#fff" />
             </TouchableOpacity>
           </View>

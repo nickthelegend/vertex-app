@@ -34,6 +34,7 @@ import MarketPlace from './screens/MarketPlace';
 import AdDetails from './screens/AdDetails';
 import CategoryBooks from './screens/CategoryBooks';
 import FilterScreen from './screens/FilterScreen';
+import CreateSellAd from './screens/CreateSellAd';
 
 const Stack = createStackNavigator();
 
@@ -97,7 +98,7 @@ export default function App() {
         <Stack.Screen name="AdDetail" component={AdDetails}/>
         <Stack.Screen name="CategoryBooks" component={CategoryBooks}/>
         <Stack.Screen name="FilterScreen" component={FilterScreen}/>
-
+        <Stack.Screen name="CreateSellAd" component={CreateSellAd}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
