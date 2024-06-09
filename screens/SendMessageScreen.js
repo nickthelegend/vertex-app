@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, TouchableOpacity, Image } from 'react-native';
-import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat';
+import { View, TouchableOpacity, Image, StyleSheet,Text } from 'react-native';
+import { GiftedChat, Bubble, InputToolbar, Send, Composer } from 'react-native-gifted-chat';
 import { getFirestore, collection, doc, setDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { app } from '../services/config';
 import uuid from 'react-native-uuid';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const db = getFirestore(app);
 
@@ -14,16 +15,14 @@ export default function SendMessageScreen({ route }) {
   const [messages, setMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentUserFullName, setCurrentUserFullName] = useState(null);
-    // console.log(currentUserFullName)
   const navigation = useNavigation();
-    console.log(otherUserId)
+
   useEffect(() => {
     const fetchCurrentUser = async () => {
       const userData = await AsyncStorage.getItem('user');
       const jsonObj = JSON.parse(userData);
-      console.log(jsonObj.userId)
       setCurrentUser(jsonObj.userId);
-      setCurrentUserFullName(jsonObj.fullName)
+      setCurrentUserFullName(jsonObj.fullName);
     };
 
     fetchCurrentUser();
@@ -79,11 +78,12 @@ export default function SendMessageScreen({ route }) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 10, backgroundColor: '#1c40bd' }}>
         <TouchableOpacity onPress={handleGoBack}>
-          <Image source={require('../assets/icons/back.png')} style={{ width: 30, height: 30 }} />
+          <Image source={require('../assets/icons/back.png')} style={{ width: 30, height: 30, tintColor: 'white' }} />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>Chat</Text>
       </View>
       <GiftedChat
         messages={messages}
@@ -100,24 +100,79 @@ export default function SendMessageScreen({ route }) {
             {...props}
             wrapperStyle={{
               right: {
-                backgroundColor: '#007AFF'
+                backgroundColor: '#34B7F1',
               },
               left: {
-                backgroundColor: '#f0f0f0'
-              }
+                backgroundColor: '#ECE5DD',
+              },
+            }}
+            textStyle={{
+              right: {
+                color: 'white',
+              },
+              left: {
+                color: 'black',
+              },
             }}
           />
         )}
         renderInputToolbar={props => (
           <InputToolbar
             {...props}
-            containerStyle={{
-              borderTopWidth: 1.5,
-              borderTopColor: '#007AFF'
-            }}
+            containerStyle={styles.inputToolbar}
+          />
+        )}
+        renderSend={props => (
+          <Send
+            {...props}
+            containerStyle={styles.sendContainer}
+          >
+            <Image source={require('../assets/icons/send.png')} style={styles.sendIcon} />
+          </Send>
+        )}
+        renderComposer={props => (
+          <Composer
+            {...props}
+            textInputStyle={styles.composer}
           />
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fafafa',
+      },
+  headerTitle: {
+    color: 'white',
+    fontSize: 21,
+    marginLeft: 10,
+  },
+  inputToolbar: {
+    backgroundColor: '#ECE5DD',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5',
+  },
+  sendContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+    marginBottom: 5,
+  },
+  sendIcon: {
+    width: 30,
+    height: 30,
+    tintColor: '#34B7F1',
+  },
+  composer: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    marginLeft: 10,
+    marginRight: 5,
+    marginBottom: 5,
+  },
+});
