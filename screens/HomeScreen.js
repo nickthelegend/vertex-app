@@ -161,6 +161,10 @@ console.log(userFullName)
           <CategoryButton text="Clubs" />
 
           <CategoryButton text="Events" />
+
+          <CategoryButton text="Opportunities" />
+
+          <CategoryButton text="Question/Help" />
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}  >
