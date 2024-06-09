@@ -15,6 +15,7 @@ import scaleSize from '../utils/ScaleSize';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 // import BottomSheetModal from '../components/BottomModalSheet';
 import CreatePostModal from '../components/BottomModalSheet';
+import MessagesPage from './MessagesPage';
 const Tab = createBottomTabNavigator();
 const CustomTabBarButton = ({ children, onPress }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -213,7 +214,7 @@ export default function BottomTabNavigator() {
 />
 <Tab.Screen
   name="Chat"
-  component={ChatScreen}
+  component={MessagesPage}
   options={({ color, size }) => ({
     tabBarIcon: ({ color, size, focused }) => (
          

@@ -13,7 +13,7 @@ import LoginScreen from './screens/LoginScreen';
 import MessagesPage from './screens/MessagesPage';
 import CommunityScreen from './screens/CommunityScreen';
 import ServicesScreen from './screens/ServicesScreen';
-import ChatScreen from './screens/ChatScreen';
+import ChatScreen from './components/ChatScreen';
 import PostScreen from './screens/PostScreen';
 import NavigationScreen from './screens/NavigationScreen';
 import ProfileScreen from './screens/ProfileScreen';
@@ -35,6 +35,7 @@ import AdDetails from './screens/AdDetails';
 import CategoryBooks from './screens/CategoryBooks';
 import FilterScreen from './screens/FilterScreen';
 import CreateSellAd from './screens/CreateSellAd';
+import SendMessageScreen from './screens/SendMessageScreen';
 
 const Stack = createStackNavigator();
 
@@ -99,6 +100,7 @@ export default function App() {
         <Stack.Screen name="CategoryBooks" component={CategoryBooks}/>
         <Stack.Screen name="FilterScreen" component={FilterScreen}/>
         <Stack.Screen name="CreateSellAd" component={CreateSellAd}/>
+        <Stack.Screen name="SendMessageScreen" component={SendMessageScreen}/>
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>
     </NavigationContainer>

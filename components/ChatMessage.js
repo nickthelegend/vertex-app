@@ -1,10 +1,12 @@
+// components/ChatMessage.js
+
 import React from "react";
-import { View, Text, Image, Touchable } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useFonts } from "expo-font";
-import Spacing from "../utils/Spacing";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-export default function ChatMessage({name,newMessages,profilePic}) {
+import Spacing from "../utils/Spacing";
+
+export default function ChatMessage({ name, profilePic, userId }) {
   const navigation = useNavigation();
   const [fontsLoaded] = useFonts({
     AudioWideFont: require("../fonts/Audiowide-Regular.ttf"),
@@ -15,13 +17,13 @@ export default function ChatMessage({name,newMessages,profilePic}) {
   });
 
   if (!fontsLoaded) {
-    // Return a loading indicator or null until fonts are loaded
     return null;
   }
+
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate("SendMessage");
+        navigation.navigate("SendMessageScreen", { userId });
       }}
     >
       <View
@@ -29,17 +31,12 @@ export default function ChatMessage({name,newMessages,profilePic}) {
           marginBottom: 10,
           borderBottomColor: "#1e41bc",
           borderBottomWidth: 1,
-          paddingBottom:5
+          paddingBottom: 5,
         }}
       >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Image
-            source={{uri: profilePic}}
+            source={{ uri: profilePic }}
             style={{
               width: 65,
               height: 65,
@@ -55,21 +52,8 @@ export default function ChatMessage({name,newMessages,profilePic}) {
             >
               {name}
             </Text>
-            <Text
-              style={{
-                color: "#f92382",
-              }}
-            >
-              {newMessages ? `${newMessages} New Messages` : 'Seen Yesterday'}
-            </Text>
           </View>
-
-          <View
-            style={{
-              flex: 1,
-              alignItems: "flex-end",
-            }}
-          >
+          <View style={{ flex: 1, alignItems: "flex-end" }}>
             <Image
               source={require("../assets/icons/camera.png")}
               style={{
