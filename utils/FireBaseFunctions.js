@@ -9,7 +9,9 @@ import { app } from '../services/config'
 
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-const database = getFirestore(app)
+const database = getFirestore(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 // import { firebase } from '@react-native-firebase/firestore';
 // const firebaseConfig = {
 //   apiKey: "AIzaSyB056tMKN588natkE09N_5BAHuTp-0IXWw",
@@ -275,5 +277,27 @@ export async function updateUserInfo  (uri,userInfo) {
   }
 };
 
+
+
+export const savePostToFirestore = async (post) => {
+  try {
+    const postRef = doc(collection(db, 'posts'), post.id);
+
+    if (post.imgUrl) {
+      const imageUri = post.imgUrl;
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      const imageRef = ref(storage, `postImages/${uuid.v4()}`);
+      await uploadBytes(imageRef, blob);
+      const imageUrl = await getDownloadURL(imageRef);
+      post.imgUrl = imageUrl;
+    }
+
+    await setDoc(postRef, post);
+    console.log('Post successfully written!');
+  } catch (error) {
+    console.error('Error writing post to Firestore: ', error);
+  }
+};
 
 

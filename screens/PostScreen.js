@@ -7,57 +7,71 @@ import { savePostToFirestore } from '../utils/FireBaseFunctions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LoadingIndicator from '../components/LoadingIndicator';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 export default function PostScreen({ navigation }) {
+  
   const [caption, setCaption] = useState('');
   const [image, setImage] = useState(null);
   const [selectedTag, setSelectedTag] = useState(null);
+  const [loadingVisible, setLoadingVisible] = useState(false); // State to control loading animation visibility
   const tags = ['What\'s Happening', 'Community', 'Clubs', 'Events', 'Opportunities', 'Question/Help'];
-  // console.log(image)
+
   const openImagePicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-  
-    // console.log(result); // Log the result to see what is returned
-    setImage(result.assets[0].uri);
-    // if (!result.canceled && result.uri) {
-    //   console.log('Selected image:', result.uri); // Log the selected image URI
-    //   setImage({ uri: result.uri });
-    // } else {
-    //   console.log('Image selection cancelled or URI is invalid');
-    // }
+
+    if (!result.canceled && result.assets && result.assets[0].uri) {
+      setImage(result.assets[0].uri);
+    } else {
+      console.log('Image selection cancelled or URI is invalid');
+    }
   };
 
   const handlePost = async () => {
-    const userId = await AsyncStorage.getItem('userId');
-    const userName = await AsyncStorage.getItem('userName');
-    const userFullName = await AsyncStorage.getItem('userFullName');
+    try {
+      setLoadingVisible(true);
+      const userData = await AsyncStorage.getItem('user');
+      const jsonObj = JSON.parse(userData);
+      console.log(jsonObj);
+  
+      const userId = jsonObj.userId;
+      const userName = jsonObj.username;
+      const userFullName = jsonObj.fullName;
+  
+      const postId = uuid.v4();
+      const post = {
+        id: postId,
+        caption,
+        imgUrl: image || null,
+        likes: [],
+        comments: [],
+        createdAt: new Date(),
+        createdBy: userId,
+        createdByUserName: userName,
+        createdByUserFullname: userFullName,
+        postCategory: 'Public',
+        postTags: selectedTag,
+      };
+  
+      await savePostToFirestore(post);
+      setLoadingVisible(false);
 
-    const postId = uuid.v4();
-    const post = {
-      id: postId,
-      caption,
-      imgUrl: image ? image.uri : null,
-      likes: [],
-      comments: [],
-      createdAt: new Date(),
-      createdBy: userId,
-      createdByUserName: userName,
-      createdByUserFullname: userFullName,
-      postCategory: 'Public',
-      postTags: selectedTag,
-    };
+      // Reset form and navigate back or show a success message
+    } catch (error) {
+      // Handle the error here
+      console.error('Error in handlePost:', error);
+      setLoadingVisible(false);
 
-    await savePostToFirestore(post);
-    // Reset form and navigate back or show a success message
+      // Optionally, you can also show an error message to the user
+    }
   };
-
+  
   const handleBack = () => {
     navigation.goBack();
   };
@@ -80,7 +94,11 @@ export default function PostScreen({ navigation }) {
           onChangeText={setCaption}
           multiline
         />
-        <Text style={styles.sectionTitle}>Image</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+  <Text style={[styles.sectionTitle, { marginRight: 5 }]}>Image</Text>
+  <Text style={{ fontSize: 11, alignSelf: 'center' }}>(Optional)</Text>
+</View>
+
         <View style={styles.imageContainer}>
           {image && (
             <Image source={{ uri: image }} style={styles.image} />
@@ -107,6 +125,8 @@ export default function PostScreen({ navigation }) {
       <TouchableOpacity onPress={handlePost} style={styles.postButton}>
         <Text style={styles.postButtonText}>Post</Text>
       </TouchableOpacity>
+
+      {loadingVisible && <LoadingIndicator />}
     </SafeAreaView>
   );
 }
@@ -189,7 +209,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   selectedTagText: {
-    color:'#fff'
+    color: '#fff',
   },
   postButton: {
     backgroundColor: '#1c40bd',
@@ -202,6 +222,5 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 18,
-
   },
 });
