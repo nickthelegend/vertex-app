@@ -12,7 +12,6 @@ import LoadingIndicator from '../components/LoadingIndicator';
 const { width: screenWidth } = Dimensions.get('window');
 
 export default function PostScreen({ navigation }) {
-  
   const [caption, setCaption] = useState('');
   const [image, setImage] = useState(null);
   const [selectedTag, setSelectedTag] = useState(null);
@@ -71,6 +70,11 @@ export default function PostScreen({ navigation }) {
       // Optionally, you can also show an error message to the user
     }
   };
+
+  const isPostButtonDisabled = () => {
+    const wordCount = caption.trim().split(/\s+/).length;
+    return wordCount < 9 || !selectedTag;
+  };
   
   const handleBack = () => {
     navigation.goBack();
@@ -86,6 +90,8 @@ export default function PostScreen({ navigation }) {
         <View></View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollView}>
+      <Text style={[styles.sectionTitle, { marginRight: 5 }]}>Caption</Text>
+
         <TextInput
           style={styles.input}
           placeholder="What's happening?"
@@ -95,10 +101,9 @@ export default function PostScreen({ navigation }) {
           multiline
         />
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-  <Text style={[styles.sectionTitle, { marginRight: 5 }]}>Image</Text>
-  <Text style={{ fontSize: 11, alignSelf: 'center' }}>(Optional)</Text>
-</View>
-
+          <Text style={[styles.sectionTitle, { marginRight: 5 }]}>Image</Text>
+          <Text style={{ fontSize: 11, alignSelf: 'center' }}>(Optional)</Text>
+        </View>
         <View style={styles.imageContainer}>
           {image && (
             <Image source={{ uri: image }} style={styles.image} />
@@ -122,7 +127,11 @@ export default function PostScreen({ navigation }) {
           ))}
         </View>
       </ScrollView>
-      <TouchableOpacity onPress={handlePost} style={styles.postButton}>
+      <TouchableOpacity
+        onPress={handlePost}
+        style={[styles.postButton, isPostButtonDisabled() && styles.disabledPostButton]}
+        disabled={isPostButtonDisabled()}
+      >
         <Text style={styles.postButtonText}>Post</Text>
       </TouchableOpacity>
 
@@ -217,6 +226,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     margin: 20,
+  },
+  disabledPostButton: {
+    backgroundColor: '#aaaaaa',
   },
   postButtonText: {
     color: 'white',
