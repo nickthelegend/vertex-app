@@ -240,6 +240,17 @@ longitudeDelta: 0.00080, // or any smaller value
     }
   };
 
+  const onMapReady = async () => {
+    setMapReady(true);
+    try {
+      if (_map.current) {
+        await _map.current.setMapBoundaries(northEast, southWest);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View
@@ -252,6 +263,7 @@ longitudeDelta: 0.00080, // or any smaller value
           padding: 15,
           borderBottomWidth: 1,
     borderBottomColor: '#dddddd',
+    
           // justifyContent: "space-between",
 
         }}
@@ -295,7 +307,8 @@ longitudeDelta: 0.00080, // or any smaller value
         maxZoomLevel={35}
         onRegionChangeComplete={onRegionChangeComplete}
         customMapStyle={mapStyle}
-        
+        onMapReady={onMapReady}
+
       >
         {markers.map((marker, index) => (
   <Marker
