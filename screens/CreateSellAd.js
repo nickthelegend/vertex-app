@@ -112,7 +112,7 @@ export default function CreateSellAd() {
                   style={[styles.categoryButton, category === cat && styles.selectedCategoryButton]}
                   onPress={() => setCategory(cat)}
                 >
-                  <Text style={styles.categoryText}>{cat}</Text>
+                  <Text style={[styles.categoryText, category === cat && styles.selectedButtonText]}>{cat}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -127,7 +127,7 @@ export default function CreateSellAd() {
                       style={[styles.yearButton, year === selectedYear && styles.selectedYearButton]}
                       onPress={() => handleYearClick(selectedYear)}
                     >
-                      <Text style={styles.yearText}>{`${selectedYear} Year`}</Text>
+                      <Text style={[styles.yearText, year === selectedYear && styles.selectedButtonText]}>{`${selectedYear} Year`}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -140,7 +140,7 @@ export default function CreateSellAd() {
                       style={[styles.branchButton, branch === dept && styles.selectedBranchButton]}
                       onPress={() => handleBranchClick(dept)}
                     >
-                      <Text style={styles.branchText}>{dept}</Text>
+                      <Text style={[styles.branchText,, branch === dept && styles.selectedButtonText]}>{dept}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -195,7 +195,7 @@ export default function CreateSellAd() {
                   style={[styles.conditionButton, condition === cond && styles.selectedConditionButton]}
                   onPress={() => setCondition(cond)}
                 >
-                  <Text style={styles.conditionText}>{cond}</Text>
+                  <Text style={[styles.conditionText, condition === cond && styles.selectedButtonText]}>{cond}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -233,7 +233,7 @@ export default function CreateSellAd() {
                   style={[styles.branchButton, hostel === hostelName && styles.selectedBranchButton]}
                   onPress={() => setHostel(hostelName)}
                 >
-                  <Text style={styles.branchText}>{hostelName}</Text>
+                  <Text style={[styles.branchText,hostel === hostelName && styles.selectedButtonText]}>{hostelName}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -328,6 +328,9 @@ const styles = StyleSheet.create({
   },
   selectedYearButton: {
     backgroundColor: '#1c40bd',
+  },
+  selectedButtonText:{
+    color: '#fff',
   },
   yearText: {
     fontSize: 18,
