@@ -12,7 +12,7 @@ import Spacing from "../utils/Spacing";
 import { useFonts } from "expo-font";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { app } from '../services/config';
 import ChatMessage from "../components/ChatMessage";
 import SPACING from "../utils/Spacing";
@@ -27,7 +27,7 @@ const db = getFirestore(app);
 export default function MessagesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState([]);
-  console.log(users)
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [fontsLoaded] = useFonts({
     AudioWideFont: require("../fonts/Audiowide-Regular.ttf"),
     Comfortaa: require("../fonts/Comfortaa-VariableFont_wght.ttf"),
@@ -43,18 +43,27 @@ export default function MessagesPage() {
   };
 
   useEffect(() => {
+    const fetchUsers = async () => {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const usersData = querySnapshot.docs.map(doc => doc.data());
+      setUsers(usersData);
+    };
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
     if (searchQuery.length > 0) {
-      const fetchUsers = async () => {
-        const q = query(collection(db, "users"), where("fullName", "==", searchQuery));
-        const querySnapshot = await getDocs(q);
-        const usersData = querySnapshot.docs.map(doc => doc.data());
-        setUsers(usersData);
-      };
-      fetchUsers();
+      const lowerCaseQuery = searchQuery.toLowerCase();
+      const upperCaseQuery = searchQuery.toUpperCase();
+      const filtered = users.filter(user =>
+        user.fullName.toLowerCase().includes(lowerCaseQuery) ||
+        user.fullName.toUpperCase().includes(upperCaseQuery)
+      );
+      setFilteredUsers(filtered);
     } else {
-      setUsers([]);
+      setFilteredUsers([]);
     }
-  }, [searchQuery]);
+  }, [searchQuery, users]);
 
   if (!fontsLoaded) {
     return null;
@@ -90,7 +99,7 @@ export default function MessagesPage() {
           </View>
         </View>
         <FlatList
-          data={users}
+          data={filteredUsers}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <ChatMessage
