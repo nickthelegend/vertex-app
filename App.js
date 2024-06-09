@@ -99,6 +99,7 @@ export default function App() {
         <Stack.Screen name="CategoryBooks" component={CategoryBooks}/>
         <Stack.Screen name="FilterScreen" component={FilterScreen}/>
         <Stack.Screen name="CreateSellAd" component={CreateSellAd}/>
+        {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>
     </NavigationContainer>
   );

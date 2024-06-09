@@ -1,4 +1,5 @@
 // CreatePostModal.js
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Modal,
@@ -13,6 +14,7 @@ import {
 const { height } = Dimensions.get('window');
 
 const CreatePostModal = ({ visible, onClose }) => {
+  const navigation = useNavigation();
   const [showModal, setShowModal] = useState(visible);
   const slideAnim = useRef(new Animated.Value(height)).current;
 
@@ -33,6 +35,13 @@ const CreatePostModal = ({ visible, onClose }) => {
     }
   }, [visible, slideAnim]);
 
+  const handleNavigation = (screen) => {
+    onClose();
+    setTimeout(() => {
+      navigation.navigate(screen);
+    }, 300); // Adjust the delay if necessary
+  };
+
   return (
     <Modal
       transparent
@@ -47,7 +56,7 @@ const CreatePostModal = ({ visible, onClose }) => {
       >
         <Animated.View style={[styles.modalContainer, { transform: [{ translateY: slideAnim }] }]}>
           <Text style={styles.modalText}>Create Post</Text>
-          <TouchableOpacity onPress={() => { onClose(); /* Navigate to Create Post Publicly screen */ }} style={styles.optionButton}>
+          <TouchableOpacity onPress={() => handleNavigation("PostScreen")} style={styles.optionButton}>
             <Text style={styles.optionButtonText}>Publicly</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => { onClose(); /* Navigate to Create Post in Community screen */ }} style={styles.optionButton}>
@@ -58,7 +67,6 @@ const CreatePostModal = ({ visible, onClose }) => {
     </Modal>
   );
 };
-
 
 const styles = StyleSheet.create({
   modalOverlay: {
