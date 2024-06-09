@@ -176,7 +176,7 @@ export default function RegisterScreen() {
               {rollNumberError ? <Text style={{ color: 'red' }}>{rollNumberError}</Text> : null}
               <CustomTextField hint="Email" value={email} onChangeText={setEmail} drawableStart={<MaterialIcons name="email" size={24} color="black" />} />
               {emailError ? <Text style={{ color: 'red' }}>{emailError}</Text> : null}
-              <CustomTextField hint="Phone" value={phone} onChangeText={setPhone} drawableStart={<MaterialIcons name="phone" size={24} color="black" />} />
+              <CustomTextField numericKeyboard={true} hint="Phone" value={phone} onChangeText={setPhone} drawableStart={<MaterialIcons name="phone" size={24} color="black" />} />
               {phoneError ? <Text style={{ color: 'red' }}>{phoneError}</Text> : null}
               <CustomTextField hint="Password" secureTextEntry={true} value={password} onChangeText={setPassword} drawableStart={<MaterialIcons name="password" size={24} color="black" />} />
               {passwordError ? <Text style={{ color: 'red' }}>{passwordError}</Text> : null}

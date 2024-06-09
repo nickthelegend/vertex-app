@@ -4,7 +4,7 @@ import SPACING from '../utils/Spacing';
 import Spacing from '../utils/Spacing';
 import { useFonts } from 'expo-font';
 
-const CustomTextField = ({ drawableStart,hint,secureTextEntry, ...props }) => {
+const CustomTextField = ({numericKeyboard, drawableStart,hint,secureTextEntry, ...props }) => {
 
   const [fontsLoaded] = useFonts({
     'Comfortaa': require('../fonts/Comfortaa-VariableFont_wght.ttf'),
@@ -34,7 +34,7 @@ const CustomTextField = ({ drawableStart,hint,secureTextEntry, ...props }) => {
         </View>
       )}
         
-      <TextInput style={{ flex: 1, paddingHorizontal: 1, fontSize: SPACING * 1.8, fontFamily: 'MontserratBold', color: 'black',fontWeight: '100' }} {...props} secureTextEntry={secureTextEntry} placeholder={hint} />
+      <TextInput style={{ flex: 1, paddingHorizontal: 1, fontSize: SPACING * 1.8, fontFamily: 'MontserratBold', color: 'black',fontWeight: '100' }} {...props} secureTextEntry={secureTextEntry} placeholder={hint} keyboardType={numericKeyboard?'numeric' :'default'}/>
     </View>
   );
 };
