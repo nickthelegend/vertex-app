@@ -105,7 +105,7 @@ export default function MessagesPage() {
 
   const handleChatPress = async (user) => {
     // Navigate to chat screen
-    navigation.navigate('SendMessageScreen', { userId: user.userId });
+    navigation.navigate('SendMessageScreen', { userId: user.userId ,name: user.fullName});
 
     // Check if the user already exists in chat history
     const userExists = chatHistory.some(chatUser => chatUser.userId === user.userId);
@@ -174,14 +174,14 @@ export default function MessagesPage() {
 
   return (
     <SafeAreaView>
-      <View style={{ paddingVertical: Spacing * 4, paddingHorizontal: Spacing * 2 }}>
+      <View style={{ paddingVertical: Spacing * 1, paddingHorizontal: Spacing * 2 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <TouchableOpacity onPress={handleGoBack}>
+          {/* <TouchableOpacity onPress={handleGoBack}>
             <Image
               source={require("../assets/icons/back.png")}
               style={{ width: 30, height: 30 }}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <Text style={{ fontSize: Spacing * 2.5, marginLeft: Spacing * 1.5, fontFamily: "ComfortaaBold" }}>
             Chats
           </Text>

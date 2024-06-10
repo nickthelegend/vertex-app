@@ -7,11 +7,13 @@ import { useNavigation } from '@react-navigation/native';
 import { app } from '../services/config';
 import uuid from 'react-native-uuid';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'react-native'
+import ProfilePicture from '../components/ProfilePicture';
 
 const db = getFirestore(app);
 
 export default function SendMessageScreen({ route }) {
-  const { userId: otherUserId } = route.params;
+  const { userId: otherUserId, name: fullName } = route.params;
   const [messages, setMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentUserFullName, setCurrentUserFullName] = useState(null);
@@ -77,13 +79,19 @@ export default function SendMessageScreen({ route }) {
     navigation.goBack();
   };
 
+  console.log(fullName)
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 10, backgroundColor: '#1c40bd' }}>
+          <StatusBar barStyle = "dark-content" hidden = {false} backgroundColor = "#1c40bd" translucent = {true}/>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 15, backgroundColor: '#1c40bd',borderBottomLeftRadius:20,borderBottomRightRadius:20 }}>
+      
         <TouchableOpacity onPress={handleGoBack}>
           <Image source={require('../assets/icons/back.png')} style={{ width: 30, height: 30, tintColor: 'white' }} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chat</Text>
+
+        <ProfilePicture fullName= {fullName}/>
+        <Text style={styles.headerTitle}>{fullName}</Text>
       </View>
       <GiftedChat
         messages={messages}
@@ -150,26 +158,32 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 21,
     marginLeft: 10,
+    fontFamily:'Comfortaa'
   },
   inputToolbar: {
     backgroundColor: '#ECE5DD',
     borderTopWidth: 1,
     borderTopColor: '#E5E5E5',
+    padding:2
   },
   sendContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
     marginBottom: 5,
+    marginLeft:5,
+    backgroundColor:'#34B7F1',
+    borderRadius:10,
+    paddingHorizontal:5
   },
   sendIcon: {
     width: 30,
     height: 30,
-    tintColor: '#34B7F1',
+    tintColor: '#fff',
   },
   composer: {
     backgroundColor: 'white',
-    borderRadius: 20,
+    borderRadius: 10,
     paddingHorizontal: 15,
     marginLeft: 10,
     marginRight: 5,
