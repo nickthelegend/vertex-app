@@ -4,6 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from 'expo-image-picker';
+import { app } from '../services/config'
+import { getFirestore, collection,addDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import uuid from 'react-native-uuid';
+
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -21,15 +28,51 @@ export default function CreateSellAd() {
   const [images, setImages] = useState([]);
   const [userName, setUserName] = useState('');
   const [hostel, setHostel] = useState('');
-
+  const [phoneNumber, setPhoneNumber] = useState('');
+  
   const handleNext = () => {
     if (step === 1 && category) {
       setStep(2);
     } else if (step === 2 && productName && description && (price || giveaway) && condition) {
       setStep(3);
-    } else if (step === 3 && userName && hostel) {
+    } else if (step === 3 && userName && hostel && phoneNumber) {
       // Submit the form
-      console.log('Form Submitted', { category, year, branch, productName, description, price, giveaway, condition, images, userName, hostel });
+      console.log('Form Submitted', { category, year, branch, productName, description, price, giveaway, condition, images, userName, hostel, phoneNumber });
+      handleSubmit();
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      // Upload images to Firebase Storage
+      const uploadedImages = await Promise.all(images.map(async (image) => {
+        const imageRef = ref(storage, `sellAds/${uuid.v4()}`);
+        const img = await fetch(image.uri);
+        const bytes = await img.blob();
+        await uploadBytes(imageRef, bytes);
+        const downloadURL = await getDownloadURL(imageRef);
+        return downloadURL;
+      }));
+  
+      // Add document to Firestore with image URLs
+      await addDoc(collection(db, 'sellAds'), {
+        category,
+        year,
+        branch,
+        productName,
+        description,
+        price,
+        giveaway,
+        condition,
+        images: uploadedImages, // Use uploaded image URLs
+        userName,
+        hostel,
+        phoneNumber,
+      });
+      console.log('Document successfully written!');
+      navigation.goBack();
+    } catch (e) {
+      console.error('Error adding document: ', e);
     }
   };
 
@@ -55,11 +98,12 @@ export default function CreateSellAd() {
       allowsMultipleSelection: true,
       quality: 1,
     });
-
+  
     if (!result.canceled) {
-      setImages([...images, ...result.assets.slice(0, 3 - images.length)]);
+      setImages([...images, ...result.assets.slice(0, 3 - images.length).map(asset => ({ uri: asset.uri }))]);
     }
   };
+  
 
   const handleCategoryClick = (selectedCategory) => {
     if (selectedCategory === 'Resources') {
@@ -80,7 +124,7 @@ export default function CreateSellAd() {
       return !(productName && description && (price || giveaway) && condition);
     }
     if (step === 3) {
-      return !(userName && hostel);
+      return !(userName && hostel && phoneNumber);
     }
     return false;
   };
@@ -140,7 +184,7 @@ export default function CreateSellAd() {
                       style={[styles.branchButton, branch === dept && styles.selectedBranchButton]}
                       onPress={() => handleBranchClick(dept)}
                     >
-                      <Text style={[styles.branchText,, branch === dept && styles.selectedButtonText]}>{dept}</Text>
+                      <Text style={[styles.branchText, branch === dept && styles.selectedButtonText]}>{dept}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -233,10 +277,18 @@ export default function CreateSellAd() {
                   style={[styles.branchButton, hostel === hostelName && styles.selectedBranchButton]}
                   onPress={() => setHostel(hostelName)}
                 >
-                  <Text style={[styles.branchText,hostel === hostelName && styles.selectedButtonText]}>{hostelName}</Text>
+                  <Text style={[styles.branchText, hostel === hostelName && styles.selectedButtonText]}>{hostelName}</Text>
                 </TouchableOpacity>
               ))}
             </View>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Phone Number"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              keyboardType="phone-pad"
+            />
           </>
         )}
       </ScrollView>
