@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
   itemImageStyle: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
+    resizeMode:'contain'
   },
   itemDetails: {
     padding: 15,
