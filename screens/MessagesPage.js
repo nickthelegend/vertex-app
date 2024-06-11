@@ -13,7 +13,6 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { getFirestore, collection, getDocs, doc, updateDoc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from "expo-font";
-import Spacing from "../utils/Spacing";
 import SPACING from "../utils/Spacing";
 import { app } from '../services/config';
 import ChatMessage from "../components/ChatMessage";
@@ -30,6 +29,8 @@ export default function MessagesPage() {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [chatHistory, setChatHistory] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserFullName, setCurrentUserFullName] = useState(null);
 
   const [fontsLoaded] = useFonts({
     AudioWideFont: require("../fonts/Audiowide-Regular.ttf"),
@@ -40,20 +41,40 @@ export default function MessagesPage() {
   });
 
   const navigation = useNavigation();
-  const currentUserId = "currentUserId"; // Replace this with the actual current user's ID
 
   const handleGoBack = () => {
     navigation.goBack();
   };
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('user');
+        if (userData) {
+          const jsonObj = JSON.parse(userData);
+          setCurrentUserId(jsonObj.userId);
+          setCurrentUserFullName(jsonObj.fullName);
+        }
+      } catch (error) {
+        console.error("Error fetching current user data:", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
     const fetchUsers = async () => {
-      const querySnapshot = await getDocs(collection(db, "users"));
-      const usersData = querySnapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      setUsers(usersData);
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const usersData = querySnapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setUsers(usersData);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     };
     fetchUsers();
   }, []);
@@ -62,7 +83,7 @@ export default function MessagesPage() {
     if (searchQuery.length > 0) {
       const lowerCaseQuery = searchQuery.toLowerCase();
       const filtered = users.filter(user =>
-        user.fullName.toLowerCase().includes(lowerCaseQuery)
+        user.fullName && user.fullName.toLowerCase().includes(lowerCaseQuery)
       );
       setFilteredUsers(filtered);
     } else {
@@ -86,26 +107,26 @@ export default function MessagesPage() {
   }, []);
 
   useEffect(() => {
-    // Real-time listener for the current user's chat history and newMessagesCount
-    const unsubscribe = onSnapshot(doc(db, "users", currentUserId), (doc) => {
-      const data = doc.data();
-      if (data) {
-        setChatHistory(data.chatHistory || []);
-        // Handle new message notifications
-        const updatedChatHistory = (data.chatHistory || []).map(chatUser => ({
-          ...chatUser,
-          newMessagesCount: chatUser.newMessagesCount || 0,
-        }));
-        setChatHistory(updatedChatHistory);
-      }
-    });
+    if (currentUserId) {
+      // Real-time listener for the current user's chat history and newMessagesCount
+      const unsubscribe = onSnapshot(doc(db, "users", currentUserId), (doc) => {
+        const data = doc.data();
+        if (data) {
+          const updatedChatHistory = (data.chatHistory || []).map(chatUser => ({
+            ...chatUser,
+            newMessagesCount: chatUser.newMessagesCount || 0,
+          }));
+          setChatHistory(updatedChatHistory);
+        }
+      });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    }
   }, [currentUserId]);
 
   const handleChatPress = async (user) => {
     // Navigate to chat screen
-    navigation.navigate('SendMessageScreen', { userId: user.userId ,name: user.fullName});
+    navigation.navigate('SendMessageScreen', { userId: user.userId, name: user.fullName });
 
     // Check if the user already exists in chat history
     const userExists = chatHistory.some(chatUser => chatUser.userId === user.userId);
@@ -144,7 +165,11 @@ export default function MessagesPage() {
 
     // Update the chat history for both users
     await updateChatHistoryForUser(currentUserId, user);
-    await updateChatHistoryForUser(user.userId, { userId: currentUserId, fullName: "Current User", profilePic: "path/to/profilePic" });
+    await updateChatHistoryForUser(user.userId, { userId: currentUserId, fullName: currentUserFullName, profilePic: "path/to/profilePic" });
+
+    // Update chatHistoryUsers for both users
+    await updateChatHistoryUsersForUser(currentUserId, user.userId);
+    await updateChatHistoryUsersForUser(user.userId, currentUserId);
 
     // Load the updated chat history for the current user
     await loadChatHistory();
@@ -168,21 +193,32 @@ export default function MessagesPage() {
     }
   };
 
+  const updateChatHistoryUsersForUser = async (userId, chatUserId) => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const chatHistoryUsers = userData.chatHistoryUsers || [];
+        if (!chatHistoryUsers.includes(chatUserId)) {
+          chatHistoryUsers.push(chatUserId);
+          await updateDoc(userRef, { chatHistoryUsers });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update chatHistoryUsers for user', error);
+    }
+  };
+
   if (!fontsLoaded) {
     return null;
   }
 
   return (
     <SafeAreaView>
-      <View style={{ paddingVertical: Spacing * 1, paddingHorizontal: Spacing * 2 }}>
+      <View style={{ paddingVertical: SPACING * 1, paddingHorizontal: SPACING * 2 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          {/* <TouchableOpacity onPress={handleGoBack}>
-            <Image
-              source={require("../assets/icons/back.png")}
-              style={{ width: 30, height: 30 }}
-            />
-          </TouchableOpacity> */}
-          <Text style={{ fontSize: Spacing * 2.5, marginLeft: Spacing * 1.5, fontFamily: "ComfortaaBold" }}>
+          <Text style={{ fontSize: SPACING * 2.5, marginLeft: SPACING * 1.5, fontFamily: "ComfortaaBold" }}>
             Chats
           </Text>
         </View>

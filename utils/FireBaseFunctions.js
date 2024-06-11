@@ -65,7 +65,7 @@ export async function registerUser(userInfo) {
       is_verified: userInfo.is_verified || false, // Default to false if not provided
       profilepic: userInfo.profilepic || '', // Default to empty string if not provided
       verifyDocument: userInfo.verifyDocument || '', // Default to empty string if not provided
-      fullName : userInfo.fullname || '',
+      fullName: userInfo.fullname || '',
       streetAddress: userInfo.streetAddress || '',
       city: userInfo.city || '',
       state: userInfo.state || '',
@@ -77,9 +77,9 @@ export async function registerUser(userInfo) {
       graduationYear: '',
       posts: [],
       bio: '',
-
-
-    }
+      chatHistoryUsers: [], // New field for chat history users
+    };
+    
     // Set user information in the document
     const registrationResult = await setDoc(userDoc,userDataObject )
     // console.log(registrationResult)
