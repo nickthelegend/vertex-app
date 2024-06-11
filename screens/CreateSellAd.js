@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Dimensions, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from "@expo/vector-icons";
@@ -8,6 +8,7 @@ import { app } from '../services/config'
 import { getFirestore, collection,addDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import uuid from 'react-native-uuid';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -29,32 +30,42 @@ export default function CreateSellAd() {
   const [userName, setUserName] = useState('');
   const [hostel, setHostel] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  
+  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUserFullName, setCurrentUserFullName] = useState('');
+  console.log(currentUser);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const userData = await AsyncStorage.getItem('user');
+      const jsonObj = JSON.parse(userData);
+      setCurrentUser(jsonObj.userId);
+      setCurrentUserFullName(jsonObj.fullName);
+    };
+
+    fetchCurrentUser();
+  }, []);
   const handleNext = () => {
     if (step === 1 && category) {
       setStep(2);
     } else if (step === 2 && productName && description && (price || giveaway) && condition) {
       setStep(3);
     } else if (step === 3 && userName && hostel && phoneNumber) {
-      // Submit the form
-      console.log('Form Submitted', { category, year, branch, productName, description, price, giveaway, condition, images, userName, hostel, phoneNumber });
       handleSubmit();
     }
   };
 
   const handleSubmit = async () => {
     try {
-      // Upload images to Firebase Storage
-      const uploadedImages = await Promise.all(images.map(async (image) => {
-        const imageRef = ref(storage, `sellAds/${uuid.v4()}`);
-        const img = await fetch(image.uri);
-        const bytes = await img.blob();
-        await uploadBytes(imageRef, bytes);
-        const downloadURL = await getDownloadURL(imageRef);
+      // Upload images to Firebase Storage and get URLs
+      const urls = await Promise.all(images.map(async (image, index) => {
+        const response = await fetch(image.uri);
+        const blob = await response.blob();
+        const storageRef = ref(storage, `sellAds/${currentUser}/${Date.now()}_${index}`);
+        await uploadBytes(storageRef, blob);
+        const downloadURL = await getDownloadURL(storageRef);
         return downloadURL;
       }));
-  
-      // Add document to Firestore with image URLs
+
       await addDoc(collection(db, 'sellAds'), {
         category,
         year,
@@ -64,10 +75,12 @@ export default function CreateSellAd() {
         price,
         giveaway,
         condition,
-        images: uploadedImages, // Use uploaded image URLs
+        images: urls,
         userName,
         hostel,
         phoneNumber,
+        userId: currentUser,
+        userFullName: currentUserFullName,
       });
       console.log('Document successfully written!');
       navigation.goBack();
@@ -75,6 +88,7 @@ export default function CreateSellAd() {
       console.error('Error adding document: ', e);
     }
   };
+
 
   const handleBack = () => {
     if (step > 1) {
