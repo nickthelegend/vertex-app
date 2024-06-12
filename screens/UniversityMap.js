@@ -308,7 +308,8 @@ longitudeDelta: 0.00080, // or any smaller value
         onRegionChangeComplete={onRegionChangeComplete}
         customMapStyle={mapStyle}
         onMapReady={onMapReady}
-        
+        showsUserLocation={true}
+
 
       >
         {markers.map((marker, index) => (
