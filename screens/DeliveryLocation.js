@@ -1,19 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,Image } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 export default function DeliveryLocation({ navigation }) {
+  const northEast = { latitude: 17.49617, longitude: 78.39486 };
+  const southWest = { latitude: 17.490222, longitude: 78.386944 };
+
   const [region, setRegion] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+    latitude: 17.493504, // Center point within your boundaries
+    longitude: 78.391198, // Center point within your boundaries
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
   });
 
-  const [currentLocation, setCurrentLocation] = useState(null);
+  const mapRef = useRef(null);
+
+  const onRegionChangeComplete = async (newRegion) => {
+    const maxLatitudeDelta = 0.01;
+    const maxLongitudeDelta = 0.01;
+    
+    const adjustedRegion = {
+      ...newRegion,
+      latitudeDelta: Math.min(newRegion.latitudeDelta, maxLatitudeDelta),
+      longitudeDelta: Math.min(newRegion.longitudeDelta, maxLongitudeDelta),
+    };
+
+    setRegion(adjustedRegion);
+
+    try {
+      const boundaries = await mapRef.current.getMapBoundaries();
+      await mapRef.current.setMapBoundaries(northEast, southWest);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleConfirmLocation = () => {
+    console.log('Selected coordinates:', region.latitude, region.longitude);
+  };
 
   useEffect(() => {
     (async () => {
@@ -24,7 +51,6 @@ export default function DeliveryLocation({ navigation }) {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      setCurrentLocation(location.coords);
       setRegion({
         ...region,
         latitude: location.coords.latitude,
@@ -32,14 +58,6 @@ export default function DeliveryLocation({ navigation }) {
       });
     })();
   }, []);
-
-  const onRegionChangeComplete = (region) => {
-    setRegion(region);
-  };
-
-  const handleConfirmLocation = () => {
-    console.log('Selected coordinates:', region.latitude, region.longitude);
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -54,6 +72,7 @@ export default function DeliveryLocation({ navigation }) {
         <View></View>
       </View>
       <MapView
+        ref={mapRef}
         style={styles.map}
         region={region}
         onRegionChangeComplete={onRegionChangeComplete}
@@ -65,6 +84,10 @@ export default function DeliveryLocation({ navigation }) {
         <Image style={styles.marker} source={require('../assets/map_marker.png')} />
       </View>
       <View style={styles.centerDot} />
+      {/* <View style={styles.coordinatesContainer}>
+        <Text style={styles.coordinatesText}>Latitude: {region.latitude}</Text>
+        <Text style={styles.coordinatesText}>Longitude: {region.longitude}</Text>
+      </View> */}
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmLocation}>
         <Text style={styles.confirmButtonText}>Confirm Location</Text>
       </TouchableOpacity>
@@ -117,6 +140,20 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginLeft: -4,
     marginTop: -4,
+  },
+  coordinatesContainer: {
+    position: 'absolute',
+    bottom: 100,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  coordinatesText: {
+    fontSize: 16,
+    fontFamily: "Poppins-SemiBold",
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 5,
+    borderRadius: 5,
   },
   confirmButton: {
     backgroundColor: "#1c40bd",

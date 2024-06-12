@@ -308,6 +308,7 @@ longitudeDelta: 0.00080, // or any smaller value
         onRegionChangeComplete={onRegionChangeComplete}
         customMapStyle={mapStyle}
         onMapReady={onMapReady}
+        
 
       >
         {markers.map((marker, index) => (
