@@ -36,6 +36,7 @@ import CategoryBooks from './screens/CategoryBooks';
 import FilterScreen from './screens/FilterScreen';
 import CreateSellAd from './screens/CreateSellAd';
 import SendMessageScreen from './screens/SendMessageScreen';
+import DeliveryLocation from './screens/DeliveryLocation';
 
 const Stack = createStackNavigator();
 
@@ -64,7 +65,7 @@ export default function App() {
   return (
     <NavigationContainer>
     
-      <Stack.Navigator initialRouteName="Splash" screenOptions={({ route }) => ({
+      <Stack.Navigator initialRouteName="OrderFood" screenOptions={({ route }) => ({
         headerShown: false,
         ...(route.name === 'CommunityScreen' || route.name === 'ServicesScreen' || route.name === 'ChatScreen' || route.name === 'PostScreen'
           ? { ...TransitionPresets.FadeFromBottomAndroid }
@@ -101,6 +102,8 @@ export default function App() {
         <Stack.Screen name="FilterScreen" component={FilterScreen}/>
         <Stack.Screen name="CreateSellAd" component={CreateSellAd}/>
         <Stack.Screen name="SendMessageScreen" component={SendMessageScreen}/>
+        <Stack.Screen name="DeliveryLocation" component={DeliveryLocation} />
+
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>
     </NavigationContainer>

@@ -137,8 +137,12 @@ const CartScreen = ({ navigation }) => {
             <Text style={styles.summaryText}>Delivery Charges: ₹{deliveryCharges}</Text>
             <Text style={styles.summaryText}>Total: ₹{total}</Text>
           </View>
-          <TouchableOpacity style={styles.orderButton} onPress={() => Alert.alert('Order placed')}>
-            <Text style={styles.orderButtonText}>Place Order</Text>
+          <TouchableOpacity 
+            style={styles.orderButton} 
+            onPress={() => navigation.navigate('DeliveryLocation', { cartItems })}
+
+          >
+            <Text style={styles.orderButtonText}>Next: Delivery Location</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -257,8 +261,8 @@ const styles = StyleSheet.create({
   },
   summaryText: {
     fontSize: 18,
-    fontFamily: "ComfortaaBold",
-    marginBottom: 10,
+    marginBottom: 5,
+    fontFamily: "Poppins-SemiBold",
   },
   orderButton: {
     backgroundColor: "#1c40bd",
@@ -278,10 +282,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   emptyCartText: {
-    fontSize: 20,
-    fontFamily: "ComfortaaBold",
+    fontSize: 18,
+    color: "#777777",
   },
 });
 
 export default CartScreen;
-
