@@ -37,6 +37,7 @@ import FilterScreen from './screens/FilterScreen';
 import CreateSellAd from './screens/CreateSellAd';
 import SendMessageScreen from './screens/SendMessageScreen';
 import DeliveryLocation from './screens/DeliveryLocation';
+import DeliveryStatus from './screens/DeliveryStatus';
 
 const Stack = createStackNavigator();
 
@@ -103,6 +104,7 @@ export default function App() {
         <Stack.Screen name="CreateSellAd" component={CreateSellAd}/>
         <Stack.Screen name="SendMessageScreen" component={SendMessageScreen}/>
         <Stack.Screen name="DeliveryLocation" component={DeliveryLocation} />
+        <Stack.Screen name="DeliveryStatus" component={DeliveryStatus} />
 
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>

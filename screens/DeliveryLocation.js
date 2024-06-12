@@ -87,7 +87,16 @@ export default function DeliveryLocation({ route }) {
         userOrders: arrayUnion(orderId),
       });
 
+      // Clear the cart
+      await AsyncStorage.setItem('cart', JSON.stringify([]));
+
+      // Store the delivery item
+      await AsyncStorage.setItem('delivery', JSON.stringify(newOrder));
+
       console.log('Order confirmed and stored in Firestore:', newOrder);
+
+      // Navigate to the DeliveryStatus page
+      navigation.navigate('DeliveryStatus', { orderId });
     } catch (error) {
       console.error('Error confirming and storing order:', error);
     }
