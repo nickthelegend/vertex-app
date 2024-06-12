@@ -8,8 +8,11 @@ import { getFirestore, collection, doc, setDoc, updateDoc, arrayUnion } from 'fi
 import { app } from '../services/config'; // Assuming you have a firebase config file
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
+import { useNavigation } from '@react-navigation/native';
 
-export default function DeliveryLocation({ navigation }) {
+export default function DeliveryLocation({ route }) {
+  const { cartItems, subtotal, deliveryCharges, total } = route.params;
+  const navigation = useNavigation();
   const northEast = { latitude: 17.49617, longitude: 78.39486 };
   const southWest = { latitude: 17.490222, longitude: 78.386944 };
   const [currentUser, setCurrentUser] = useState(null);
@@ -68,6 +71,10 @@ export default function DeliveryLocation({ navigation }) {
       orderDetails: {
         latitude: region.latitude,
         longitude: region.longitude,
+        cartItems: cartItems,
+        subtotal: subtotal,
+        deliveryCharges: deliveryCharges,
+        total: total,
       },
     };
 

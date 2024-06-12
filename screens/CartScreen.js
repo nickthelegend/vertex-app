@@ -139,7 +139,7 @@ const CartScreen = ({ navigation }) => {
           </View>
           <TouchableOpacity 
             style={styles.orderButton} 
-            onPress={() => navigation.navigate('DeliveryLocation', { cartItems })}
+            onPress={() => navigation.navigate('DeliveryLocation', { cartItems,subtotal,deliveryCharges,total })}
 
           >
             <Text style={styles.orderButtonText}>Next: Delivery Location</Text>
