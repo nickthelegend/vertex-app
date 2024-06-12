@@ -66,7 +66,7 @@ export default function App() {
   return (
     <NavigationContainer>
     
-      <Stack.Navigator initialRouteName="OrderFood" screenOptions={({ route }) => ({
+      <Stack.Navigator initialRouteName="Splash" screenOptions={({ route }) => ({
         headerShown: false,
         ...(route.name === 'CommunityScreen' || route.name === 'ServicesScreen' || route.name === 'ChatScreen' || route.name === 'PostScreen'
           ? { ...TransitionPresets.FadeFromBottomAndroid }
