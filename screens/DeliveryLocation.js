@@ -2,13 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import MapView, { Marker } from 'react-native-maps';
+import MapView from 'react-native-maps';
 import * as Location from 'expo-location';
+import { getFirestore, collection, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { app } from '../services/config'; // Assuming you have a firebase config file
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
 
 export default function DeliveryLocation({ navigation }) {
   const northEast = { latitude: 17.49617, longitude: 78.39486 };
   const southWest = { latitude: 17.490222, longitude: 78.386944 };
-
+  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUserFullName, setCurrentUserFullName] = useState('');
+  const [currentUserPhoneNumber, setCurrentUserPhoneNumber] = useState('');
   const [region, setRegion] = useState({
     latitude: 17.493504, // Center point within your boundaries
     longitude: 78.391198, // Center point within your boundaries
@@ -18,10 +24,22 @@ export default function DeliveryLocation({ navigation }) {
 
   const mapRef = useRef(null);
 
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const userData = await AsyncStorage.getItem('user');
+      const jsonObj = JSON.parse(userData);
+      setCurrentUser(jsonObj.userId);
+      setCurrentUserFullName(jsonObj.fullName);
+      setCurrentUserPhoneNumber(jsonObj.phonenumber);
+    };
+
+    fetchCurrentUser();
+  }, []);
+
   const onRegionChangeComplete = async (newRegion) => {
     const maxLatitudeDelta = 0.01;
     const maxLongitudeDelta = 0.01;
-    
+
     const adjustedRegion = {
       ...newRegion,
       latitudeDelta: Math.min(newRegion.latitudeDelta, maxLatitudeDelta),
@@ -31,15 +49,41 @@ export default function DeliveryLocation({ navigation }) {
     setRegion(adjustedRegion);
 
     try {
-      const boundaries = await mapRef.current.getMapBoundaries();
       await mapRef.current.setMapBoundaries(northEast, southWest);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleConfirmLocation = () => {
-    console.log('Selected coordinates:', region.latitude, region.longitude);
+  const handleConfirmLocation = async () => {
+    const db = getFirestore(app);
+
+    const orderId = uuid.v4();
+    const newOrder = {
+      orderId,
+      userId: currentUser,
+      deliveredBy: '', // Initially blank
+      userFullName: currentUserFullName,
+      status: 'placed', // Default status
+      orderDetails: {
+        latitude: region.latitude,
+        longitude: region.longitude,
+      },
+    };
+
+    try {
+      // Add the order to the orders collection
+      await setDoc(doc(collection(db, 'orders'), orderId), newOrder);
+
+      // Update the user's document to include the new orderId in userOrders
+      await updateDoc(doc(collection(db, 'users'), currentUser), {
+        userOrders: arrayUnion(orderId),
+      });
+
+      console.log('Order confirmed and stored in Firestore:', newOrder);
+    } catch (error) {
+      console.error('Error confirming and storing order:', error);
+    }
   };
 
   useEffect(() => {
@@ -84,10 +128,6 @@ export default function DeliveryLocation({ navigation }) {
         <Image style={styles.marker} source={require('../assets/map_marker.png')} />
       </View>
       <View style={styles.centerDot} />
-      {/* <View style={styles.coordinatesContainer}>
-        <Text style={styles.coordinatesText}>Latitude: {region.latitude}</Text>
-        <Text style={styles.coordinatesText}>Longitude: {region.longitude}</Text>
-      </View> */}
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmLocation}>
         <Text style={styles.confirmButtonText}>Confirm Location</Text>
       </TouchableOpacity>
@@ -140,20 +180,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginLeft: -4,
     marginTop: -4,
-  },
-  coordinatesContainer: {
-    position: 'absolute',
-    bottom: 100,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  coordinatesText: {
-    fontSize: 16,
-    fontFamily: "Poppins-SemiBold",
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    padding: 5,
-    borderRadius: 5,
   },
   confirmButton: {
     backgroundColor: "#1c40bd",
