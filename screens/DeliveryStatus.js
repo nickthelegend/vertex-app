@@ -4,10 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { getDatabase, ref, onValue, off } from 'firebase/database';
 
 export default function DeliveryStatus() {
   const [orderDetails, setOrderDetails] = useState(null);
+  const [nearbyUser, setNearbyUser] = useState(null);
   const navigation = useNavigation();
+  const database = getDatabase();
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -17,6 +20,32 @@ export default function DeliveryStatus() {
 
     fetchOrderDetails();
   }, []);
+
+  useEffect(() => {
+    const usersRef = ref(database, 'users');
+    const unsubscribe = onValue(usersRef, (snapshot) => {
+      const users = snapshot.val();
+      for (const userId in users) {
+        const user = users[userId];
+        console.log(user)
+        if (user.isNearCanteen) {
+          setNearbyUser(user);
+
+
+
+          ///Do the thing here
+
+
+
+          off(usersRef); // Stop the listener
+          break;
+        }
+      }
+    });
+
+    // Cleanup listener on unmount
+    return () => off(usersRef, 'value', unsubscribe);
+  }, [database]);
 
   if (!orderDetails) {
     return (
@@ -43,7 +72,7 @@ export default function DeliveryStatus() {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.cartItem}>
-            <Image source={item.image } style={styles.cartItemImage} />
+            <Image source={item.image} style={styles.cartItemImage} />
             <View style={styles.cartItemDetails}>
               <Text style={styles.cartItemName}>{item.name}</Text>
               <Text style={styles.cartItemPrice}>₹{item.price}</Text>
@@ -58,6 +87,15 @@ export default function DeliveryStatus() {
           </View>
         )}
       />
+      {nearbyUser && (
+        <View style={styles.nearbyUserDetails}>
+          <Text style={styles.nearbyUserText}>Nearby User Found:</Text>
+          <Text style={styles.nearbyUserText}>Name: {nearbyUser.userFullName}</Text>
+          <Text style={styles.nearbyUserText}>User ID: {nearbyUser.userId}</Text>
+          <Text style={styles.nearbyUserText}>Latitude: {nearbyUser.latitude}</Text>
+          <Text style={styles.nearbyUserText}>Longitude: {nearbyUser.longitude}</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -110,6 +148,16 @@ const styles = StyleSheet.create({
     borderTopColor: '#ddd',
   },
   orderSummaryText: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  nearbyUserDetails: {
+    padding: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+  },
+  nearbyUserText: {
     fontSize: 18,
     marginBottom: 5,
   },
