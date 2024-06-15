@@ -22,12 +22,71 @@ import { getDatabase, ref, set } from 'firebase/database';
 import { app } from '../services/config'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as TaskManager from 'expo-task-manager';
+// import * as Location from 'expo-location';r
+const LOCATION_TASK_NAME = 'com.nickthelegend.MyProject';
+TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+  if (error) {
+    console.error(error);
+    return;
+  }
+  if (data) {
+    const { locations } = data;
+    const location = locations[0];
+    if (location) {
+      // Fetch the current user info from AsyncStorage
+      const userData = await AsyncStorage.getItem('user');
+      const currentUser = userData ? JSON.parse(userData) : null;
+      if (currentUser) {
+        const database = getDatabase(app);
+        const coords = location.coords;
+        const canteen = { latitude: 17.494301782035425, longitude: 78.39279772477056 };
 
-const database = getDatabase(app);
+        const distance = geolib.getDistance(coords, canteen);
+        const isNearCanteen = distance <= 100; // 100 meters radius
+        console.log("isNearCanteen=>", isNearCanteen)
+        const lastTime = new Date().toISOString();
 
-const canteen = { latitude: 17.494301782035425, longitude: 78.39279772477056 };
+        await set(ref(database, 'users/' + currentUser.userId), {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          lastTime,
+          userId: currentUser.userId,
+          userFullName: currentUser.fullName,
+          isNearCanteen
+        });
+      }
+    }
+  }
+});
+
+const startLocationUpdates = async () => {
+  const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+  if (foregroundStatus !== 'granted') {
+    Alert.alert('Permission to access location was denied');
+    return;
+  }
+
+  const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+  if (backgroundStatus !== 'granted') {
+    Alert.alert('Permission to access background location was denied');
+    return;
+  }
+
+  await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+    accuracy: Location.Accuracy.High,
+    timeInterval: 10000, // 2 minutes in milliseconds
+    distanceInterval: 0, // Minimum distance in meters between location updates
+    foregroundService: {
+      notificationTitle: 'Location Tracking',
+      notificationBody: 'We are tracking your location in the background',
+      notificationColor: '#1d40bd'
+    },
+  });
+};
 
 const Drawer = createDrawerNavigator();
+
 
 function NavigationScreen() {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
@@ -42,98 +101,10 @@ function NavigationScreen() {
   const [currentUser, setCurrentUser] = useState(null);
   const [currentUserFullName, setCurrentUserFullName] = useState('');
   
+  
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const userData = await AsyncStorage.getItem('user');
-        if (userData !== null) {
-          const jsonObj = JSON.parse(userData);
-          console.log(jsonObj)
-          setCurrentUser(jsonObj.userId);
-          setCurrentUserFullName(jsonObj.fullName);
-        } else {
-          console.log("No user data found in AsyncStorage");
-        }
-      } catch (error) {
-        console.error("Failed to fetch user data from AsyncStorage", error);
-      }
-    };
-
-    fetchCurrentUser();
+    startLocationUpdates();
   }, []);
-
-  useEffect(() => {
-    const setupGeofencing = async () => {
-      try {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert('Permission to access location was denied');
-          return;
-        }
-
-        let { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-        if (backgroundStatus !== 'granted') {
-          Alert.alert('Permission to access background location was denied');
-          return;
-        }
-
-        const location = await Location.getCurrentPositionAsync({});
-        setCurrentLocation(location.coords);
-        setRegion({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        });
-
-        Location.watchPositionAsync({ distanceInterval: 10 }, (newLocation) => {
-          const coords = newLocation.coords;
-          setCurrentLocation(coords);
-          const nearCanteen = checkIfNearCanteen(coords);
-          storeLocationInDatabase(coords, nearCanteen);
-        });
-
-        setInterval(async () => {
-          const location = await Location.getCurrentPositionAsync({});
-          const coords = location.coords;
-          setCurrentLocation(coords);
-          const nearCanteen = checkIfNearCanteen(coords);
-          storeLocationInDatabase(coords, nearCanteen);
-        }, 30000);
-      } catch (error) {
-        console.error('Error initializing geofencing:', error);
-      }
-    };
-
-    setupGeofencing();
-  }, [currentUser, currentUserFullName]);
-
-  const checkIfNearCanteen = (coords) => {
-    const distance = geolib.getDistance(coords, canteen);
-    const isNear = distance <= 100; // 50 meters radius
-    setIsNearCanteen(isNear);
-    console.log('checkIfNearCanteen=>', isNear);
-    return isNear;
-  };
-
-  const storeLocationInDatabase = (coords, isNearCanteen) => {
-    const { latitude, longitude } = coords;
-    const lastTime = new Date().toISOString();
-    if (currentUser && currentUserFullName) {
-      console.log(currentUser);
-      set(ref(database, 'users/' + currentUser), {
-        latitude,
-        longitude,
-        lastTime,
-        userId: currentUser,
-        userFullName: currentUserFullName,
-        isNearCanteen
-      });
-    } else {
-      console.warn('userId or userFullName is empty, data not saved to database.');
-    }
-  };
-
   const toggleLogoutModal = () => {
     setIsLogoutModalVisible(!isLogoutModalVisible);
   };
