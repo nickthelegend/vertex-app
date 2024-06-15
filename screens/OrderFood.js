@@ -38,6 +38,134 @@ export const vegItems = [
   },
 ];
 
+
+
+export const bakeryItems = [
+
+{
+
+  name :  "Veg Puff",
+  image: "",
+  price : 20
+} , 
+
+
+{ name: "Egg Puff",
+  image : "",
+  price : 25
+
+
+
+},
+
+{ name: "Chicken Puff",
+  image : "",
+  price : 30
+
+
+
+},
+
+{ name: "Panner Puff",
+  image : "",
+  price : 30
+
+
+
+},
+
+{ name: "Gone Mad",
+  image : "",
+  price : 5
+
+
+
+},
+
+
+{ name: "Hershey's ChocoTubes",
+  image : "",
+  price : 20
+
+
+
+},
+
+
+
+{ name: "Chocolate Dips",
+  image : "",
+  price : 10
+
+
+
+},
+
+
+{ name: "Dilkush",
+  image : "",
+  price : 20
+
+
+
+},
+
+
+{ name: "Dilpasand",
+  image : "",
+  price : 20
+
+
+
+},
+
+
+
+{ name: "Cream Bun",
+  image : "",
+  price : 20
+
+
+
+},
+
+
+
+
+
+{ name: "Sandwich",
+  image : "",
+  price : 30
+
+
+
+},
+
+
+
+
+{ name: "Samosa [Big]",
+  image : "",
+  price : 20
+
+
+
+},
+
+{ name: "Samosa [Small] 1 Plate",
+  image : "",
+  price : 30
+
+
+
+},
+
+]
+
+
+
+
+
 const nonVegItems = [
   "Chicken Curry",
   "Fish Fry",
@@ -45,7 +173,280 @@ const nonVegItems = [
   "Prawn Fry",
 ];
 const iceCreamItems = ["Vanilla", "Chocolate", "Strawberry", "Butterscotch"];
-const coolDrinksItems = ["Coke", "Pepsi", "Sprite", "Fanta"];
+const coolDrinksItems = [
+  { name: "Thumps Up",
+  image : "",
+  price : 20,
+},
+
+{ name: "Sprite",
+  image : "",
+  price : 20,
+},
+
+{ name: "CocaCola",
+  image : "",
+  price : 20,
+},
+
+{ name: "Fanta",
+  image : "",
+  price : 20,
+},
+
+{ name: "Limca",
+  image : "",
+  price : 20,
+},
+
+{ name: "Mountain Dew",
+  image : "",
+  price : 20,
+},
+
+{ name: "Water Bottle",
+  image : "",
+  price : 20,
+},
+
+
+{ name: "Minutemaid Pulpy Orange",
+  image : "",
+  price : 20,
+},
+
+{ name: "Maaza [Tetrapack]",
+  image : "",
+  price : 10,
+},
+
+
+{ name: "Maaza [Bottle]",
+  image : "",
+  price : 25,
+},
+
+{ name: "Minutemaid Grape Juice",
+  image : "",
+  price : 20,
+},
+
+
+
+
+];
+
+
+
+
+export const fastFoodItems = [
+
+
+  { name: "Veg Manchuria",
+  image : "",
+  price : 60,
+},
+
+{ name: "Veg Noodles",
+  image : "",
+  price : 60,
+},
+
+
+{ name: "Veg FriedRice",
+  image : "",
+  price : 50,
+},
+
+{ name: "Veg Manchurian Fried Rice",
+  image : "",
+  price : 60,
+},
+
+{  name: "Veg Manchurian Noodles",
+  image : "",
+  price : 70,
+},
+{  name: "Egg Fried Rice",
+  image : "",
+  price : 60,
+},
+
+
+{  name: "Double Egg Fried Rice",
+  image : "",
+  price : 70,
+},
+
+{  name: "Chicken Fried Rice",
+  image : "",
+  price : 70,
+},
+
+{  name: "Double Egg Chicken Fried Rice",
+  image : "",
+  price : 80,
+},
+
+{  name: "Double Egg Chicken Noodles",
+  image : "",
+  price : 80,
+},
+
+
+{  name: "Veg Manchurian Noodles",
+  image : "",
+  price : 70,
+},
+]
+
+
+
+
+export const fruitJuices = [
+    {  name: "Mosambi",
+  image : "",
+  price : 40,
+},
+
+{  name: "Grapes",
+  image : "",
+  price : 40,
+},
+
+{  name: "Sappota",
+  image : "",
+  price : 30,
+},
+
+{  name: "Muskmelon",
+  image : "",
+  price : 30,
+},
+
+
+
+  {  name: "Watermelon",
+  image : "",
+  price : 30,
+},
+
+{  name: "Papaya",
+  image : "",
+  price : 30,
+},
+{  name: "Pineapple",
+  image : "",
+  price : 70,
+},
+
+
+{  name: "Mango",
+  image : "",
+  price : 30,
+},
+
+
+{  name: "Fruit Bowl",
+  image : "",
+  price : 50,
+},
+]
+
+export const frankiesItems = [
+
+  {  name: "Tangi Paneer Franike",
+  image : "",
+  price : 70,
+},
+
+{  name: "Paneer Tikka Franike",
+image : "",
+price : 70,
+},
+{  name: "Kadai Paneer Franike",
+image : "",
+price : 70,
+},
+
+{  name: "Veg Manchurian Franike",
+image : "",
+price : 70,
+},
+
+{  name: "Schezwan Veg Frankie",
+image : "",
+price : 70,
+
+},
+
+{  name: "Hyderabadi Chicken Franike",
+image : "",
+price : 80,
+},
+
+{  name: "Chicken Tikka Franike",
+image : "",
+price : 80,
+},
+
+]
+
+
+
+export const snacksItems = [ {  name: "French Fries",
+image : "",
+price : 60,
+},
+
+{  name: "Potato Twister",
+image : "",
+price : 60,
+},
+
+
+{  name: "Veg Chilli Garlic Bites [10 pcs]",
+image : "",
+price : 60,
+},
+
+
+
+{  name: "Egg Stick ",
+image : "",
+price :40,
+},
+
+
+{  name: "Chicken PopCorn [10pcs]",
+image : "",
+price : 70,
+},
+
+{  name: "Chicken Nuggets [5pcs]",
+image : "",
+price : 60,
+},
+
+{   name: "Chicken Cheese Balls [7pcs]",
+image : "",
+price : 85,
+},
+
+
+
+
+
+
+
+]
+
+
+
+
+
+
+
 
 export default function OrderFood({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState("Veg");
@@ -156,7 +557,7 @@ export default function OrderFood({ navigation }) {
             style={{ flex: 1, fontSize: 18 }} // Adjust the width of TextInput to take remaining space
           />
         </View>
-        <View style={styles.categoriesContainer}>
+        <ScrollView contentContainerStyle={styles.categoriesContainer} horizontal showsHorizontalScrollIndicator={false} style={{padding:10}}>
           <TouchableOpacity
             onPress={() => setSelectedCategory("Veg")}
             style={[
@@ -170,7 +571,7 @@ export default function OrderFood({ navigation }) {
                 selectedCategory === "Veg" && styles.categoryTextSelected,
               ]}
             >
-              Veg
+              Bakery & Confectionery
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -223,7 +624,7 @@ export default function OrderFood({ navigation }) {
               Cool Drinks
             </Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
