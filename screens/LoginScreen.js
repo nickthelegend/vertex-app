@@ -151,7 +151,7 @@ try {
           // Register user with the push token              
           await loginUser(rollNumber,password,token);
           sendPushNotification(token)
-          navigation.navigate('VerifyYourAccount');
+          // navigation.navigate('VerifyYourAccount');
       setLoadingVisible(false);
         }
       })
