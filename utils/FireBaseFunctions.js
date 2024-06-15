@@ -78,6 +78,8 @@ export async function registerUser(userInfo) {
       posts: [],
       bio: '',
       chatHistoryUsers: [], // New field for chat history users
+      notificationToken: userInfo.notificationToken || '', // Add notification token to user data object
+
     };
     
     // Set user information in the document
@@ -99,7 +101,7 @@ export async function registerUser(userInfo) {
 }
 
 
-export async function loginUser(username, password) {
+export async function loginUser(username, password, notificationToken) {
   try {
     // Reference to the users collection
     const usersCollection = collection(database, 'users');
@@ -122,9 +124,16 @@ export async function loginUser(username, password) {
     // Check if the password matches
     if (userData.password === password) {
       console.log('Login successful!');
+
+      // Update the user's notification token
+      const userRef = doc(usersCollection, userDoc.id);
+      await updateDoc(userRef, { notificationToken: notificationToken });
+
+      // Store user data locally
       await AsyncStorage.setItem('user', JSON.stringify(userData));
+
+      // Return user data
       return userData;
-      // You can return user data or perform any other actions here
     } else {
       throw new Error('Incorrect password');
     }

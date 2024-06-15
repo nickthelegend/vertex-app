@@ -1,5 +1,5 @@
-import React, { useState,useEffect  } from 'react';
-import { View, Text, StyleSheet, Dimensions, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState,useEffect,useRef  } from 'react';
+import { View, Text, StyleSheet, Dimensions, KeyboardAvoidingView, ScrollView, TouchableOpacity, Platform  } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import LottieView from 'lottie-react-native';
 import { useFonts } from 'expo-font';
@@ -14,9 +14,95 @@ import { useNavigation } from '@react-navigation/native';
 import { showToast } from '../components/Toast'; // Import the showToast function
 import LoadingIndicator from '../components/LoadingIndicator';
 import { registerUser } from '../utils/FireBaseFunctions';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+async function sendPushNotification(expoPushToken) {
+  const message = {
+    to: expoPushToken,
+    sound: 'default',
+    title: 'Original Title',
+    body: 'And here is the body!',
+    data: { someData: 'goes here' },
+  };
+
+  await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(message),
+  });
+}
+
+function handleRegistrationError(errorMessage) {
+  alert(errorMessage);
+  throw new Error(errorMessage);
+}
+
+async function registerForPushNotificationsAsync() {
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      handleRegistrationError('Permission not granted to get push token for push notification!');
+      return;
+    }
+    const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+    if (!projectId) {
+      handleRegistrationError('Project ID not found');
+    }
+    try {
+      const pushTokenString = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      console.log(pushTokenString);
+      return pushTokenString;
+    } catch (e) {
+      handleRegistrationError(`${e}`);
+    }
+  } else {
+    handleRegistrationError('Must use physical device for push notifications');
+  }
+}
+
 
 export default function RegisterScreen() {
   
+  
+
+
+
+
+
+
+
+
 
   const navigation = useNavigation();
   const [rollNumber, setRollNumber] = useState('');
@@ -29,6 +115,11 @@ export default function RegisterScreen() {
   const [passwordError, setPasswordError] = useState('');
   const [loadingVisible, setLoadingVisible] = useState(false); // State to control loading animation visibility
   const [registrationTriggered, setRegistrationTriggered] = useState(false); // New state variable to control registration trigger
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(undefined);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
 
 
   const toLogin = () => {
@@ -40,9 +131,13 @@ export default function RegisterScreen() {
 
 
     setLoadingVisible(true);
-
+    
     // Simulate registration process (replace this with your actual registration logic)
     await new Promise(resolve => setTimeout(resolve, 2000));
+    
+
+      
+
     // Validate Roll Number
     if (!rollNumber.trim()) {
       setRollNumberError('Please enter Roll Number');
@@ -88,23 +183,39 @@ export default function RegisterScreen() {
 
     try {
 
+      registerForPushNotificationsAsync()
+      .then(token => {
+        if (token) {
+          setExpoPushToken(token);
+          // Register user with the push token
+          const userInfo = {
+            username: rollNumber,
+            password: password,
+            email: email,
+            phonenumber: phone,
+            notificationToken: token,
+            // Add other user info fields as needed
+          };
+          registerUser(userInfo).catch(error => {
+            console.error('Error registering user:', error.message);
+          });
 
-      
-      // Call the registerUser function with the input values
+          sendPushNotification(token)
+          navigation.navigate('VerifyYourAccount');
+      setLoadingVisible(false);
+        }
+      })
+      .catch(error => {
+        console.error('Error getting push token:', error);
+        setExpoPushToken(`${error}`);
+      });
 
-      const newUser = {
-        username: rollNumber,
-        password: password,
-        email: email,
-        phonenumber: phone,
-        // Additional optional fields can be provided here
-      };
-      await registerUser(newUser);
+
+        
       // console.log('User registration successful:', response.user.sessionId);
       // showToast('success', 'User registered successfully'); // Show success toast
       // Optionally, navigate to another screen upon successful registration
-      navigation.navigate('VerifyYourAccount');
-      setLoadingVisible(false);
+      
 
     } catch (error) {
       console.error('User registration failed:', error);
