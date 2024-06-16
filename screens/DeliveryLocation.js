@@ -101,7 +101,7 @@ export default function DeliveryLocation({ route }) {
       console.log('Order confirmed and stored in Firestore:', newOrder);
 
       // Navigate to the DeliveryStatus page
-      navigation.navigate('DeliveryStatus', { orderId });
+      navigation.navigate('DeliveryStatus', { orderId,region });
     } catch (error) {
       console.error('Error confirming and storing order:', error);
     }

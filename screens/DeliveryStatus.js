@@ -9,7 +9,11 @@ import { getFirestore, doc, getDoc, setDoc, onSnapshot, updateDoc } from 'fireba
 import { sendPushNotification } from '../utils/sendPushNotification';
 import uuid from 'react-native-uuid';
 
-export default function DeliveryStatus() {
+export default function DeliveryStatus({route}) {
+  const {region} = route.params;
+  // console.log(region)
+
+
   const [orderDetails, setOrderDetails] = useState(null);
   const [nearbyUser, setNearbyUser] = useState(null);
   const [notifiedUsers, setNotifiedUsers] = useState(new Set());
@@ -155,7 +159,7 @@ export default function DeliveryStatus() {
           <Text style={styles.nearbyUserText}>Latitude: {nearbyUser.latitude}</Text>
           <Text style={styles.nearbyUserText}>Longitude: {nearbyUser.longitude}</Text>
 
-          <TouchableOpacity style={styles.confirmButton} onPress={() => { navigation.navigate("TrackOrder", { orderId: orderDetails.orderId }) }}>
+          <TouchableOpacity style={styles.confirmButton} onPress={() => { navigation.navigate("TrackOrder", { orderId: orderDetails.orderId, deliveryAddress: region }) }}>
             <Text style={styles.confirmButtonText}>Track Order</Text>
           </TouchableOpacity>
         </View>
