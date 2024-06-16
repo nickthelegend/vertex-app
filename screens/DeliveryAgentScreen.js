@@ -103,6 +103,8 @@ const DeliveryAgentScreen = ({ route }) => {
             <View style={styles.cartItemDetails}>
               <Text style={styles.cartItemName}>{item.name}</Text>
               <Text style={styles.cartItemPrice}>₹{item.price}</Text>
+              <Text style={styles.cartItemPrice}>Qty: {item.quantity}</Text>
+              <Text style={styles.cartItemPrice}>Price: {item.quantity} x {item.price} = ₹{item.quantity * item.price} </Text>
             </View>
           </View>
         )}
