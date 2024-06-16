@@ -64,7 +64,7 @@ export default function DeliveryStatus() {
                 expoPushToken,
                 'Delivery Request',
                 'Would you like to deliver this order?',
-                { deliveryRequestId }
+                { deliveryRequestId , orderId : orderDetails.orderId}
               );
 
               console.log('Push notification sent');

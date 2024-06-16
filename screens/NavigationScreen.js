@@ -141,6 +141,7 @@ function NavigationScreen() {
 
       if (response.actionIdentifier === 'accept') {
         console.log("User clicked accept for deliveryRequestId:", deliveryRequestId);
+        console.log("User clicked accept for orderId:", orderId);
 
         const deliveryRequestRef = doc(firestore, 'deliveryRequests', deliveryRequestId);
         try {
@@ -150,7 +151,7 @@ function NavigationScreen() {
           });
           console.log("Delivery request accepted:", deliveryRequestId);
 
-          navigation.navigate('DeliveryAgentScreen', { deliveryRequestId });
+          navigation.navigate('DeliveryAgentScreen', { orderId });
         } catch (error) {
           console.error("Error updating delivery request to accepted:", error);
         }
