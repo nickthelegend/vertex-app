@@ -22,6 +22,8 @@ export default function OrderLocation({ route }) {
   });
 
   useEffect(() => {
+    let locationSubscription;
+
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -40,7 +42,33 @@ export default function OrderLocation({ route }) {
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
+
+      locationSubscription = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 5000, // Update every 5 seconds
+          distanceInterval: 10, // Update every 10 meters
+        },
+        (newLocation) => {
+          setOrigin({
+            latitude: newLocation.coords.latitude,
+            longitude: newLocation.coords.longitude
+          });
+          setRegion({
+            latitude: newLocation.coords.latitude,
+            longitude: newLocation.coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }
+      );
     })();
+
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+    };
   }, []);
 
   return (
@@ -56,7 +84,7 @@ export default function OrderLocation({ route }) {
       {origin && (
         <MapView 
           style={styles.map}
-          initialRegion={region}
+          region={region}
           rotateEnabled={false} // Disabling map rotation
         >
           <Marker coordinate={origin} title={"Origin"}>
