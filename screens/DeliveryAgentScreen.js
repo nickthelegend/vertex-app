@@ -113,8 +113,8 @@ const DeliveryAgentScreen = ({ route }) => {
         Total Amount: ₹{orderDetails.orderDetails.total}
       </Text>
 
-      <TouchableOpacity style={styles.confirmButton} onPress={()=>{navigation.navigate("TrackOrder")}}>
-        <Text style={styles.confirmButtonText}>Track Order</Text>
+      <TouchableOpacity style={styles.confirmButton} onPress={()=>{navigation.navigate("OrderLocation", {deliveryLocation : {latitude:orderDetails.orderDetails.latitude, longitude: orderDetails.orderDetails.longitude }})}}>
+        <Text style={styles.confirmButtonText}>Show directions</Text>
       </TouchableOpacity>
 
 
