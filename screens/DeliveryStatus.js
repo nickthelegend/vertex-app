@@ -59,6 +59,7 @@ export default function DeliveryStatus() {
               });
 
               console.log('Delivery request created:', deliveryRequestId);
+              
 
               await sendPushNotification(
                 expoPushToken,
@@ -145,7 +146,7 @@ export default function DeliveryStatus() {
           </View>
         )}
       />
-      <TouchableOpacity style={styles.confirmButton} onPress={()=>{navigation.navigate("TrackOrder")}}>
+      <TouchableOpacity style={styles.confirmButton} onPress={()=>{navigation.navigate("TrackOrder", {orderId: orderDetails.orderId} )}}>
         <Text style={styles.confirmButtonText}>Track Order</Text>
       </TouchableOpacity>
       {nearbyUser && (

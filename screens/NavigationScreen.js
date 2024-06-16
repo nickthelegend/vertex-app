@@ -133,6 +133,10 @@ function NavigationScreen() {
     // Define and add the response listener
   const responseListener = Notifications.addNotificationResponseReceivedListener(
     async (response) => {
+      const userData = await AsyncStorage.getItem("user");
+      const currentUser = userData ? JSON.parse(userData) : null;
+
+
       const { deliveryRequestId, orderId } = response.notification.request.content.data;
       console.log("data=>",deliveryRequestId)
       const firestore = getFirestore();
@@ -155,6 +159,36 @@ function NavigationScreen() {
         } catch (error) {
           console.error("Error updating delivery request to accepted:", error);
         }
+
+
+        ////////////////////////////////
+       
+        if (currentUser){
+
+          const ordersRef = doc(firestore, 'orders', orderId);
+          console.log(currentUser)
+          try {
+            await updateDoc(ordersRef, {
+              deliveredBy: currentUser.userId,
+              // responderId: currentUser,
+            });
+            console.log("Updated Order Id:", orderId);
+  
+            // navigation.navigate('DeliveryAgentScreen', { orderId });
+          } catch (error) {
+            console.error("Error updating order to accepted:", error);
+          }
+  
+        }
+        
+
+
+
+
+
+
+
+          //////////////////////////////
       } else if (response.actionIdentifier === 'decline') {
         console.log("User clicked decline for deliveryRequestId:", deliveryRequestId);
 

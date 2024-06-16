@@ -6,9 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 export default function TrackOrder({route}) {
+    const {orderId} = route.params;
+
     const navigation = useNavigation()
 
-
+    
 
 
   return (
