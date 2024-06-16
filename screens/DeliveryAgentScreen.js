@@ -81,7 +81,10 @@ const DeliveryAgentScreen = ({ route }) => {
         Customer Name: {orderDetails.userFullName}
       </Text>
       <Text style={styles.label}>
-        Delivery Address: {orderDetails.deliveryAddress}
+        Delivery Address: {orderDetails.address}
+      </Text>
+      <Text style={styles.label}>
+       Room Number: {orderDetails.roomNo}
       </Text>
       <Text style={styles.label}>
         Latitude: {orderDetails.orderDetails.latitude}
@@ -90,6 +93,8 @@ const DeliveryAgentScreen = ({ route }) => {
         Longitude: {orderDetails.orderDetails.longitude}
       </Text>
       <Text style={styles.label}>Status: {orderDetails.status}</Text>
+      <Text style={styles.label}>Phone: {orderDetails.phoneNo}</Text>
+      
       <FlatList
         data={orderDetails.orderDetails.cartItems}
         keyExtractor={(item) => item.name}

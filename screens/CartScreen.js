@@ -6,14 +6,21 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  TextInput,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Modal from "react-native-modal";
 
 const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [address, setAddress] = useState("");
+  const [newAddress, setNewAddress] = useState("");
+  const [roomNo, setRoomNo] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -25,7 +32,6 @@ const CartScreen = ({ navigation }) => {
   const loadCartItems = async () => {
     try {
       const cart = await AsyncStorage.getItem("cart");
-      console.log(cart);
       const parsedCart = cart ? JSON.parse(cart) : [];
       setCartItems(parsedCart);
     } catch (error) {
@@ -63,10 +69,7 @@ const CartScreen = ({ navigation }) => {
   };
 
   const calculateSubtotal = () => {
-    return cartItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
+    return cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
   const renderItem = ({ item }) => (
@@ -94,6 +97,15 @@ const CartScreen = ({ navigation }) => {
     </View>
   );
 
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const handleSaveAddress = () => {
+    setAddress(newAddress);
+    toggleModal();
+  };
+
   const subtotal = calculateSubtotal();
   const deliveryCharges = 50; // Fixed delivery charge
   const total = subtotal + deliveryCharges;
@@ -117,15 +129,45 @@ const CartScreen = ({ navigation }) => {
         </View>
       ) : (
         <View style={styles.cartContent}>
-          <View style={styles.addressContainer}>
-            <Text>Delivery Location</Text>
-            <Text style={styles.addressText}>
-              301 International Students Hostel, JNTU Hyderabad
-            </Text>
-            <TouchableOpacity style={styles.editAddressButton}>
-              <Text style={styles.editAddressText}>Edit Address</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={toggleModal}>
+            <View style={styles.addressContainer}>
+              <Text>Delivery Location</Text>
+              {address && roomNo ? (
+                <>
+                  <Text style={styles.addressText}>{address}</Text>
+                  <Text style={styles.addressText}>Room No: {roomNo}</Text>
+                  <Text style={styles.addressText}>Phone No: {phoneNo}</Text>
+                </>
+              ) : (
+                <Text style={styles.editAddressText}>Edit Address</Text>
+              )}
+            </View>
+          </TouchableOpacity>
+
+          <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Edit Delivery Address</Text>
+              <TextInput
+                style={styles.addressInput}
+                value={newAddress}
+                onChangeText={setNewAddress}
+                placeholder="Enter new address"
+              />
+              <TextInput
+                style={styles.addressInput}
+                value={roomNo}
+                onChangeText={setRoomNo}
+                placeholder="Enter room no"
+              />
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSaveAddress}
+              >
+                <Text style={styles.saveButtonText}>Save Address</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+
           <FlatList
             data={cartItems}
             renderItem={renderItem}
@@ -134,13 +176,28 @@ const CartScreen = ({ navigation }) => {
           />
           <View style={styles.summaryContainer}>
             <Text style={styles.summaryText}>Subtotal: ₹{subtotal}</Text>
-            <Text style={styles.summaryText}>Delivery Charges: ₹{deliveryCharges}</Text>
+            <Text style={styles.summaryText}>
+              Delivery Charges: ₹{deliveryCharges}
+            </Text>
             <Text style={styles.summaryText}>Total: ₹{total}</Text>
           </View>
-          <TouchableOpacity 
-            style={styles.orderButton} 
-            onPress={() => navigation.navigate('DeliveryLocation', { cartItems,subtotal,deliveryCharges,total })}
-
+          <TouchableOpacity
+            style={[
+              styles.orderButton,
+              { backgroundColor: address && roomNo ? "#1c40bd" : "#d3d3d3" },
+            ]}
+            onPress={() =>
+              address && roomNo && navigation.navigate("DeliveryLocation", {
+                cartItems,
+                subtotal,
+                deliveryCharges,
+                total,
+                address,
+                roomNo,
+                phoneNo,
+              })
+            }
+            disabled={!address || !roomNo}
           >
             <Text style={styles.orderButtonText}>Next: Delivery Location</Text>
           </TouchableOpacity>
@@ -181,19 +238,10 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     fontSize: 21,
   },
-  editAddressButton: {
-    borderWidth: 1,
-    borderColor: "#d5d5d5",
-    padding: 10,
-    borderRadius: 20,
-    marginTop: 10,
-    alignSelf: "flex-start", // This will make the button take only the width it needs
-
-  },
   editAddressText: {
-    color: "#555555",
-    fontFamily: "Montserrat",
-    fontSize: 15,
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 21,
+    color: "#1c40bd",
   },
   cartItemsContainer: {
     padding: 10,
@@ -284,6 +332,35 @@ const styles = StyleSheet.create({
   emptyCartText: {
     fontSize: 18,
     color: "#777777",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: "ComfortaaBold",
+    marginBottom: 20,
+  },
+  addressInput: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#d5d5d5",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
+    fontFamily: "Poppins-SemiBold",
+  },
+  saveButton: {
+    backgroundColor: "#1c40bd",
+    padding: 10,
+    borderRadius: 5,
+  },
+  saveButtonText: {
+    color: "white",
+    fontFamily: "Poppins-SemiBold",
   },
 });
 

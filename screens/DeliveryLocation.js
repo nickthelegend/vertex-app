@@ -11,7 +11,9 @@ import uuid from 'react-native-uuid';
 import { useNavigation } from '@react-navigation/native';
 
 export default function DeliveryLocation({ route }) {
-  const { cartItems, subtotal, deliveryCharges, total } = route.params;
+  const { cartItems, subtotal, deliveryCharges, total , address,
+    roomNo,
+    phoneNo,} = route.params;
   const navigation = useNavigation();
   const northEast = { latitude: 17.49617, longitude: 78.39486 };
   const southWest = { latitude: 17.490222, longitude: 78.386944 };
@@ -68,6 +70,9 @@ export default function DeliveryLocation({ route }) {
       deliveredBy: '', // Initially blank
       userFullName: currentUserFullName,
       status: 'placed', // Default status
+      address: address,
+      roomNo: roomNo,
+      phoneNo: currentUserPhoneNumber,
       orderDetails: {
         latitude: region.latitude,
         longitude: region.longitude,
