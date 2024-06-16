@@ -46,7 +46,7 @@ export default function HomeHeader({userFullName, userProfilePic}) {
               />
             </TouchableOpacity>
 
-            <Text
+            {userFullName && <Text
             numberOfLines={1}
             ellipsizeMode="tail"
               style={{
@@ -58,7 +58,20 @@ export default function HomeHeader({userFullName, userProfilePic}) {
               }}
             >
               Hello, {userFullName}
-            </Text>
+            </Text>}
+              
+            {!userFullName && <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+              style={{
+                fontSize: SPACING * 2.7,
+                color: "#1e40bc",
+                fontFamily: "ComfortaaBold",
+                width: 300, // Adjust the width of the text container
+
+              }}
+            >
+Home            </Text>}
           </View>
 
           <View style={{ flexDirection: "row", alignItems: "center" }}>

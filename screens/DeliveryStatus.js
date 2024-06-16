@@ -5,13 +5,14 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { getDatabase, ref, onValue, off } from 'firebase/database';
-import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { sendPushNotification } from '../utils/sendPushNotification';
-import uuid from 'react-native-uuid'; // Import uuid
+import uuid from 'react-native-uuid';
 
 export default function DeliveryStatus() {
   const [orderDetails, setOrderDetails] = useState(null);
   const [nearbyUser, setNearbyUser] = useState(null);
+  const [notifiedUsers, setNotifiedUsers] = useState(new Set());
   const navigation = useNavigation();
   const database = getDatabase();
   const firestore = getFirestore();
@@ -19,7 +20,7 @@ export default function DeliveryStatus() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       const orderData = await AsyncStorage.getItem('delivery');
-      console.log(orderData)
+      console.log(orderData);
       setOrderDetails(JSON.parse(orderData));
     };
 
@@ -27,63 +28,65 @@ export default function DeliveryStatus() {
   }, []);
 
   useEffect(() => {
+    if (!orderDetails) return;
+
     const usersRef = ref(database, 'users');
-  
+
     const handleUserUpdate = async (snapshot) => {
       const users = snapshot.val();
+      if (!users) return;
+
       for (const userId in users) {
         const user = users[userId];
-        if (user.isNearCanteen) {
+        if (user.isNearCanteen && !notifiedUsers.has(userId)) {
           setNearbyUser(user);
-  
+
           try {
-            // Fetch the delivery agent's push token from Firestore
             const userDoc = await getDoc(doc(firestore, 'users', userId));
             if (userDoc.exists()) {
               const userData = userDoc.data();
               const expoPushToken = userData.notificationToken;
-  
-              // Log the token
+
               console.log('Expo Push Token:', expoPushToken);
-  
-              // Generate a unique ID for the delivery request
+
               const deliveryRequestId = uuid.v4();
-  
-              // Create the delivery request in Firestore
+
               await setDoc(doc(firestore, 'deliveryRequests', deliveryRequestId), {
                 status: 'pending',
                 createdAt: new Date(),
                 orderId: orderDetails.orderId,
                 deliveryAgentId: userId,
               });
-  
-              // Log the delivery request creation
+
               console.log('Delivery request created:', deliveryRequestId);
-  
-              // Send push notification to the delivery agent
+
               await sendPushNotification(
                 expoPushToken,
                 'Delivery Request',
                 'Would you like to deliver this order?',
                 { deliveryRequestId }
               );
-  
-              // Log notification sending
+
               console.log('Push notification sent');
-  
-              // Listen for changes in Firestore
+
+              setNotifiedUsers((prevSet) => {
+                const updatedSet = new Set(prevSet);
+                updatedSet.add(userId);
+                return updatedSet;
+              });
+
               const deliveryRequestRef = doc(firestore, 'deliveryRequests', deliveryRequestId);
               const unsubscribeRequest = onSnapshot(deliveryRequestRef, (docSnapshot) => {
                 const deliveryRequest = docSnapshot.data();
                 if (deliveryRequest.status === 'accepted') {
                   console.log('Delivery accepted');
-                  off(usersRef); // Stop the listener
+                  off(usersRef, 'value', handleUserUpdate); // Stop the listener
                 } else if (deliveryRequest.status === 'declined') {
                   console.log('Delivery declined');
-                  setNearbyUser(null); // Reset nearby user to check for another user
+                  setNearbyUser(null);
                 }
               });
-  
+
               return () => unsubscribeRequest();
             } else {
               console.log('User document does not exist:', userId);
@@ -94,13 +97,13 @@ export default function DeliveryStatus() {
         }
       }
     };
-  
+
     const unsubscribe = onValue(usersRef, handleUserUpdate);
-  
-    // Cleanup listener on unmount
-    return () => off(usersRef, 'value', unsubscribe);
-  }, [database, firestore, orderDetails]);
-  
+
+    return () => {
+      off(usersRef, 'value', handleUserUpdate);
+    };
+  }, [database, firestore, orderDetails, notifiedUsers]);
 
   if (!orderDetails) {
     return (
@@ -113,10 +116,7 @@ export default function DeliveryStatus() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Delivery Status</Text>

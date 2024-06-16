@@ -24,7 +24,9 @@ import {
   getDoc,
   setDoc,
   onSnapshot,
+  updateDoc
 } from "firebase/firestore";
+
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as TaskManager from "expo-task-manager";
@@ -128,28 +130,46 @@ function NavigationScreen() {
     ]);
   
     // Handle notification responses
-    const responseListener = Notifications.addNotificationResponseReceivedListener(
-      async (response) => {
-        const { deliveryRequestId, orderId } = response.notification.request.content.data;
-        const firestore = getFirestore();
-  
-        if (response.actionIdentifier === 'accept') {
-          const deliveryRequestRef = doc(firestore, 'deliveryRequests', deliveryRequestId);
+    // Define and add the response listener
+  const responseListener = Notifications.addNotificationResponseReceivedListener(
+    async (response) => {
+      const { deliveryRequestId, orderId } = response.notification.request.content.data;
+      console.log("data=>",deliveryRequestId)
+      const firestore = getFirestore();
+
+      console.log("Notification received:", response);
+
+      if (response.actionIdentifier === 'accept') {
+        console.log("User clicked accept for deliveryRequestId:", deliveryRequestId);
+
+        const deliveryRequestRef = doc(firestore, 'deliveryRequests', deliveryRequestId);
+        try {
           await updateDoc(deliveryRequestRef, {
             status: 'accepted',
-            responderId: currentUser.userId,
-            orderId: orderId,
+            // responderId: currentUser,
           });
+          console.log("Delivery request accepted:", deliveryRequestId);
+
           navigation.navigate('DeliveryAgentScreen', { deliveryRequestId });
-        } else if (response.actionIdentifier === 'decline') {
-          const deliveryRequestRef = doc(firestore, 'deliveryRequests', deliveryRequestId);
+        } catch (error) {
+          console.error("Error updating delivery request to accepted:", error);
+        }
+      } else if (response.actionIdentifier === 'decline') {
+        console.log("User clicked decline for deliveryRequestId:", deliveryRequestId);
+
+        const deliveryRequestRef = doc(firestore, 'deliveryRequests', deliveryRequestId);
+        try {
           await updateDoc(deliveryRequestRef, {
             status: 'declined',
             responderId: currentUser.userId,
           });
+          console.log("Delivery request declined:", deliveryRequestId);
+        } catch (error) {
+          console.error("Error updating delivery request to declined:", error);
         }
       }
-    );
+    }
+  );
   
     // Request notification permissions
     const requestPermissions = async () => {

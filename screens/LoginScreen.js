@@ -36,8 +36,8 @@ async function sendPushNotification(expoPushToken) {
   const message = {
     to: expoPushToken,
     sound: 'default',
-    title: 'Original Title',
-    body: 'And here is the body!',
+    title: 'Welcome',
+    body: 'Good to see you back!',
     data: { someData: 'goes here' },
   };
 
@@ -154,27 +154,32 @@ try {
           // Register user with the push token              
           await loginUser(rollNumber,password,token);
           sendPushNotification(token)
+          await new Promise(resolve => setTimeout(resolve, 2000));
+
+          navigation.navigate('NavigationScreen');
           // navigation.navigate('VerifyYourAccount');
-      setLoadingVisible(false);
+    setLoadingVisible(false);
+          
         }
       })
       .catch(error => {
         console.error('Error getting push token:', error);
+        setPasswordError(`${error}`)
+
         setExpoPushToken(`${error}`);
       });
   // console.log('User registration successful:', response.user.sessionId);
   // showToast('success', 'User registered successfully'); // Show success toast
   // Optionally, navigate to another screen upon successful registration
-  navigation.navigate('NavigationScreen');
 } catch (error) {
   console.error('User registration failed:', error);
   // showToast('error', 'User registration failed'); // Show error toast
-  setLoadingVisible(false);
 
   setPasswordError('Incorrect Password')
+    setLoadingVisible(false);
 
 }
-setLoadingVisible(false);
+// setLoadingVisible(false);
 
 
 console.log('Roll:', rollNumber);
