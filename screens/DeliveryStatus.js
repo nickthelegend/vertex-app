@@ -13,6 +13,7 @@ export default function DeliveryStatus() {
   const [orderDetails, setOrderDetails] = useState(null);
   const [nearbyUser, setNearbyUser] = useState(null);
   const [notifiedUsers, setNotifiedUsers] = useState(new Set());
+  const [deliveryAccepted, setDeliveryAccepted] = useState(false);
   const navigation = useNavigation();
   const database = getDatabase();
   const firestore = getFirestore();
@@ -59,7 +60,6 @@ export default function DeliveryStatus() {
               });
 
               console.log('Delivery request created:', deliveryRequestId);
-              
 
               await sendPushNotification(
                 expoPushToken,
@@ -81,6 +81,7 @@ export default function DeliveryStatus() {
                 const deliveryRequest = docSnapshot.data();
                 if (deliveryRequest.status === 'accepted') {
                   console.log('Delivery accepted');
+                  setDeliveryAccepted(true);
                   off(usersRef, 'value', handleUserUpdate); // Stop the listener
                 } else if (deliveryRequest.status === 'declined') {
                   console.log('Delivery declined');
@@ -133,8 +134,7 @@ export default function DeliveryStatus() {
               <Text style={styles.cartItemName}>{item.name}</Text>
               <Text style={styles.cartItemPrice}>₹{item.price}</Text>
               <Text style={styles.cartItemPrice}>Qty: {item.quantity}</Text>
-              <Text style={styles.cartItemPrice}>Price: {item.quantity} x {item.price} = ₹{item.quantity * item.price} </Text>
-
+              <Text style={styles.cartItemPrice}>Price: {item.quantity} x {item.price} = ₹{item.quantity * item.price}</Text>
             </View>
           </View>
         )}
@@ -146,8 +146,8 @@ export default function DeliveryStatus() {
           </View>
         )}
       />
-      
-      {nearbyUser && (
+
+      {deliveryAccepted && nearbyUser && (
         <View style={styles.nearbyUserDetails}>
           <Text style={styles.nearbyUserText}>Nearby User Found:</Text>
           <Text style={styles.nearbyUserText}>Name: {nearbyUser.userFullName}</Text>
@@ -155,12 +155,10 @@ export default function DeliveryStatus() {
           <Text style={styles.nearbyUserText}>Latitude: {nearbyUser.latitude}</Text>
           <Text style={styles.nearbyUserText}>Longitude: {nearbyUser.longitude}</Text>
 
-          <TouchableOpacity style={styles.confirmButton} onPress={()=>{navigation.navigate("TrackOrder", {orderId: orderDetails.orderId} )}}>
-        <Text style={styles.confirmButtonText}>Track Order</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.confirmButton} onPress={() => { navigation.navigate("TrackOrder", { orderId: orderDetails.orderId }) }}>
+            <Text style={styles.confirmButtonText}>Track Order</Text>
+          </TouchableOpacity>
         </View>
-
-        
       )}
     </SafeAreaView>
   );
@@ -227,7 +225,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 5,
   },
-
   confirmButton: {
     backgroundColor: "#1c40bd",
     padding: 15,
