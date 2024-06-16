@@ -22,7 +22,12 @@ export default function TrackOrder({ route }) {
   const db = getFirestore(app);
   const rtdb = getDatabase(app);
   const navigation = useNavigation();
-
+  const [region, setRegion] = useState({
+    latitude: 17.493504,
+    longitude: 78.391198,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  });
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
@@ -129,12 +134,8 @@ export default function TrackOrder({ route }) {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
-        region={{
-          latitude: (userLocation.latitude + agentLocation.latitude) / 2,
-          longitude: (userLocation.longitude + agentLocation.longitude) / 2,
-          latitudeDelta: Math.abs(userLocation.latitude - agentLocation.latitude) * 1.5,
-          longitudeDelta: Math.abs(userLocation.longitude - agentLocation.longitude) * 1.5,
-        }}
+        region={region}
+
         rotateEnabled={false} // Disabling map rotation
       >
         <Marker coordinate={userLocation} title={"Your Location"}>

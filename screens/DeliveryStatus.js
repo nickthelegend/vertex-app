@@ -146,9 +146,7 @@ export default function DeliveryStatus() {
           </View>
         )}
       />
-      <TouchableOpacity style={styles.confirmButton} onPress={()=>{navigation.navigate("TrackOrder", {orderId: orderDetails.orderId} )}}>
-        <Text style={styles.confirmButtonText}>Track Order</Text>
-      </TouchableOpacity>
+      
       {nearbyUser && (
         <View style={styles.nearbyUserDetails}>
           <Text style={styles.nearbyUserText}>Nearby User Found:</Text>
@@ -156,7 +154,13 @@ export default function DeliveryStatus() {
           <Text style={styles.nearbyUserText}>User ID: {nearbyUser.userId}</Text>
           <Text style={styles.nearbyUserText}>Latitude: {nearbyUser.latitude}</Text>
           <Text style={styles.nearbyUserText}>Longitude: {nearbyUser.longitude}</Text>
+
+          <TouchableOpacity style={styles.confirmButton} onPress={()=>{navigation.navigate("TrackOrder", {orderId: orderDetails.orderId} )}}>
+        <Text style={styles.confirmButtonText}>Track Order</Text>
+      </TouchableOpacity>
         </View>
+
+        
       )}
     </SafeAreaView>
   );
