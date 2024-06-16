@@ -145,6 +145,9 @@ export default function DeliveryStatus() {
           </View>
         )}
       />
+      <TouchableOpacity style={styles.confirmButton} onPress={()=>{navigation.navigate("TrackOrder")}}>
+        <Text style={styles.confirmButtonText}>Track Order</Text>
+      </TouchableOpacity>
       {nearbyUser && (
         <View style={styles.nearbyUserDetails}>
           <Text style={styles.nearbyUserText}>Nearby User Found:</Text>
@@ -218,5 +221,18 @@ const styles = StyleSheet.create({
   nearbyUserText: {
     fontSize: 18,
     marginBottom: 5,
+  },
+
+  confirmButton: {
+    backgroundColor: "#1c40bd",
+    padding: 15,
+    margin: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  confirmButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontFamily: "Poppins-SemiBold",
   },
 });

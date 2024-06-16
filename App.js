@@ -39,7 +39,7 @@ import SendMessageScreen from './screens/SendMessageScreen';
 import DeliveryLocation from './screens/DeliveryLocation';
 import DeliveryStatus from './screens/DeliveryStatus';
 import DeliveryAgentScreen from './screens/DeliveryAgentScreen';
-import TrackOrder from './screens/OrderLocation';
+import TrackOrder from './screens/TrackOrder';
 import OrderLocation from './screens/OrderLocation';
 
 const Stack = createStackNavigator();
@@ -110,6 +110,7 @@ export default function App() {
         <Stack.Screen name="DeliveryStatus" component={DeliveryStatus} />
         <Stack.Screen name="DeliveryAgentScreen" component={DeliveryAgentScreen} />
         <Stack.Screen name="OrderLocation" component={OrderLocation} />
+        <Stack.Screen name="TrackOrder" component={TrackOrder} />
 
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>
