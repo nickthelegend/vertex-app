@@ -52,10 +52,10 @@ async function sendPushNotification(expoPushToken) {
   });
 }
 
-function handleRegistrationError(errorMessage) {
-  alert(errorMessage);
-  throw new Error(errorMessage);
-}
+// function handleRegistrationError(errorMessage) {
+//   alert(errorMessage);
+//   throw new Error(errorMessage);
+// }
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
@@ -67,7 +67,7 @@ async function registerForPushNotificationsAsync() {
     });
   }
 
-  if (Device.isDevice) {
+  // if (Device.isDevice) {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
@@ -75,12 +75,12 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      handleRegistrationError('Permission not granted to get push token for push notification!');
+      // handleRegistrationError('Permission not granted to get push token for push notification!');
       return;
     }
     const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
     if (!projectId) {
-      handleRegistrationError('Project ID not found');
+      // handleRegistrationError('Project ID not found');
     }
     try {
       const pushTokenString = (
@@ -91,11 +91,14 @@ async function registerForPushNotificationsAsync() {
       console.log(pushTokenString);
       return pushTokenString;
     } catch (e) {
-      handleRegistrationError(`${e}`);
+      // handleRegistrationError(`${e}`);
     }
-  } else {
-    handleRegistrationError('Must use physical device for push notifications');
-  }
+  // } 
+  
+  
+  // else {
+  //   handleRegistrationError('Must use physical device for push notifications');
+  // }
 }
 
 

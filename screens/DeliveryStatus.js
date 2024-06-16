@@ -5,16 +5,21 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { getDatabase, ref, onValue, off } from 'firebase/database';
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { sendPushNotification } from '../utils/sendPushNotification';
+import uuid from 'react-native-uuid'; // Import uuid
 
 export default function DeliveryStatus() {
   const [orderDetails, setOrderDetails] = useState(null);
   const [nearbyUser, setNearbyUser] = useState(null);
   const navigation = useNavigation();
   const database = getDatabase();
+  const firestore = getFirestore();
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
       const orderData = await AsyncStorage.getItem('delivery');
+      console.log(orderData)
       setOrderDetails(JSON.parse(orderData));
     };
 
@@ -23,29 +28,79 @@ export default function DeliveryStatus() {
 
   useEffect(() => {
     const usersRef = ref(database, 'users');
-    const unsubscribe = onValue(usersRef, (snapshot) => {
+  
+    const handleUserUpdate = async (snapshot) => {
       const users = snapshot.val();
       for (const userId in users) {
         const user = users[userId];
-        console.log(user)
         if (user.isNearCanteen) {
           setNearbyUser(user);
-
-
-
-          ///Do the thing here
-
-
-
-          off(usersRef); // Stop the listener
-          break;
+  
+          try {
+            // Fetch the delivery agent's push token from Firestore
+            const userDoc = await getDoc(doc(firestore, 'users', userId));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              const expoPushToken = userData.notificationToken;
+  
+              // Log the token
+              console.log('Expo Push Token:', expoPushToken);
+  
+              // Generate a unique ID for the delivery request
+              const deliveryRequestId = uuid.v4();
+  
+              // Create the delivery request in Firestore
+              await setDoc(doc(firestore, 'deliveryRequests', deliveryRequestId), {
+                status: 'pending',
+                createdAt: new Date(),
+                orderId: orderDetails.orderId,
+                deliveryAgentId: userId,
+              });
+  
+              // Log the delivery request creation
+              console.log('Delivery request created:', deliveryRequestId);
+  
+              // Send push notification to the delivery agent
+              await sendPushNotification(
+                expoPushToken,
+                'Delivery Request',
+                'Would you like to deliver this order?',
+                { deliveryRequestId }
+              );
+  
+              // Log notification sending
+              console.log('Push notification sent');
+  
+              // Listen for changes in Firestore
+              const deliveryRequestRef = doc(firestore, 'deliveryRequests', deliveryRequestId);
+              const unsubscribeRequest = onSnapshot(deliveryRequestRef, (docSnapshot) => {
+                const deliveryRequest = docSnapshot.data();
+                if (deliveryRequest.status === 'accepted') {
+                  console.log('Delivery accepted');
+                  off(usersRef); // Stop the listener
+                } else if (deliveryRequest.status === 'declined') {
+                  console.log('Delivery declined');
+                  setNearbyUser(null); // Reset nearby user to check for another user
+                }
+              });
+  
+              return () => unsubscribeRequest();
+            } else {
+              console.log('User document does not exist:', userId);
+            }
+          } catch (error) {
+            console.error('Error processing user update:', error);
+          }
         }
       }
-    });
-
+    };
+  
+    const unsubscribe = onValue(usersRef, handleUserUpdate);
+  
     // Cleanup listener on unmount
     return () => off(usersRef, 'value', unsubscribe);
-  }, [database]);
+  }, [database, firestore, orderDetails]);
+  
 
   if (!orderDetails) {
     return (
