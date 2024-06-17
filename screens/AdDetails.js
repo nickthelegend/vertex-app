@@ -1,13 +1,25 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, ScrollView, Linking } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, Text, Image, StyleSheet, ScrollView, Dimensions, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
+import Carousel, { Pagination } from 'react-native-snap-carousel';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 export default function AdDetails({ route }) {
   const { item } = route.params;
   const navigation = useNavigation();
+  const carouselRef = useRef(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  const renderItem = ({ item }) => (
+    <View>
+      <Image source={{ uri: item }} style={styles.image} />
+    </View>
+  );
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.header}>
@@ -21,7 +33,24 @@ export default function AdDetails({ route }) {
         <View></View>
       </View>
       <ScrollView contentContainerStyle={styles.container}>
-        <Image source={{ uri: item.images[0] }} style={styles.image} />
+        <Carousel
+          ref={carouselRef}
+          data={item.images}
+          renderItem={renderItem}
+          sliderWidth={screenWidth}
+          itemWidth={screenWidth}
+          layout={"default"}
+          onSnapToItem={(index) => setActiveSlide(index)}
+        />
+        <Pagination
+          dotsLength={item.images.length}
+          activeDotIndex={activeSlide}
+          containerStyle={styles.paginationContainer}
+          dotStyle={styles.dotStyle}
+          inactiveDotStyle={styles.inactiveDotStyle}
+          inactiveDotOpacity={0.4}
+          inactiveDotScale={0.6}
+        />
 
         <View style={{ marginVertical: 20 }}>
           <View
@@ -54,7 +83,7 @@ export default function AdDetails({ route }) {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              alignSelf: 'flex-end'
+              alignSelf: "flex-end",
             }}
           >
             <Ionicons name="location-outline" size={18} color="#434048" />
@@ -64,9 +93,7 @@ export default function AdDetails({ route }) {
 
         <View style={styles.separator} />
 
-        <Text
-          style={{ marginBottom: 10, fontFamily: "Montserrat", fontSize: 18 }}
-        >
+        <Text style={{ marginBottom: 10, fontFamily: "Montserrat", fontSize: 18 }}>
           Description
         </Text>
         <Text style={styles.description}>
@@ -75,19 +102,11 @@ export default function AdDetails({ route }) {
       </ScrollView>
 
       <View style={styles.buttonContainer}>
-        
-        <TouchableOpacity
-          style={styles.callButton}
-          onPress={()=>{    Linking.openURL(`tel:${item.phoneNumber}`);}}
-        >
+        <TouchableOpacity style={styles.callButton} onPress={()=>{Linking.openURL(`tel:${item.phoneNumber}`)}}>
           <Ionicons name="call-outline" size={33} color="#641dce" />
-          {/* <Text style={styles.buttonText}>Call</Text> */}
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.chatButton}
-          // onPress={chatWithSeller}
-        >
+        <TouchableOpacity style={styles.chatButton}>
           <Ionicons name="chatbubbles-outline" size={24} color="#fff" />
           <Text style={styles.buttonText}>Chat</Text>
         </TouchableOpacity>
@@ -116,9 +135,9 @@ const styles = StyleSheet.create({
     fontFamily: "ComfortaaBold",
   },
   image: {
-    width: "100%",
+    width: screenWidth,
     height: 300,
-    borderRadius: 50,
+    borderRadius: 20,
     marginBottom: 20,
     marginVertical: 30,
     shadowColor: "#000",
@@ -126,6 +145,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 10,
+    resizeMode:'center'
+  },
+  paginationContainer: {
+    paddingVertical: 8,
+  },
+  dotStyle: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginHorizontal: 8,
+    backgroundColor: '#1c40bd',
+  },
+  inactiveDotStyle: {
+    backgroundColor: '#434048',
   },
   name: {
     fontSize: 35,
@@ -136,8 +169,7 @@ const styles = StyleSheet.create({
     fontSize: 21,
     color: "#1c40bd",
     fontFamily: "ComfortaaBold",
-    textAlign: 'left',
-    color: '#434048',
+    textAlign: "left",
     marginBottom: 10,
   },
   price: {
@@ -165,8 +197,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    // justifyContent: "space-between",
-    alignItems:'center',
+    alignItems: "center",
     padding: 20,
     backgroundColor: "#fefcff",
     borderTopWidth: 1,
@@ -175,12 +206,12 @@ const styles = StyleSheet.create({
   chatButton: {
     backgroundColor: "#1c40bd",
     padding: 15,
-    paddingHorizontal:'33%',
+    paddingHorizontal: "33%",
     borderRadius: 15,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent:'center',
-    marginLeft:10
+    justifyContent: "center",
+    marginLeft: 10,
   },
   callButton: {
     backgroundColor: "#e5d8fa",
@@ -197,8 +228,8 @@ const styles = StyleSheet.create({
   },
   separator: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderStyle: 'dotted',
+    borderColor: "#ddd",
+    borderStyle: "dotted",
     marginVertical: 20,
   },
 });

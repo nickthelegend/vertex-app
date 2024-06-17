@@ -68,6 +68,7 @@
     "react-native-screens": "~3.29.0",
     "react-native-scrollable-tab-view": "^1.0.0",
     "react-native-shimmer-placeholder": "^2.0.9",
+    "react-native-snap-carousel": "^3.9.1",
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.2.0",
     "react-native-uuid": "^2.0.2"
