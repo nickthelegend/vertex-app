@@ -59,12 +59,18 @@ export default function PostScreen({ navigation }) {
       };
   
       await savePostToFirestore(post);
+      await new Promise (resolve => setTimeout(resolve,2000))
+      navigation.goBack();
       setLoadingVisible(false);
+
 
       // Reset form and navigate back or show a success message
     } catch (error) {
       // Handle the error here
       console.error('Error in handlePost:', error);
+      // setLoadingVisible(false);
+      await new Promise (resolve => setTimeout(resolve,2000))
+      navigation.goBack();
       setLoadingVisible(false);
 
       // Optionally, you can also show an error message to the user
@@ -73,7 +79,7 @@ export default function PostScreen({ navigation }) {
 
   const isPostButtonDisabled = () => {
     const wordCount = caption.trim().split(/\s+/).length;
-    return wordCount < 9 || !selectedTag;
+    return wordCount < 5 || !selectedTag;
   };
   
   const handleBack = () => {
@@ -90,7 +96,13 @@ export default function PostScreen({ navigation }) {
         <View></View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollView}>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+       
       <Text style={[styles.sectionTitle, { marginRight: 5 }]}>Caption</Text>
+      <Text style={{ fontSize: 11, alignSelf: 'center' }}>(Minimum 5 words)</Text>
+
+      </View>
 
         <TextInput
           style={styles.input}
