@@ -9,6 +9,7 @@ import { getFirestore, collection,addDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import uuid from 'react-native-uuid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoadingIndicator from '../components/LoadingIndicator';
 
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -32,7 +33,8 @@ export default function CreateSellAd() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [currentUserFullName, setCurrentUserFullName] = useState('');
-  console.log(currentUser);
+  // console.log(currentUser);
+  const [loadingVisible, setLoadingVisible] = useState(false); // State to control loading animation visibility
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -55,6 +57,8 @@ export default function CreateSellAd() {
   };
 
   const handleSubmit = async () => {
+    setLoadingVisible(true);
+
     try {
       // Upload images to Firebase Storage and get URLs
       const urls = await Promise.all(images.map(async (image, index) => {
@@ -84,8 +88,13 @@ export default function CreateSellAd() {
       });
       console.log('Document successfully written!');
       navigation.goBack();
+      setLoadingVisible(false);
+
     } catch (e) {
       console.error('Error adding document: ', e);
+      navigation.goBack();
+      setLoadingVisible(false);
+
     }
   };
 
@@ -269,6 +278,8 @@ export default function CreateSellAd() {
                 </TouchableOpacity>
               )}
             </View>
+
+            
           </>
         )}
 
@@ -319,6 +330,8 @@ export default function CreateSellAd() {
           <Text style={styles.nextButtonText}>{step === 3 ? 'Submit' : 'Next: Product Details'}</Text>
         </TouchableOpacity>
       </View>
+      {loadingVisible && <LoadingIndicator />}
+
     </SafeAreaView>
   );
 }
