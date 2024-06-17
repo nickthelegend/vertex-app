@@ -69,7 +69,7 @@ export default function BuyGetComponent() {
               <Ionicons name="phone-portrait-outline" size={24} color="#333" />
               <Text style={styles.categoryText}>Gadgets</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.categoryButton}>
+            <TouchableOpacity style={styles.categoryButton} onPress={() => { navigation.navigate("CategoryResources") }}>
               <Ionicons name="school-outline" size={24} color="#333" />
               <Text style={styles.categoryText}>Resources</Text>
             </TouchableOpacity>
