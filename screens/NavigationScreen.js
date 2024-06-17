@@ -101,7 +101,10 @@ const startLocationUpdates = async () => {
 
 const Drawer = createDrawerNavigator();
 
-function NavigationScreen() {
+
+
+
+ function NavigationScreen() {
   const navigation = useNavigation();
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const [region, setRegion] = useState({
@@ -114,6 +117,32 @@ function NavigationScreen() {
   const [isNearCanteen, setIsNearCanteen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentUserFullName, setCurrentUserFullName] = useState("");
+  const checkUserFullName= async()=>{
+    try {
+      // Step 1: Retrieve user data from AsyncStorage
+      const userData = await AsyncStorage.getItem('user');
+  
+      // Step 2: Check if userData is not null and parse it
+      if (userData) {
+        const jsonObj = JSON.parse(userData);
+        console.log("sad=>",jsonObj);
+        
+        setCurrentUser(jsonObj)
+  
+  
+      }
+  
+  
+  
+    } catch (error) {
+      console.error('Error In Checking userFullname', error.message);
+      return null;
+    }
+  }
+  useEffect(()=>{
+    checkUserFullName()
+
+  },[])
   useEffect(() => {
     // Set notification categories for delivery requests
     Notifications.setNotificationCategoryAsync('delivery_request', [
@@ -251,7 +280,14 @@ function NavigationScreen() {
         drawerActiveBackgroundColor: "#1d40bd",
         drawerInactiveTintColor: "#333",
       }}
-      drawerContent={(props) => <CustomDrawer {...props} />}
+      drawerContent={(props) => {
+  if (currentUser) {
+    return <CustomDrawer {...props} fullName={currentUser.fullName} userId={currentUser.username} />;
+  } else {
+    // You might want to return null or some default drawer content if currentUser is not defined
+    return null;
+  }
+}}
     >
       <Drawer.Screen
         name="Home"

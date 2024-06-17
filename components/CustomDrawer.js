@@ -16,8 +16,8 @@ import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for icons
 import { logoutUser } from "../utils/FireBaseFunctions";
 import LogoutModal from "./LogoutModal";
 
-const CustomDrawer = (props) => {
-  
+const CustomDrawer = ({userId,fullName, ...props }) => {
+    console.log("fullName=>", fullName)
     const navigation = useNavigation();
     const handlePress = () => {
         // Navigate to the ProfileScreen within the stack navigator
@@ -46,8 +46,10 @@ const CustomDrawer = (props) => {
           <View style={{
             flexDirection: "column"
           }}> 
-          <Text style={styles.userName}>Nihal</Text>
-          <Text style={{color: '#fff',marginTop: -10,marginBottom: 10}}>@nihal</Text>
+         <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
+  {fullName}
+</Text>
+          <Text style={{color: '#fff',marginTop: -10,marginBottom: 10}}>{userId}</Text>
 
           </View>
           
@@ -168,6 +170,7 @@ const styles = StyleSheet.create({
     fontFamily: "Comfortaa",
     fontSize: Spacing * 4,
     color: "#fff",
+    width:150
   },
   userCoins: {
     marginTop: -10,
