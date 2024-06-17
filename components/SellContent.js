@@ -68,7 +68,7 @@ export default function SellContent({ navigation }) {
           renderItem={renderAd}
         />
       ) : (
-        <Text>No ads posted yet.</Text>
+        <Text>Loading...</Text>
       )}
       <TouchableOpacity style={styles.floatingButton} onPress={() => navigation.navigate('CreateSellAd')}>
         <Ionicons name="add" size={32} color="#fff" />

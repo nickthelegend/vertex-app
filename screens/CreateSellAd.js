@@ -85,6 +85,7 @@ export default function CreateSellAd() {
         phoneNumber,
         userId: currentUser,
         userFullName: currentUserFullName,
+        dateCreated: new Date()
       });
       console.log('Document successfully written!');
       navigation.goBack();
