@@ -10,6 +10,7 @@ const { width: screenWidth } = Dimensions.get('window');
 
 export default function AdDetails({ route }) {
   const { item } = route.params;
+  // console.log(item)
   const navigation = useNavigation();
   const carouselRef = useRef(null);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -106,7 +107,7 @@ export default function AdDetails({ route }) {
           <Ionicons name="call-outline" size={33} color="#641dce" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.chatButton}>
+        <TouchableOpacity style={styles.chatButton} onPress={()=>{navigation.navigate('SendMessageScreen', { userId: item.userId, name: item.userFullName });}}>
           <Ionicons name="chatbubbles-outline" size={24} color="#fff" />
           <Text style={styles.buttonText}>Chat</Text>
         </TouchableOpacity>
