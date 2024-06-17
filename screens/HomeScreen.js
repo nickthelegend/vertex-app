@@ -1,36 +1,29 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  // SafeAreaView,
-  Image,
-  Dimensions,
-  StyleSheet,
-} from "react-native";
-import * as Animatable from "react-native-animatable";
-import SPACING from "../utils/Spacing";
+import { View, FlatList, SafeAreaView, StyleSheet, ActivityIndicator } from "react-native";
 import { useFonts } from "expo-font";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
-import { Ionicons } from "@expo/vector-icons";
-import Spacing from "../utils/Spacing";
-import CategoryButton from "../components/CategoryButton";
-// import BottomNavigationBar from "../components/BottomNavigationBar";
-import TwitterIcons from "../components/TwitterIcons"
-import UserPost from "../components/UserPost";
-import currentUserProfilePic from "../assets/images/Avatar.png";
+import { Dimensions } from "react-native";
 import * as NavigationBar from 'expo-navigation-bar';
-import { SafeAreaView } from "react-native-safe-area-context";
-import userProfilePic from "../assets/images/avatar2.png";
-import userPostPicture from "../assets/images/chicken.png";
+import { Ionicons } from "@expo/vector-icons";
+import { getFirestore, collection, query, orderBy, startAfter, limit, getDocs } from 'firebase/firestore';
+import { app } from '../services/config';
+
+import SPACING from "../utils/Spacing";
+import CategoryButton from "../components/CategoryButton";
+import UserPost from "../components/UserPost";
 import HomeHeader from "../components/HomeHeader";
-import { checkUserLoggedIn } from "../utils/FireBaseFunctions.js";
+import { checkUserLoggedIn } from "../utils/FireBaseFunctions";
+
+import currentUserProfilePic from "../assets/images/Avatar.png";
 
 export default function HomeScreen() {
-
-  const [userFullName,setUserFullName]= useState('');
-  NavigationBar.setBackgroundColorAsync('#ffffff00');
-
+  const [userFullName, setUserFullName] = useState('');
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [lastVisiblePost, setLastVisiblePost] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const deviceWidth = Dimensions.get("window").width;
+
+  NavigationBar.setBackgroundColorAsync('#ffffff00');
 
   const [fontsLoaded] = useFonts({
     AudioWideFont: require("../fonts/Audiowide-Regular.ttf"),
@@ -43,228 +36,108 @@ export default function HomeScreen() {
     'Lato-Regular': require('../fonts/Lato/Lato-Regular.ttf'),
     NotoSansGrantha: require('../fonts/Noto_Sans_Grantha/NotoSansGrantha-Regular.ttf'),
     NotoSansKawi: require('../fonts/Noto_Sans_Kawi/NotoSansKawi-VariableFont_wght.ttf')
-
-
-
   });
 
   if (!fontsLoaded) {
-    // Return a loading indicator or null until fonts are loaded
     return null;
   }
 
-console.log(userFullName)
   useEffect(() => {
-    const fetchLoggedInUser = async () => {
+    const fetchUserData = async () => {
       const loggedInUser = await checkUserLoggedIn();
-      console.log(loggedInUser);
-      setUserFullName(loggedInUser.fullName)
+      setUserFullName(loggedInUser.fullName);
     };
-    
-    fetchLoggedInUser();
-  
+
+    const fetchInitialPosts = async () => {
+      setLoading(true);
+      const { posts, lastVisible } = await fetchPosts(null);
+      setPosts(posts);
+      setLastVisiblePost(lastVisible);
+      setLoading(false);
+    };
+
+    fetchUserData();
+    fetchInitialPosts();
   }, []);
-  return (
-    <SafeAreaView style={{flex:1}}>
 
-<View style={{ flex: 1 }}>
-      <View
-        style={{
-          flex: 1,
-          paddingHorizontal: SPACING * 1,
-          paddingTop: SPACING * 1,
-        }}
-      >
+  const fetchPosts = async (lastVisiblePost) => {
+    const db = getFirestore(app);
+    let q;
 
-      <HomeHeader userFullName={userFullName} userProfilePic={currentUserProfilePic}/>
-        {/* <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            width: "100%",
-            justifyContent: "space-between",
-          }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity>
-              <Image
-                source={require("../assets/images/Avatar.png")}
-                style={{
-                  height: SPACING * 5,
-                  width: SPACING * 5,
-                  borderRadius: SPACING * 2,
-                  marginRight: SPACING * 2, // Adjust the specific distance between avatar and text
-                }}
-              />
-            </TouchableOpacity>
+    if (lastVisiblePost) {
+      q = query(
+        collection(db, 'posts'),
+        orderBy('createdAt', 'desc'),
+        startAfter(lastVisiblePost),
+        limit(3)
+      );
+    } else {
+      q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(3));
+    }
 
-            <Text
-              style={{
-                fontSize: SPACING * 2.7,
-                color: "#1e40bc",
-                fontFamily: "ComfortaaBold",
-              }}
-            >
-              Hello, Nihal
-            </Text>
-          </View>
+    const querySnapshot = await getDocs(q);
+    const posts = [];
+    querySnapshot.forEach((doc) => {
+      posts.push({ id: doc.id, ...doc.data() });
+    });
 
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity
-              style={{
-                marginRight: SPACING * 2,
-              }}
-            >
-              <Image
-                source={require("../assets/icons/search.png")}
-                style={{
-                  width: 24,
-                  height: 24,
-                  resizeMode: "contain",
-                  tintColor: "black",
-                }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                marginRight: SPACING * 2,
-              }}
-            >
-              <Ionicons name="notifications" size={24} color="black" />
-            </TouchableOpacity>
+    const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    return { posts, lastVisible };
+  };
 
-            <TouchableOpacity>
-              <Image
-                source={require("../assets/icons/message.png")}
-                style={{
-                  width: 24,
-                  height: 24,
-                  resizeMode: "contain",
-                  tintColor: "black",
-                }}
-              />
-            </TouchableOpacity>
-          </View>
-        </View> */}
+  const fetchMorePosts = async () => {
+    if (loadingMore) return;
+    setLoadingMore(true);
+    const { posts: newPosts, lastVisible } = await fetchPosts(lastVisiblePost);
+    setPosts([...posts, ...newPosts]);
+    setLastVisiblePost(lastVisible);
+    setLoadingMore(false);
+  };
 
-        <View
-          style={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            marginVertical: SPACING * 2,
-          }}
-        >
-          <CategoryButton text="What's Happening" />
-
-          <CategoryButton text="Community" />
-
-          <CategoryButton text="Clubs" />
-
-          <CategoryButton text="Events" />
-
-          <CategoryButton text="Opportunities" />
-
-          <CategoryButton text="Question/Help" />
-        </View>
-
-        <ScrollView showsVerticalScrollIndicator={false}  >
-        <UserPost
-  userProfilePic={userProfilePic}
-  userPostPicture={userPostPicture}
-  userFullName="Sai Siddu"
-  username="saisiddu"
-  datePosted={"Sep 23"}
-  postComments={"32.2K"}
-  postLikes={"12.5M"}
-  postRetweets={"4.3M"}
-  postContext={"hi i am eating chicken pasta"}
-  // Other props...
-
-  
+  const renderPost = ({ item }) => (
+    <UserPost
+      key={item.id}
+      userProfilePic={{ uri: item.createdByUserProfilePic }}
+      userPostPicture={{ uri: item.imgUrl }}
+      userFullName={item.createdByUserFullname}
+      username={item.createdByUserName}
+      datePosted={
+  new Date(item.createdAt.seconds * 1000).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}     postComments={item.comments.length}
+      postLikes={item.likes.length}
+      postRetweets={item.retweets ? item.retweets.length : 0}
+      postContext={item.caption}
     />
-    {/*THis is simpple please remove it TODO */ }
-          <View
-            style={{
-              backgroundColor: "#f7f7f7",
-              padding: SPACING,
-              marginBottom: SPACING *1.7
-            }}
-            
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                // justifyContent: "space-between",
-                marginVertical: SPACING,
-                marginBottom: SPACING * 2,
-              }}
-            >
-              <Image
-                source={require("../assets/images/avatar3.png")}
-                style={{
-                  height: SPACING * 5,
-                  width: SPACING * 5,
-                  borderRadius: SPACING * 2,
-                  marginRight: SPACING,
-                }}
-              />
+  );
 
-              <View style={{}}>
-                <Text
-                  style={{
-                    color: "black",
-                  }}
-                >
-                  NICKTHELEGEND
-                </Text>
-                <Text
-                  style={{
-                    color: "grey",
-                  }}
-                >
-                  @nickthelegend
-                </Text>
-              </View>
-
-              <View style={{ flex: 1, alignItems: "flex-end" }}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text>Sep 23</Text>
-                  <Image
-                    source={require("../assets/icons/dropdown.png")}
-                    style={{
-                      marginLeft: SPACING * 0.3,
-                      width: 20,
-                      height: 20,
-                    }}
-                  />
-                </View>
-              </View>
-            </View>
-
-            <View>
-              <Text style={{ marginBottom: 10 }}>
-                really feeling depressed man i really want someone to talk to me 😢
-              </Text>
-              <Image
-                source={require("../assets/images/images.jpg")}
-                style={{
-                  width: "100%", // Make the image width span the width of the container
-                  aspectRatio: 1, // Maintain the aspect ratio of the image (1:1)
-                  resizeMode: "cover", // Cover the container with the image, maintaining aspect ratio
-                }}
-              />
-
-              <TwitterIcons/>
-            </View>
-          </View> 
-        </ScrollView>
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, paddingHorizontal: SPACING * 1, paddingTop: SPACING * 1 }}>
+          <HomeHeader userFullName={userFullName} userProfilePic={currentUserProfilePic} />
+          <View style={{ flexDirection: "row", flexWrap: "wrap", marginVertical: SPACING * 2 }}>
+            <CategoryButton text="What's Happening" />
+            <CategoryButton text="Community" />
+            <CategoryButton text="Clubs" />
+            <CategoryButton text="Events" />
+            <CategoryButton text="Opportunities" />
+            <CategoryButton text="Question/Help" />
+          </View>
+          <FlatList
+            data={posts}
+            renderItem={renderPost}
+            keyExtractor={(item) => item.id}
+            onEndReached={fetchMorePosts}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="#0000ff" /> : null}
+          />
+        </View>
       </View>
-
-      {/* <BottomNavigationBar /> */}
-    </View>
     </SafeAreaView>
-    
   );
 }
 

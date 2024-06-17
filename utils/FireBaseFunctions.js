@@ -310,3 +310,39 @@ export const savePostToFirestore = async (post) => {
 };
 
 
+
+export const fetchPostsFromFirestore = async () => {
+  try {
+    const postsCollection = collection(db, 'posts');
+    const postsSnapshot = await getDocs(postsCollection);
+    const postsList = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return postsList;
+  } catch (error) {
+    console.error('Error fetching posts from Firestore:', error);
+    throw error;
+  }
+};
+
+export const fetchPosts = async (lastVisiblePost, pageSize = 10) => {
+  let q;
+
+  if (lastVisiblePost) {
+    q = query(
+      collection(db, 'posts'),
+      orderBy('createdAt', 'desc'),
+      startAfter(lastVisiblePost),
+      limit(pageSize)
+    );
+  } else {
+    q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(pageSize));
+  }
+
+  const querySnapshot = await getDocs(q);
+  const posts = [];
+  querySnapshot.forEach((doc) => {
+    posts.push({ id: doc.id, ...doc.data() });
+  });
+
+  const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+  return { posts, lastVisible };
+};
