@@ -65,7 +65,7 @@ export default function BuyGetComponent() {
               <Ionicons name="book-outline" size={24} color="#333" />
               <Text style={styles.categoryText}>Books</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.categoryButton}>
+            <TouchableOpacity style={styles.categoryButton} onPress={() => { navigation.navigate("CategoryGadgets") }}>
               <Ionicons name="phone-portrait-outline" size={24} color="#333" />
               <Text style={styles.categoryText}>Gadgets</Text>
             </TouchableOpacity>
@@ -73,7 +73,7 @@ export default function BuyGetComponent() {
               <Ionicons name="school-outline" size={24} color="#333" />
               <Text style={styles.categoryText}>Resources</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.categoryButton}>
+            <TouchableOpacity style={styles.categoryButton}  onPress={() => { navigation.navigate("CategoryMisc") }}>
               <Ionicons name="ellipsis-horizontal-outline" size={24} color="#333" />
               <Text style={styles.categoryText}>Misc</Text>
             </TouchableOpacity>
@@ -99,9 +99,9 @@ export default function BuyGetComponent() {
                       source={{ uri: item.images[0] }}
                       style={[styles.itemImage, { borderRadius: 50 }]}
                     >
-                      <TouchableOpacity style={[styles.button, styles.favoriteButton]}>
+                      {/* <TouchableOpacity style={[styles.button, styles.favoriteButton]}>
                         <Ionicons name="heart-outline" size={21} color="white" />
-                      </TouchableOpacity>
+                      </TouchableOpacity> */}
                     </ImageBackground>
                     <Text
                       style={styles.itemText}

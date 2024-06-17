@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   itemImageStyle: {
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   itemDetails: {
     padding: 20,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     height:screenWidth/2,
     marginRight: 10,
     borderRadius: 10,
-    resizeMode:'cover'
+    resizeMode:'contain'
   },
   addImageButton: {
     width: 80,

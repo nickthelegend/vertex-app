@@ -47,13 +47,13 @@ export default function MarketPlace({ navigation }) {
           <Ionicons name="cash-outline" size={24} color={activeTab === 'sell' ? '#007bff' : '#333'} />
           <Text style={styles.tabButtonText}>Sell/Give</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[styles.tabButton, activeTab === 'shortlist' && styles.activeTab]}
           onPress={() => handleTabPress('shortlist')}
         >
           <Ionicons name="heart-outline" size={24} color={activeTab === 'shortlist' ? '#007bff' : '#333'} />
           <Text style={styles.tabButtonText}>Shortlist</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </SafeAreaView>
   );

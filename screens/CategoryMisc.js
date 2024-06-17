@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ImageBackground, Dimensions,Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ImageBackground, Dimensions } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -9,9 +9,8 @@ import { app } from '../services/config';
 
 const screenWidth = Dimensions.get("window").width;
 
-export default function FilterScreen({ route }) {
+export default function CategoryMisc() {
   const navigation = useNavigation();
-  const { year, department } = route.params;
   const [filteredItems, setFilteredItems] = useState([]);
   const db = getFirestore(app);
 
@@ -20,9 +19,7 @@ export default function FilterScreen({ route }) {
       try {
         const q = query(
           collection(db, 'sellAds'),
-          where('category', '==', 'Books'),
-          where('year', '==', year),
-          where('branch', '==', department)
+          where('category', '==', 'Misc')
         );
         const querySnapshot = await getDocs(q);
         const itemsList = querySnapshot.docs.map(doc => ({
@@ -36,16 +33,33 @@ export default function FilterScreen({ route }) {
     };
 
     fetchFilteredItems();
-  }, [year, department]);
+  }, []);
 
-  const chunkArray = (array, chunkSize) => {
-    return Array(Math.ceil(array.length / chunkSize))
-      .fill()
-      .map((_, index) => index * chunkSize)
-      .map((begin) => array.slice(begin, begin + chunkSize));
-  };
-
-  const itemsInRows = chunkArray(filteredItems, 2);
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={() => navigation.navigate("AdDetail", { item })}
+    >
+      <ImageBackground
+        source={{ uri: item.images[0] }}
+        style={styles.itemImage}
+      >
+      </ImageBackground>
+      <Text style={styles.itemText} numberOfLines={1} ellipsizeMode="tail">
+        {item.productName}
+      </Text>
+      <Text style={styles.itemCondition}>{item.condition}</Text>
+      <View style={styles.buttonContainer}>
+        {item.giveaway ? <Text style={styles.itemPrice}>Free</Text> : <Text style={styles.itemPrice}>₹{item.price}</Text>}
+        <TouchableOpacity
+          style={[styles.button, styles.addToCartButton]}
+          onPress={() => navigation.navigate("Chat", { item })}
+        >
+          <Text style={styles.buttonText}>Chat</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -56,46 +70,17 @@ export default function FilterScreen({ route }) {
         >
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Books for {year} Year - {department}</Text>
+        <Text style={styles.headerText}>Misc</Text>
         <View></View>
+        
       </View>
       
       <FlatList
-        data={itemsInRows}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item: row }) => (
-          <View style={styles.rowContainer}>
-            {row.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.itemContainer}
-                onPress={() => navigation.navigate("AdDetail", { item })}
-              >
-                <Image
-                  source={{ uri: item.images[0] }}
-                  style={styles.itemImage}
-                />
-                  {/* <TouchableOpacity style={styles.favoriteButton}>
-                    <Ionicons name="heart-outline" size={21} color="white" />
-                  </TouchableOpacity> */}
-                {/* </ImageBackground> */}
-                <Text style={styles.itemText} numberOfLines={1} ellipsizeMode="tail">
-                  {item.productName}
-                </Text>
-                <Text style={styles.itemCondition}>{item.condition}</Text>
-                <View style={styles.buttonContainer}>
-                  {item.giveaway ? <Text style={styles.itemPrice}>Free</Text> : <Text style={styles.itemPrice}>₹{item.price}</Text>}
-                  <TouchableOpacity
-                    style={[styles.button, styles.addToCartButton]}
-                    onPress={() => navigation.navigate("Chat", { item })}
-                  >
-                    <Text style={styles.buttonText}>Chat</Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+        data={filteredItems}
+        keyExtractor={item => item.id}
+        renderItem={renderItem}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
       />
     </SafeAreaView>
   );
@@ -122,17 +107,17 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontFamily: "ComfortaaBold",
   },
-  rowContainer: {
-    flexDirection: "row",
-    marginBottom: 10,
+  row: {
     flex: 1,
+    justifyContent: "space-between",
+    marginHorizontal: 10,
   },
   itemContainer: {
-    flex: 1,
     backgroundColor: "#ffffff",
     padding: 10,
     borderRadius: 15,
-    marginHorizontal: 5,
+    margin: 10,
+    flex: 1,
     elevation: 10,
     shadowColor: "#000",
     shadowOffset: {
@@ -143,7 +128,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   itemImage: {
-    width: (screenWidth / 2) * 0.85,
+    width: (screenWidth / 2) - 30,
     height: 150,
     borderRadius: 15,
     resizeMode: "cover",
@@ -199,4 +184,3 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
 });
-
