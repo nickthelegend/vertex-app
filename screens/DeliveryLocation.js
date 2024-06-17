@@ -9,12 +9,14 @@ import { app } from '../services/config'; // Assuming you have a firebase config
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import { useNavigation } from '@react-navigation/native';
+import LoadingIndicator from '../components/LoadingIndicator';
 
 export default function DeliveryLocation({ route }) {
   const { cartItems, subtotal, deliveryCharges, total , address,
     roomNo,
     phoneNo,} = route.params;
   const navigation = useNavigation();
+  const [loadingVisible, setLoadingVisible] = useState(false); // State to control loading animation visibility
   const northEast = { latitude: 17.49617, longitude: 78.39486 };
   const southWest = { latitude: 17.490222, longitude: 78.386944 };
   const [currentUser, setCurrentUser] = useState(null);
@@ -61,6 +63,8 @@ export default function DeliveryLocation({ route }) {
   };
 
   const handleConfirmLocation = async () => {
+    setLoadingVisible(true);
+
     const db = getFirestore(app);
 
     const orderId = uuid.v4();
@@ -99,11 +103,12 @@ export default function DeliveryLocation({ route }) {
       await AsyncStorage.setItem('delivery', JSON.stringify(newOrder));
 
       console.log('Order confirmed and stored in Firestore:', newOrder);
-
+      setLoadingVisible(false)
       // Navigate to the DeliveryStatus page
       navigation.navigate('DeliveryStatus', { orderId,region });
     } catch (error) {
       console.error('Error confirming and storing order:', error);
+      setLoadingVisible(false)
     }
   };
 
@@ -152,6 +157,7 @@ export default function DeliveryLocation({ route }) {
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmLocation}>
         <Text style={styles.confirmButtonText}>Confirm Location</Text>
       </TouchableOpacity>
+      {loadingVisible && <LoadingIndicator />}
     </SafeAreaView>
   );
 }
