@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,43 +9,33 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView, TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
+import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { app } from '../services/config';
 
 const screenWidth = Dimensions.get("window").width;
 
 export default function BuyGetComponent() {
   const navigation = useNavigation();
-  const vegItems = [
-    {
-      name: "Electric Guitar",
-      image: require("../assets/temp/electric_guitar.jpg"),
-      price: 150,
-      condition: "Okay Condition",
-      user: 'Batu Honey Vardhan',
-      address: 'Kinnera Hostel',
-      category:'',
-      subCatYear:'',
-      subCatBranch: '',
+  const [items, setItems] = useState([]);
+  const db = getFirestore(app);
 
-    },
-    {
-      name: "Algorithms Set of 3 Books",
-      image: require("../assets/temp/algorithims.jpg"),
-      price: 120,
-      condition: "Like New",
-    },
-    {
-      name: "Data Structures 2nd Edition",
-      image: require("../assets/temp/datastructuresandalgo.jpg"),
-      condition: 'Poor',
-      price: 'Free',
-    },
-    {
-      name: "MTB Cycle Black",
-      image: require("../assets/temp/cycle.jpg"),
-      condition: "Good Condition",
-      price: 100,
-    },
-  ];
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const q = query(collection(db, 'sellAds'), orderBy('dateCreated', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const itemsList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setItems(itemsList);
+      } catch (error) {
+        console.error('Error fetching items: ', error);
+      }
+    };
+
+    fetchItems();
+  }, []);
 
   const chunkArray = (array, chunkSize) => {
     return Array(Math.ceil(array.length / chunkSize))
@@ -54,7 +44,7 @@ export default function BuyGetComponent() {
       .map((begin) => array.slice(begin, begin + chunkSize));
   };
 
-  const itemsInRows = chunkArray(vegItems, 2);
+  const itemsInRows = chunkArray(items.slice(0, 4), 2); // Only show first 4 items
 
   return (
     <View style={styles.container}>
@@ -71,7 +61,7 @@ export default function BuyGetComponent() {
 
           <Text style={styles.categoryHeader}>Categories</Text>
           <View style={styles.categoriesContainer}>
-            <TouchableOpacity style={[styles.categoryButton, styles.firstCategory]} onPress={()=>{navigation.navigate("CategoryBooks")}}>
+            <TouchableOpacity style={[styles.categoryButton, styles.firstCategory]} onPress={() => { navigation.navigate("CategoryBooks") }}>
               <Ionicons name="book-outline" size={24} color="#333" />
               <Text style={styles.categoryText}>Books</Text>
             </TouchableOpacity>
@@ -91,7 +81,7 @@ export default function BuyGetComponent() {
 
           <View style={styles.recentlyAddedContainer}>
             <Text style={styles.recentlyAddedTitle}>Recently Added</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("MoreItems")}>
               <Text style={styles.showMoreButton}>Show More</Text>
             </TouchableOpacity>
           </View>
@@ -106,7 +96,7 @@ export default function BuyGetComponent() {
                     onPress={() => navigation.navigate("AdDetail", { item })}
                   >
                     <ImageBackground
-                      source={item.image}
+                      source={{ uri: item.images[0] }}
                       style={[styles.itemImage, { borderRadius: 50 }]}
                     >
                       <TouchableOpacity style={[styles.button, styles.favoriteButton]}>
@@ -118,15 +108,15 @@ export default function BuyGetComponent() {
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
-                      {item.name}
+                      {item.productName}
                     </Text>
                     <Text style={styles.itemCondition}>{item.condition}</Text>
                     <View style={styles.buttonContainer}>
-                    {item.price == "Free" ?<Text style={styles.itemPrice}>Free</Text> : <Text style={styles.itemPrice}>₹{item.price}</Text>}
+                      {item.giveaway ? <Text style={styles.itemPrice}>Free</Text> : <Text style={styles.itemPrice}>₹{item.price}</Text>}
 
                       <TouchableOpacity
                         style={[styles.button, styles.addToCartButton]}
-                        onPress={() => addToCart(item)}
+                        onPress={() => navigation.navigate("Chat", { item })}
                       >
                         <Text style={styles.buttonText}>Chat</Text>
                       </TouchableOpacity>
@@ -137,7 +127,7 @@ export default function BuyGetComponent() {
             ))}
           </View>
         </View>
-        
+
       </ScrollView>
     </View>
   );
@@ -160,7 +150,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     marginBottom: 20,
     flexWrap: "wrap",
-    paddingHorizontal:10,
+    paddingHorizontal: 10,
   },
   searchBar: {
     flexDirection: "row",
@@ -226,7 +216,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     padding: 10,
     borderRadius: 15,
-    // alignItems: "center",
     marginHorizontal: 5,
     elevation: 10,
     shadowColor: "#000",
@@ -251,16 +240,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "ComfortaaBold",
     marginTop: 10,
-    textAlign:'left',
+    textAlign: 'left',
     color: "#007bff",
   },
   itemCondition: {
     fontSize: 15,
     color: "#1c40bd",
     fontFamily: "ComfortaaBold",
-    textAlign:'left',
-    color:'#434048'
-
+    textAlign: 'left',
+    color: '#434048'
   },
   itemPrice: {
     fontSize: 30,
@@ -270,7 +258,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     marginTop: 10,
-    justifyContent:'space-between'
+    justifyContent: 'space-between'
   },
   button: {
     flex: 1,
@@ -288,7 +276,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1c40bd",
     marginRight: 5,
     paddingHorizontal: 20,
-    borderRadius:20,
+    borderRadius: 20,
   },
   favoriteButton: {
     position: "absolute",
@@ -298,4 +286,3 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-

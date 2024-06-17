@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -21,7 +21,7 @@ export default function AdDetails({ route }) {
         <View></View>
       </View>
       <ScrollView contentContainerStyle={styles.container}>
-        <Image source={item.image} style={styles.image} />
+        <Image source={{ uri: item.images[0] }} style={styles.image} />
 
         <View style={{ marginVertical: 20 }}>
           <View
@@ -31,7 +31,7 @@ export default function AdDetails({ route }) {
               justifyContent: "space-between",
             }}
           >
-            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.name}>{item.productName}</Text>
             <Text style={styles.price}>₹{item.price}</Text>
           </View>
 
@@ -46,7 +46,7 @@ export default function AdDetails({ route }) {
             <Text style={styles.itemCondition}>{item.condition}</Text>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Ionicons name="person-outline" size={18} color="#434048" />
-              <Text style={styles.user}> {item.user}</Text>
+              <Text style={styles.user}> {item.userFullName}</Text>
             </View>
           </View>
 
@@ -58,7 +58,7 @@ export default function AdDetails({ route }) {
             }}
           >
             <Ionicons name="location-outline" size={18} color="#434048" />
-            <Text style={styles.address}> {item.address}</Text>
+            <Text style={styles.address}> {item.hostel}</Text>
           </View>
         </View>
 
@@ -70,23 +70,7 @@ export default function AdDetails({ route }) {
           Description
         </Text>
         <Text style={styles.description}>
-          This is a detailed description of the {item.name}. It is a delicious
-          dish made with the freshest ingredients and cooked to perfection. Our{" "}
-          {item.name} features a delightful combination of flavors, including
-          savory spices, aromatic herbs, and succulent meats/vegetables
-          (depending on the dish). Each bite offers a symphony of tastes that
-          will tantalize your taste buds and leave you craving for more. Our
-          skilled chefs meticulously prepare each component of the dish to
-          ensure optimum flavor and texture. Whether you're a fan of hearty
-          meals or seeking a lighter option, our {item.name} caters to all
-          palates. Indulge in the rich, creamy sauce (if applicable) that
-          complements the main ingredients, adding depth and richness to every
-          bite. Accompanied by a side of fluffy rice/piping hot bread, our{" "}
-          {item.name} is a complete meal that satisfies your hunger and delights
-          your senses. Whether you're dining alone or with loved ones, our{" "}
-          {item.name} promises a culinary experience that you won't soon forget.
-          Treat yourself to a gastronomic adventure and savor the exquisite
-          flavors of our signature dish today!
+          {item.description}
         </Text>
       </ScrollView>
 
@@ -94,7 +78,7 @@ export default function AdDetails({ route }) {
         
         <TouchableOpacity
           style={styles.callButton}
-          // onPress={callSeller}
+          onPress={()=>{    Linking.openURL(`tel:${item.phoneNumber}`);}}
         >
           <Ionicons name="call-outline" size={33} color="#641dce" />
           {/* <Text style={styles.buttonText}>Call</Text> */}
