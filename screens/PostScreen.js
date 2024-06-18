@@ -8,6 +8,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LoadingIndicator from '../components/LoadingIndicator';
+import { getFirestore, collection, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+// import { arrayUnion } from 'firebase/firestore';
+
+const db = getFirestore();
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -58,21 +62,27 @@ export default function PostScreen({ navigation }) {
         postTags: selectedTag,
       };
   
-      await savePostToFirestore(post);
-      await new Promise (resolve => setTimeout(resolve,2000))
+      // Save the post to Firestore
+      await setDoc(doc(db, 'posts', postId), post);
+  
+      // Update the user's posts array
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, {
+        posts: arrayUnion(postId)
+      });
+  
+      await new Promise(resolve => setTimeout(resolve, 2000));
       navigation.goBack();
       setLoadingVisible(false);
-
-
+  
       // Reset form and navigate back or show a success message
     } catch (error) {
       // Handle the error here
       console.error('Error in handlePost:', error);
-      // setLoadingVisible(false);
-      await new Promise (resolve => setTimeout(resolve,2000))
+      await new Promise(resolve => setTimeout(resolve, 2000));
       navigation.goBack();
       setLoadingVisible(false);
-
+  
       // Optionally, you can also show an error message to the user
     }
   };
