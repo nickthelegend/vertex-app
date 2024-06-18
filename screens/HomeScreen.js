@@ -4,7 +4,7 @@ import { useFonts } from "expo-font";
 import { Dimensions } from "react-native";
 import * as NavigationBar from 'expo-navigation-bar';
 import { Ionicons } from "@expo/vector-icons";
-import { getFirestore, collection, query, orderBy, startAfter, limit, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, query, where, orderBy, startAfter, limit, getDocs } from 'firebase/firestore';
 import { app } from '../services/config';
 
 import SPACING from "../utils/Spacing";
@@ -23,6 +23,7 @@ export default function HomeScreen() {
   const [lastVisiblePost, setLastVisiblePost] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedTag, setSelectedTag] = useState("What's Happening");
   const deviceWidth = Dimensions.get("window").width;
 
   NavigationBar.setBackgroundColorAsync('#ffffff00');
@@ -52,7 +53,7 @@ export default function HomeScreen() {
 
     const fetchInitialPosts = async () => {
       setLoading(true);
-      const { posts, lastVisible } = await fetchPosts(null);
+      const { posts, lastVisible } = await fetchPosts(null, selectedTag);
       setPosts(posts);
       setLastVisiblePost(lastVisible);
       setLoading(false);
@@ -60,21 +61,22 @@ export default function HomeScreen() {
 
     fetchUserData();
     fetchInitialPosts();
-  }, []);
+  }, [selectedTag]);
 
-  const fetchPosts = async (lastVisiblePost) => {
+  const fetchPosts = async (lastVisiblePost, tag) => {
     const db = getFirestore(app);
     let q;
 
     if (lastVisiblePost) {
       q = query(
         collection(db, 'posts'),
+        where('postTags', '==', tag),
         orderBy('createdAt', 'desc'),
         startAfter(lastVisiblePost),
         limit(3)
       );
     } else {
-      q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(3));
+      q = query(collection(db, 'posts'), where('postTags', '==', tag), orderBy('createdAt', 'desc'), limit(3));
     }
 
     const querySnapshot = await getDocs(q);
@@ -90,15 +92,21 @@ export default function HomeScreen() {
   const fetchMorePosts = async () => {
     if (loadingMore) return;
     setLoadingMore(true);
-    const { posts: newPosts, lastVisible } = await fetchPosts(lastVisiblePost);
-    setPosts([...posts, ...newPosts]);
+    const { posts: newPosts, lastVisible } = await fetchPosts(lastVisiblePost, selectedTag);
+  
+    // Filter out duplicates
+    const existingPostIds = new Set(posts.map(post => post.id));
+    const filteredNewPosts = newPosts.filter(post => !existingPostIds.has(post.id));
+  
+    setPosts([...posts, ...filteredNewPosts]);
     setLastVisiblePost(lastVisible);
     setLoadingMore(false);
   };
+  
 
   const onRefresh = async () => {
     setRefreshing(true);
-    const { posts, lastVisible } = await fetchPosts(null);
+    const { posts, lastVisible } = await fetchPosts(null, selectedTag);
     setPosts(posts);
     setLastVisiblePost(lastVisible);
     setRefreshing(false);
@@ -131,12 +139,14 @@ export default function HomeScreen() {
         <View style={{ flex: 1, paddingHorizontal: SPACING * 1, paddingTop: SPACING * 1 }}>
           <HomeHeader userFullName={userFullName} userProfilePic={currentUserProfilePic} />
           <View style={{ flexDirection: "row", flexWrap: "wrap", marginVertical: SPACING * 2 }}>
-            <CategoryButton text="What's Happening" />
-            <CategoryButton text="Community" />
-            <CategoryButton text="Clubs" />
-            <CategoryButton text="Events" />
-            <CategoryButton text="Opportunities" />
-            <CategoryButton text="Question/Help" />
+            {["What's Happening", "Community", "Clubs", "Events", "Opportunities", "Question/Help"].map((tag) => (
+              <CategoryButton 
+                key={tag} 
+                text={tag} 
+                isSelected={selectedTag === tag}
+                onPress={() => setSelectedTag(tag)}
+              />
+            ))}
           </View>
           <FlatList
             data={posts}
@@ -151,6 +161,7 @@ export default function HomeScreen() {
               />
             }
             ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="#0000ff" style={{marginBottom:50}}/> : null}
+            showsVerticalScrollIndicator={false}
           />
         </View>
       </View>
