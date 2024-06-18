@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet, ActivityIndicator } from "react-native";
+import { View, FlatList, StyleSheet, ActivityIndicator, RefreshControl } from "react-native";
 import { useFonts } from "expo-font";
 import { Dimensions } from "react-native";
 import * as NavigationBar from 'expo-navigation-bar';
@@ -22,6 +22,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(false);
   const [lastVisiblePost, setLastVisiblePost] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const deviceWidth = Dimensions.get("window").width;
 
   NavigationBar.setBackgroundColorAsync('#ffffff00');
@@ -95,6 +96,14 @@ export default function HomeScreen() {
     setLoadingMore(false);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    const { posts, lastVisible } = await fetchPosts(null);
+    setPosts(posts);
+    setLastVisiblePost(lastVisible);
+    setRefreshing(false);
+  };
+
   const renderPost = ({ item }) => (
     <UserPost
       key={item.id}
@@ -103,12 +112,13 @@ export default function HomeScreen() {
       userFullName={item.createdByUserFullname}
       username={item.createdByUserName}
       datePosted={
-  new Date(item.createdAt.seconds * 1000).toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-}     postComments={item.comments.length}
+        new Date(item.createdAt.seconds * 1000).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
+      }
+      postComments={item.comments.length}
       postLikes={item.likes.length}
       postRetweets={item.retweets ? item.retweets.length : 0}
       postContext={item.caption}
@@ -134,7 +144,13 @@ export default function HomeScreen() {
             keyExtractor={(item) => item.id}
             onEndReached={fetchMorePosts}
             onEndReachedThreshold={0.5}
-            ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="#0000ff" /> : null}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
+            ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="#0000ff" style={{marginBottom:50}}/> : null}
           />
         </View>
       </View>
