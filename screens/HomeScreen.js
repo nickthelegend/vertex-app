@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, SafeAreaView, StyleSheet, ActivityIndicator } from "react-native";
+import { View, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import { useFonts } from "expo-font";
 import { Dimensions } from "react-native";
 import * as NavigationBar from 'expo-navigation-bar';
@@ -14,6 +14,7 @@ import HomeHeader from "../components/HomeHeader";
 import { checkUserLoggedIn } from "../utils/FireBaseFunctions";
 
 import currentUserProfilePic from "../assets/images/Avatar.png";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const [userFullName, setUserFullName] = useState('');

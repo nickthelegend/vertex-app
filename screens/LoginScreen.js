@@ -32,25 +32,39 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-async function sendPushNotification(expoPushToken) {
-  const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: 'Welcome',
-    body: 'Good to see you back!',
-    data: { someData: 'goes here' },
-  };
 
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
-}
+
+Notifications.setNotificationCategoryAsync('delivery_request', [
+  {
+    identifier: 'accept',
+    buttonTitle: 'Accept',
+    options: { opensAppToForeground: true },
+  },
+  {
+    identifier: 'decline',
+    buttonTitle: 'Decline',
+    options: { opensAppToForeground: false },
+  },
+]);
+// async function sendPushNotification(expoPushToken) {
+//   const message = {
+//     to: expoPushToken,
+//     sound: 'default',
+//     title: 'Welcome',
+//     body: 'Good to see you back!',
+//     data: { someData: 'goes here' },
+//   };
+
+//   await fetch('https://exp.host/--/api/v2/push/send', {
+//     method: 'POST',
+//     headers: {
+//       Accept: 'application/json',
+//       'Accept-encoding': 'gzip, deflate',
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify(message),
+//   });
+// }
 
 // function handleRegistrationError(errorMessage) {
 //   alert(errorMessage);
@@ -153,7 +167,7 @@ try {
           setExpoPushToken(token);
           // Register user with the push token              
           await loginUser(rollNumber,password,token);
-          sendPushNotification(token)
+          // sendPushNotification(token)
           await new Promise(resolve => setTimeout(resolve, 2000));
 
           navigation.navigate('NavigationScreen');
