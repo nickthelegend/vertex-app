@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, Dimensions } from "react-native";
 import TwitterIcons from "./TwitterIcons";
 import SPACING from "../utils/Spacing";
-import { Skeleton } from 'moti/skeleton';
+import { Skeleton } from "moti/skeleton";
 const deviceWidth = Dimensions.get("window").width;
 
 export default function UserPost({
@@ -32,6 +32,7 @@ export default function UserPost({
         backgroundColor: "#f7f7f7",
         padding: SPACING,
         marginBottom: SPACING * 1.7,
+        flex:1
       }}
     >
       <View
@@ -40,6 +41,7 @@ export default function UserPost({
           alignItems: "center",
           marginVertical: SPACING,
           marginBottom: SPACING * 2,
+          flex:1
         }}
       >
         <Image
@@ -86,12 +88,16 @@ export default function UserPost({
 
       <View>
         <Text style={{ marginBottom: 10 }}>{postContext}</Text>
-        
+
         {userPostPicture && userPostPicture.uri ? (
           <>
             {!imageLoaded && (
-              <Skeleton colorMode="light" width={deviceWidth - SPACING * 2} height={deviceWidth - SPACING * 2} aspectRatio={1} />
-
+              <Skeleton
+                colorMode="light"
+                width={deviceWidth - SPACING * 2}
+                height={deviceWidth - SPACING * 2}
+                aspectRatio={1}
+              />
             )}
             <Image
               source={userPostPicture}
@@ -100,7 +106,7 @@ export default function UserPost({
                 aspectRatio: 1,
                 resizeMode: "cover",
                 marginBottom: 10, // Add margin if you want space between the image and icons
-                display: imageLoaded ? 'flex' : 'none'
+                display: imageLoaded ? "flex" : "none",
               }}
               onLoad={handleImageLoad}
             />

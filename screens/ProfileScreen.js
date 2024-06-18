@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Dimensions
 } from "react-native";
 import Iconicons from "@expo/vector-icons/Ionicons.js";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -16,6 +17,8 @@ import { getFirestore, collection, doc, getDocs, query, where, getDoc } from 'fi
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Skeleton } from 'moti/skeleton';
 import { app } from '../services/config';
+import UserPost from "../components/UserPost";
+import SPACING from "../utils/Spacing";
 
 const ProfileScreen = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -25,6 +28,7 @@ const ProfileScreen = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const deviceWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -58,8 +62,9 @@ const ProfileScreen = () => {
             );
             const postsSnapshot = await getDocs(postsQuery);
             const postsData = postsSnapshot.docs.map(doc => doc.data());
+            const reversedPostsData = postsData.reverse();
 
-            setPosts(postsData);
+            setPosts(reversedPostsData);
           }
         } else {
           console.log("User document not found");
@@ -188,21 +193,51 @@ const ProfileScreen = () => {
             <View style={styles.photosContainer}>
             {loading ? (
   Array.from({ length: 10 }).map((_, index) => (
-    <View key={index} style={styles.skeletonContainer}>
-      <Skeleton width="100%" height={200} borderRadius={10} colorMode="light"  />
+    <View  key={index} style={{ backgroundColor: "#f7f7f7", marginBottom: SPACING * 2 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", marginVertical: SPACING, marginBottom: SPACING * 2 }}>
+        <Skeleton colorMode="light" width={SPACING * 5} height={SPACING * 5} borderRadius={SPACING * 2} style={{ marginRight: SPACING }} />
+        <View style={{}}>
+          <Skeleton colorMode="light" width={deviceWidth * 0.3} height={SPACING * 2} />
+          <Skeleton colorMode="light" width={deviceWidth * 0.2} height={SPACING * 2} style={{ marginTop: SPACING * 0.3 }} />
+        </View>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <View style={{ flexDirection: "row" }}>
+            <Skeleton colorMode="light" width={deviceWidth * 0.2} height={SPACING * 2} />
+            <Skeleton colorMode="light" width={20} height={20} borderRadius={10} style={{ marginLeft: SPACING * 0.3 }} />
+          </View>
+        </View>
+      </View>
+      <View>
+        <Skeleton colorMode="light" width={deviceWidth - SPACING * 2} height={SPACING * 3} style={{ marginBottom: 10 }} />
+        <Skeleton colorMode="light" width={deviceWidth - SPACING * 2} height={deviceWidth - SPACING * 2} aspectRatio={1} />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: SPACING }}>
+          <Skeleton colorMode="light" width={SPACING * 6} height={SPACING * 3} />
+          <Skeleton colorMode="light" width={SPACING * 6} height={SPACING * 3} />
+          <Skeleton colorMode="light" width={SPACING * 6} height={SPACING * 3} />
+        </View>
+      </View>
     </View>
   ))
 ) : (
-  posts.map((post) => (
-    post.imgUrl ? (
-      <View key={post.id} style={styles.imageContainer}>
-        <Image source={{ uri: post.imgUrl }} style={styles.image} />
-      </View>
-    ) : (
-      <View key={post.id} style={styles.imageContainer}>
-        <Text style={styles.postText}>{post.caption}</Text>
-      </View>
-    )
+  posts.map((item) => (
+    <UserPost
+        key={item.id}
+        userProfilePic={{ uri: item.createdByUserProfilePic }}
+        userPostPicture={{ uri: item.imgUrl }}
+        userFullName={item.createdByUserFullname}
+        username={item.createdByUserName}
+        datePosted={
+          new Date(item.createdAt.seconds * 1000).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          })
+        }
+        postComments={item.comments.length}
+        postLikes={item.likes.length}
+        postRetweets={item.retweets ? item.retweets.length : 0}
+        postContext={item.caption}
+      />
   ))
 )}
             </View>
@@ -342,12 +377,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   skeletonContainer: {
-    width: "48%",
+    width: "100%",
     marginVertical: 5,
   },
   photosContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    // flexDirection: "row",
+    // flexWrap: "wrap",
     justifyContent: "space-between",
   },
   imageContainer: {
