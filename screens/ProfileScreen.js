@@ -7,13 +7,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
 } from "react-native";
 import Iconicons from "@expo/vector-icons/Ionicons.js";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getFirestore, collection, doc, getDocs, query, where,getDoc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDocs, query, where, getDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Skeleton } from 'moti/skeleton';
 import { app } from '../services/config';
@@ -21,10 +20,12 @@ import { app } from '../services/config';
 const ProfileScreen = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [currentUserFullName, setCurrentUserFullName] = useState("");
+  const [currentUserName, setCurrentUserName] = useState("");
+  
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
-  // console.log(posts);
+
   useEffect(() => {
     const fetchCurrentUser = async () => {
       const userData = await AsyncStorage.getItem('user');
@@ -32,6 +33,7 @@ const ProfileScreen = () => {
         const jsonObj = JSON.parse(userData);
         setCurrentUser(jsonObj.userId);
         setCurrentUserFullName(jsonObj.fullName);
+        setCurrentUserName(jsonObj.username)
       }
     };
 
@@ -42,37 +44,28 @@ const ProfileScreen = () => {
     const fetchPosts = async () => {
       if (currentUser) {
         const db = getFirestore(app);
-        const userDocRef = doc(db, "users", currentUser); // Assuming currentUser is the ID of the user document
+        const userDocRef = doc(db, "users", currentUser);
         const userDocSnapshot = await getDoc(userDocRef);
 
         if (userDocSnapshot.exists()) {
-            const userData = userDocSnapshot.data();
-            const userPosts = userData.posts || [];
+          const userData = userDocSnapshot.data();
+          const userPosts = userData.posts || [];
 
-            console.log("userData=>",userPosts);
+          if (userPosts.length > 0) {
+            const postsQuery = query(
+              collection(db, "posts"),
+              where("id", "in", userPosts)
+            );
+            const postsSnapshot = await getDocs(postsQuery);
+            const postsData = postsSnapshot.docs.map(doc => doc.data());
 
-            if (userPosts.length > 0) {
-              const postsQuery = query(
-                collection(db, "posts"),
-                where("id", "in", userPosts)
-              );
-              const postsSnapshot = await getDocs(postsQuery);
-              const postsData = postsSnapshot.docs.map(doc => doc.data());
-    
-              console.log('Fetched posts:', postsData); // Debugging log
-    
-              setPosts(postsData);
-            }
+            setPosts(postsData);
+          }
         } else {
-            console.log("User document not found");
+          console.log("User document not found");
         }
+    await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate 3 seconds loading
 
-        // console.log("userPosts=>",userPosts)
-
-
-        // const userPosts = userData[0];
-
-        
         setLoading(false);
       }
     };
@@ -104,7 +97,7 @@ const ProfileScreen = () => {
               />
               <View style={styles.profileInfo}>
                 <Text style={styles.userFullName}>{currentUserFullName}</Text>
-                <Text style={styles.userName}>@{currentUser}</Text>
+                <Text style={styles.userName}>{currentUserName}</Text>
               </View>
               <View style={styles.moreIconContainer}>
                 <MaterialIcons name="more-horiz" size={24} color="black" />
@@ -193,23 +186,25 @@ const ProfileScreen = () => {
             </View>
 
             <View style={styles.photosContainer}>
-              {loading ? (
-                Array.from({ length: 10 }).map((_, index) => (
-                  <Skeleton key={index} width="48%" height={200} borderRadius={10} style={styles.imageContainer} />
-                ))
-              ) : (
-                posts.map((post) => (
-                  post.imgUrl ? (
-                    <View key={post.id} style={styles.imageContainer}>
-                      <Image source={{ uri: post.imgUrl }} style={styles.image} />
-                    </View>
-                  ) : (
-                    <View key={post.id} style={styles.imageContainer}>
-                      <Text style={styles.postText}>{post.caption}</Text>
-                    </View>
-                  )
-                ))
-              )}
+            {loading ? (
+  Array.from({ length: 10 }).map((_, index) => (
+    <View key={index} style={styles.skeletonContainer}>
+      <Skeleton width="100%" height={200} borderRadius={10} colorMode="light"  />
+    </View>
+  ))
+) : (
+  posts.map((post) => (
+    post.imgUrl ? (
+      <View key={post.id} style={styles.imageContainer}>
+        <Image source={{ uri: post.imgUrl }} style={styles.image} />
+      </View>
+    ) : (
+      <View key={post.id} style={styles.imageContainer}>
+        <Text style={styles.postText}>{post.caption}</Text>
+      </View>
+    )
+  ))
+)}
             </View>
           </View>
         </View>
@@ -341,10 +336,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     marginVertical: 10,
-    borderBottomWidth:1,
-    marginHorizontal:-20,
-    paddingHorizontal:20,
-    paddingBottom:20
+    borderBottomWidth: 1,
+    marginHorizontal: -20,
+    paddingHorizontal: 20,
+    paddingBottom: 20
+  },
+  skeletonContainer: {
+    width: "48%",
+    marginVertical: 5,
   },
   photosContainer: {
     flexDirection: "row",
