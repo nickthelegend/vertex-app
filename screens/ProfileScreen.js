@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   View,
@@ -7,27 +7,78 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import Iconicons from "@expo/vector-icons/Ionicons.js";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getFirestore, collection, doc, getDocs, query, where,getDoc } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Skeleton } from 'moti/skeleton';
+import { app } from '../services/config';
 
 const ProfileScreen = () => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUserFullName, setCurrentUserFullName] = useState("");
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  // console.log(posts);
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const jsonObj = JSON.parse(userData);
+        setCurrentUser(jsonObj.userId);
+        setCurrentUserFullName(jsonObj.fullName);
+      }
+    };
 
-  const images = [
-    { id: 1, source: require("../assets/photos/download.jpg") },
-    { id: 2, source: require("../assets/photos/dowload2.jpg") },
-    { id: 3, source: require("../assets/photos/download3.jpg") },
-    { id: 4, source: require("../assets/photos/download4.jpg") },
-    { id: 5, source: require("../assets/photos/download4.jpg") },
-    { id: 6, source: require("../assets/photos/download4.jpg") },
-    { id: 7, source: require("../assets/photos/download4.jpg") },
-    { id: 8, source: require("../assets/photos/download4.jpg") },
-    { id: 9, source: require("../assets/photos/download4.jpg") },
-    { id: 10, source: require("../assets/photos/download4.jpg") },
-  ];
+    fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      if (currentUser) {
+        const db = getFirestore(app);
+        const userDocRef = doc(db, "users", currentUser); // Assuming currentUser is the ID of the user document
+        const userDocSnapshot = await getDoc(userDocRef);
+
+        if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+            const userPosts = userData.posts || [];
+
+            console.log("userData=>",userPosts);
+
+            if (userPosts.length > 0) {
+              const postsQuery = query(
+                collection(db, "posts"),
+                where("id", "in", userPosts)
+              );
+              const postsSnapshot = await getDocs(postsQuery);
+              const postsData = postsSnapshot.docs.map(doc => doc.data());
+    
+              console.log('Fetched posts:', postsData); // Debugging log
+    
+              setPosts(postsData);
+            }
+        } else {
+            console.log("User document not found");
+        }
+
+        // console.log("userPosts=>",userPosts)
+
+
+        // const userPosts = userData[0];
+
+        
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [currentUser]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -52,25 +103,8 @@ const ProfileScreen = () => {
                 style={styles.profileImage}
               />
               <View style={styles.profileInfo}>
-                <Text style={styles.userFullName}>Nihal</Text>
-                <Text style={styles.userName}>@nihal</Text>
-                {/* <View style={styles.statsContainer}>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statNumber}>32</Text>
-                    <Text style={styles.statTitle}>Posts</Text>
-                  </View>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statNumber}>500</Text>
-                    <Text style={styles.statTitle}>Followers</Text>
-                  </View>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statNumber}>200</Text>
-                    <Text style={styles.statTitle}>Following</Text>
-                  </View>
-                </View> */}
-                {/* <TouchableOpacity style={styles.followButton}>
-                  <Text style={styles.followButtonText}>Follow</Text>
-                </TouchableOpacity> */}
+                <Text style={styles.userFullName}>{currentUserFullName}</Text>
+                <Text style={styles.userName}>@{currentUser}</Text>
               </View>
               <View style={styles.moreIconContainer}>
                 <MaterialIcons name="more-horiz" size={24} color="black" />
@@ -159,11 +193,23 @@ const ProfileScreen = () => {
             </View>
 
             <View style={styles.photosContainer}>
-              {images.map((item) => (
-                <View key={item.id} style={styles.imageContainer}>
-                  <Image source={item.source} style={styles.image} />
-                </View>
-              ))}
+              {loading ? (
+                Array.from({ length: 10 }).map((_, index) => (
+                  <Skeleton key={index} width="48%" height={200} borderRadius={10} style={styles.imageContainer} />
+                ))
+              ) : (
+                posts.map((post) => (
+                  post.imgUrl ? (
+                    <View key={post.id} style={styles.imageContainer}>
+                      <Image source={{ uri: post.imgUrl }} style={styles.image} />
+                    </View>
+                  ) : (
+                    <View key={post.id} style={styles.imageContainer}>
+                      <Text style={styles.postText}>{post.caption}</Text>
+                    </View>
+                  )
+                ))
+              )}
             </View>
           </View>
         </View>
@@ -315,6 +361,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     resizeMode: "cover",
+  },
+  postText: {
+    padding: 10,
+    textAlign: "center",
+    fontSize: 16,
   },
 });
 

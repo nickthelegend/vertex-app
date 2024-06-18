@@ -18,7 +18,7 @@ export default function UserPost({
 }) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  console.log("userPostPicture:", userPostPicture); // Add this line for debugging
+  // console.log("userPostPicture:", userPostPicture); // Add this line for debugging
 
   const handleImageLoad = () => {
     setTimeout(() => {
