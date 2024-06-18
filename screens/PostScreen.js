@@ -61,10 +61,9 @@ export default function PostScreen({ navigation }) {
         postCategory: 'Public',
         postTags: selectedTag,
       };
-  
+      
       // Save the post to Firestore
-      await setDoc(doc(db, 'posts', postId), post);
-  
+      await savePostToFirestore(post);  
       // Update the user's posts array
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, {
