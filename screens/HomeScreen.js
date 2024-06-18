@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet, ActivityIndicator, RefreshControl } from "react-native";
+import { View, FlatList, StyleSheet, ActivityIndicator, RefreshControl, Dimensions } from "react-native";
 import { useFonts } from "expo-font";
-import { Dimensions } from "react-native";
 import * as NavigationBar from 'expo-navigation-bar';
 import { Ionicons } from "@expo/vector-icons";
 import { getFirestore, collection, query, where, orderBy, startAfter, limit, getDocs } from 'firebase/firestore';
@@ -15,6 +14,7 @@ import { checkUserLoggedIn } from "../utils/FireBaseFunctions";
 
 import currentUserProfilePic from "../assets/images/Avatar.png";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Skeleton } from 'moti/skeleton';
 
 export default function HomeScreen() {
   const [userFullName, setUserFullName] = useState('');
@@ -53,6 +53,7 @@ export default function HomeScreen() {
 
     const fetchInitialPosts = async () => {
       setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate 3 seconds loading
       const { posts, lastVisible } = await fetchPosts(null, selectedTag);
       setPosts(posts);
       setLastVisiblePost(lastVisible);
@@ -93,44 +94,75 @@ export default function HomeScreen() {
     if (loadingMore) return;
     setLoadingMore(true);
     const { posts: newPosts, lastVisible } = await fetchPosts(lastVisiblePost, selectedTag);
-  
+
     // Filter out duplicates
     const existingPostIds = new Set(posts.map(post => post.id));
     const filteredNewPosts = newPosts.filter(post => !existingPostIds.has(post.id));
-  
+
     setPosts([...posts, ...filteredNewPosts]);
     setLastVisiblePost(lastVisible);
     setLoadingMore(false);
   };
-  
 
   const onRefresh = async () => {
     setRefreshing(true);
+    await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate 3 seconds loading
     const { posts, lastVisible } = await fetchPosts(null, selectedTag);
     setPosts(posts);
     setLastVisiblePost(lastVisible);
     setRefreshing(false);
   };
 
+  const renderPostSkeleton = () => (
+    <View style={{ backgroundColor: "#f7f7f7", padding: SPACING, marginBottom: SPACING * 1.7 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", marginVertical: SPACING, marginBottom: SPACING * 2 }}>
+        <Skeleton colorMode="light" width={SPACING * 5} height={SPACING * 5} borderRadius={SPACING * 2} style={{ marginRight: SPACING }} />
+        <View style={{}}>
+          <Skeleton colorMode="light" width={deviceWidth * 0.3} height={SPACING * 2} />
+          <Skeleton colorMode="light" width={deviceWidth * 0.2} height={SPACING * 2} style={{ marginTop: SPACING * 0.3 }} />
+        </View>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <View style={{ flexDirection: "row" }}>
+            <Skeleton colorMode="light" width={deviceWidth * 0.2} height={SPACING * 2} />
+            <Skeleton colorMode="light" width={20} height={20} borderRadius={10} style={{ marginLeft: SPACING * 0.3 }} />
+          </View>
+        </View>
+      </View>
+      <View>
+        <Skeleton colorMode="light" width={deviceWidth - SPACING * 2} height={SPACING * 3} style={{ marginBottom: 10 }} />
+        <Skeleton colorMode="light" width={deviceWidth - SPACING * 2} height={deviceWidth - SPACING * 2} aspectRatio={1} />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: SPACING }}>
+          <Skeleton colorMode="light" width={SPACING * 6} height={SPACING * 3} />
+          <Skeleton colorMode="light" width={SPACING * 6} height={SPACING * 3} />
+          <Skeleton colorMode="light" width={SPACING * 6} height={SPACING * 3} />
+        </View>
+      </View>
+    </View>
+  );
+
   const renderPost = ({ item }) => (
-    <UserPost
-      key={item.id}
-      userProfilePic={{ uri: item.createdByUserProfilePic }}
-      userPostPicture={{ uri: item.imgUrl }}
-      userFullName={item.createdByUserFullname}
-      username={item.createdByUserName}
-      datePosted={
-        new Date(item.createdAt.seconds * 1000).toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        })
-      }
-      postComments={item.comments.length}
-      postLikes={item.likes.length}
-      postRetweets={item.retweets ? item.retweets.length : 0}
-      postContext={item.caption}
-    />
+    loading ? (
+      renderPostSkeleton()
+    ) : (
+      <UserPost
+        key={item.id}
+        userProfilePic={{ uri: item.createdByUserProfilePic }}
+        userPostPicture={{ uri: item.imgUrl }}
+        userFullName={item.createdByUserFullname}
+        username={item.createdByUserName}
+        datePosted={
+          new Date(item.createdAt.seconds * 1000).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          })
+        }
+        postComments={item.comments.length}
+        postLikes={item.likes.length}
+        postRetweets={item.retweets ? item.retweets.length : 0}
+        postContext={item.caption}
+      />
+    )
   );
 
   return (
@@ -149,9 +181,9 @@ export default function HomeScreen() {
             ))}
           </View>
           <FlatList
-            data={posts}
+            data={loading ? Array(3).fill({}) : posts} // Display 3 skeletons while loading
             renderItem={renderPost}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item, index) => item.id || index.toString()} // Fallback to index as key when loading
             onEndReached={fetchMorePosts}
             onEndReachedThreshold={0.5}
             refreshControl={
@@ -160,7 +192,7 @@ export default function HomeScreen() {
                 onRefresh={onRefresh}
               />
             }
-            ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="#0000ff" style={{marginBottom:50}}/> : null}
+            ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="#0000ff" style={{ marginBottom: 50 }} /> : null}
             showsVerticalScrollIndicator={false}
           />
         </View>
