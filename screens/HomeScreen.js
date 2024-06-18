@@ -106,11 +106,13 @@ export default function HomeScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
+    setLoading(true); // Show skeleton during refresh
     await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate 3 seconds loading
     const { posts, lastVisible } = await fetchPosts(null, selectedTag);
     setPosts(posts);
     setLastVisiblePost(lastVisible);
     setRefreshing(false);
+    setLoading(false); // Hide skeleton after refresh
   };
 
   const renderPostSkeleton = () => (
@@ -141,7 +143,7 @@ export default function HomeScreen() {
   );
 
   const renderPost = ({ item }) => (
-    loading ? (
+    (loading || refreshing) ? (
       renderPostSkeleton()
     ) : (
       <UserPost
@@ -181,7 +183,7 @@ export default function HomeScreen() {
             ))}
           </View>
           <FlatList
-            data={loading ? Array(3).fill({}) : posts} // Display 3 skeletons while loading
+            data={(loading || refreshing) ? Array(3).fill({}) : posts} // Display 3 skeletons while loading or refreshing
             renderItem={renderPost}
             keyExtractor={(item, index) => item.id || index.toString()} // Fallback to index as key when loading
             onEndReached={fetchMorePosts}
