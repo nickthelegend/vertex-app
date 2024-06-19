@@ -224,7 +224,7 @@ const ProfileScreen = () => {
                 </View>
                 <View>
                   <Text style={styles.bioText}>
-                    {currentUserObject.bio}
+                    {/* {!currentUserObject.bio && "Add a Bio"} */}
                   </Text>
                 </View>
               </View>

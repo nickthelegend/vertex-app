@@ -25,7 +25,9 @@ import {
   onSnapshot,
   updateDoc
 } from "firebase/firestore";
+import * as geolib from "geolib";
 
+const database = getDatabase(app);
 
 const LOCATION_TASK_NAME = "com.nickthelegend.MyProject";
 TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
@@ -41,7 +43,6 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
       const userData = await AsyncStorage.getItem("user");
       const currentUser = userData ? JSON.parse(userData) : null;
       if (currentUser) {
-        const database = getDatabase(app);
         const coords = location.coords;
         const canteen = {
           latitude: 17.494301782035425,
@@ -60,6 +61,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
           userId: currentUser.userId,
           userFullName: currentUser.fullName,
           isNearCanteen,
+          acceptingOrders:true
         });
       }
     }
@@ -84,17 +86,35 @@ const CustomDrawer = ({ userId, fullName, ...props }) => {
   };
 
   const handleToggleChange = async () => {
-    setIsOrderToggleOn(!isOrderToggleOn);
+    const newToggleState = !isOrderToggleOn;
+    setIsOrderToggleOn(newToggleState);
     if (!isOrderToggleOn) {
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.High,
         timeInterval: 10000, // Update every 10 seconds
         distanceInterval: 0, // Update for every meter
       });
+      // await set(ref(database, "users/" + userId + "/acceptingOrders"), true);
+
       console.log("Location tracking started");
     } else {
-      await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-      console.log("Location tracking stopped");
+
+      try {
+
+        const userData = await AsyncStorage.getItem("user");
+        const currentUser = userData ? JSON.parse(userData) : null;
+        if (currentUser) {
+          await set(ref(database, "users/" + currentUser.userId + "/acceptingOrders"), false);
+
+          await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+          console.log("Location tracking stopped");
+
+        }
+
+      } catch (error) {
+        console.log(error)
+      }
+      
     }
   };
 
