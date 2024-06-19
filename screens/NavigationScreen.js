@@ -172,7 +172,7 @@ const Drawer = createDrawerNavigator();
 
       console.log("Notification received:", response);
 
-      if (response.actionIdentifier === 'accept') {
+      if (response.actionIdentifier === 'accept' || (deliveryRequestId && orderId )) {
         console.log("User clicked accept for deliveryRequestId:", deliveryRequestId);
         console.log("User clicked accept for orderId:", orderId);
 
