@@ -6,6 +6,8 @@ export async function sendPushNotification(expoPushToken, title, body, data) {
     body: body,
     data: { ...data },
     categoryId: 'delivery_request',
+    priority: 'high', // Add this line
+
   };
 
   try {

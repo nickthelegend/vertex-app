@@ -31,46 +31,57 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as TaskManager from "expo-task-manager";
 import * as Notifications from "expo-notifications";
-
+Notifications.setNotificationCategoryAsync('delivery_request', [
+  {
+    identifier: 'accept',
+    buttonTitle: 'Accept',
+    options: { opensAppToForeground: true },
+  },
+  {
+    identifier: 'decline',
+    buttonTitle: 'Decline',
+    options: { opensAppToForeground: false },
+  },
+]);
 // import * as Location from 'expo-location';r
-const LOCATION_TASK_NAME = "com.nickthelegend.MyProject";
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
-  if (error) {
-    console.error(error);
-    return;
-  }
-  if (data) {
-    const { locations } = data;
-    const location = locations[0];
-    if (location) {
-      // Fetch the current user info from AsyncStorage
-      const userData = await AsyncStorage.getItem("user");
-      const currentUser = userData ? JSON.parse(userData) : null;
-      if (currentUser) {
-        const database = getDatabase(app);
-        const coords = location.coords;
-        const canteen = {
-          latitude: 17.494301782035425,
-          longitude: 78.39279772477056,
-        };
+// const LOCATION_TASK_NAME = "com.nickthelegend.MyProject";
+// TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+//   if (error) {
+//     console.error(error);
+//     return;
+//   }
+//   if (data) {
+//     const { locations } = data;
+//     const location = locations[0];
+//     if (location) {
+//       // Fetch the current user info from AsyncStorage
+//       const userData = await AsyncStorage.getItem("user");
+//       const currentUser = userData ? JSON.parse(userData) : null;
+//       if (currentUser) {
+//         const database = getDatabase(app);
+//         const coords = location.coords;
+//         const canteen = {
+//           latitude: 17.494301782035425,
+//           longitude: 78.39279772477056,
+//         };
 
-        const distance = geolib.getDistance(coords, canteen);
-        const isNearCanteen = distance <= 100; // 100 meters radius
-        console.log("isNearCanteen=>", isNearCanteen);
-        const lastTime = new Date().toISOString();
+//         const distance = geolib.getDistance(coords, canteen);
+//         const isNearCanteen = distance <= 100; // 100 meters radius
+//         console.log("isNearCanteen=>", isNearCanteen);
+//         const lastTime = new Date().toISOString();
 
-        await set(ref(database, "users/" + currentUser.userId), {
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          lastTime,
-          userId: currentUser.userId,
-          userFullName: currentUser.fullName,
-          isNearCanteen,
-        });
-      }
-    }
-  }
-});
+//         await set(ref(database, "users/" + currentUser.userId), {
+//           latitude: coords.latitude,
+//           longitude: coords.longitude,
+//           lastTime,
+//           userId: currentUser.userId,
+//           userFullName: currentUser.fullName,
+//           isNearCanteen,
+//         });
+//       }
+//     }
+//   }
+// });
 
 const startLocationUpdates = async () => {
   const { status: foregroundStatus } =
@@ -145,18 +156,7 @@ const Drawer = createDrawerNavigator();
   },[])
   useEffect(() => {
     // Set notification categories for delivery requests
-    Notifications.setNotificationCategoryAsync('delivery_request', [
-      {
-        identifier: 'accept',
-        buttonTitle: 'Accept',
-        options: { opensAppToForeground: true },
-      },
-      {
-        identifier: 'decline',
-        buttonTitle: 'Decline',
-        options: { opensAppToForeground: false },
-      },
-    ]);
+    
   
     // Handle notification responses
     // Define and add the response listener

@@ -61,7 +61,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
           userId: currentUser.userId,
           userFullName: currentUser.fullName,
           isNearCanteen,
-          acceptingOrders:true
+          // acceptingOrders:true
         });
       }
     }
@@ -70,6 +70,17 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
 const CustomDrawer = ({ userId, fullName, ...props }) => {
   const [isOrderToggleOn, setIsOrderToggleOn] = useState(true);
+  // if (!isOrderToggleOn) {
+  //   Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+  //     accuracy: Location.Accuracy.High,
+  //     timeInterval: 10000, // Update every 10 seconds
+  //     distanceInterval: 0, // Update for every meter
+  //   });
+  //   // await set(ref(database, "users/" + userId + "/acceptingOrders"), true);
+
+  //   console.log("Location tracking started");
+  // }
+
   const navigation = useNavigation();
 
 
@@ -77,6 +88,7 @@ const CustomDrawer = ({ userId, fullName, ...props }) => {
     const checkIfTaskIsRunning = async () => {
       const isTaskRunning = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
       setIsOrderToggleOn(isTaskRunning);
+      console.log("isTaskRunning=>",isTaskRunning)
     };
     checkIfTaskIsRunning();
   }, []);
@@ -88,21 +100,23 @@ const CustomDrawer = ({ userId, fullName, ...props }) => {
   const handleToggleChange = async () => {
     const newToggleState = !isOrderToggleOn;
     setIsOrderToggleOn(newToggleState);
+    const userData = await AsyncStorage.getItem("user");
+        const currentUser = userData ? JSON.parse(userData) : null;
+
     if (!isOrderToggleOn) {
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.High,
         timeInterval: 10000, // Update every 10 seconds
         distanceInterval: 0, // Update for every meter
       });
-      // await set(ref(database, "users/" + userId + "/acceptingOrders"), true);
+      await set(ref(database, "users/" + currentUser.userId + "/acceptingOrders"), true);
 
       console.log("Location tracking started");
     } else {
 
       try {
 
-        const userData = await AsyncStorage.getItem("user");
-        const currentUser = userData ? JSON.parse(userData) : null;
+        
         if (currentUser) {
           await set(ref(database, "users/" + currentUser.userId + "/acceptingOrders"), false);
 
