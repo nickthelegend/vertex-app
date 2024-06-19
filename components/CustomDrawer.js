@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect} from "react";
 import { View, Image, Text, ImageBackground, StyleSheet, Switch, Alert } from "react-native";
 import { DrawerContentScrollView, DrawerItemList } from "@react-navigation/drawer";
 import Spacing from "../utils/Spacing";
@@ -11,18 +11,91 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { logoutUser } from "../utils/FireBaseFunctions";
 import LogoutModal from "./LogoutModal";
+import * as Notifications from "expo-notifications";
+import * as TaskManager from "expo-task-manager";
+import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getDatabase, ref, set } from "firebase/database";
+import { app } from "../services/config";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  updateDoc
+} from "firebase/firestore";
+
+
+const LOCATION_TASK_NAME = "com.nickthelegend.MyProject";
+TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+  if (error) {
+    console.error(error);
+    return;
+  }
+  if (data) {
+    const { locations } = data;
+    const location = locations[0];
+    if (location) {
+      // Fetch the current user info from AsyncStorage
+      const userData = await AsyncStorage.getItem("user");
+      const currentUser = userData ? JSON.parse(userData) : null;
+      if (currentUser) {
+        const database = getDatabase(app);
+        const coords = location.coords;
+        const canteen = {
+          latitude: 17.494301782035425,
+          longitude: 78.39279772477056,
+        };
+
+        const distance = geolib.getDistance(coords, canteen);
+        const isNearCanteen = distance <= 100; // 100 meters radius
+        console.log("isNearCanteen=>", isNearCanteen);
+        const lastTime = new Date().toISOString();
+
+        await set(ref(database, "users/" + currentUser.userId), {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          lastTime,
+          userId: currentUser.userId,
+          userFullName: currentUser.fullName,
+          isNearCanteen,
+        });
+      }
+    }
+  }
+});
 
 const CustomDrawer = ({ userId, fullName, ...props }) => {
   const [isOrderToggleOn, setIsOrderToggleOn] = useState(true);
   const navigation = useNavigation();
 
+
+  useEffect(() => {
+    const checkIfTaskIsRunning = async () => {
+      const isTaskRunning = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+      setIsOrderToggleOn(isTaskRunning);
+    };
+    checkIfTaskIsRunning();
+  }, []);
+
   const handlePress = () => {
     navigation.navigate("ProfileScreen");
   };
 
-  const handleToggleChange = () => {
+  const handleToggleChange = async () => {
     setIsOrderToggleOn(!isOrderToggleOn);
-    console.log(`Toggle is ${!isOrderToggleOn ? "on" : "off"}`);
+    if (!isOrderToggleOn) {
+      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 10000, // Update every 10 seconds
+        distanceInterval: 0, // Update for every meter
+      });
+      console.log("Location tracking started");
+    } else {
+      await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+      console.log("Location tracking stopped");
+    }
   };
 
   const handleSignOut = async () => {
