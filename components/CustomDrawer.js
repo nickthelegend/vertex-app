@@ -1,34 +1,58 @@
 import React, { useState } from "react";
-import { View, Image, Text, ImageBackground, StyleSheet } from "react-native";
-import {
-  DrawerContentScrollView,
-  DrawerItemList,
-} from "@react-navigation/drawer";
+import { View, Image, Text, ImageBackground, StyleSheet, Switch, Alert } from "react-native";
+import { DrawerContentScrollView, DrawerItemList } from "@react-navigation/drawer";
 import Spacing from "../utils/Spacing";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { FontAwesome5 } from "@expo/vector-icons"; // Import FontAwesome5 icon set from Expo
-import { MaterialIcons } from "@expo/vector-icons"; // Import MaterialIcons icon set from Expo
+import { FontAwesome5 } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-
-import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome icon set from Expo
+import { FontAwesome } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for icons
+import { Ionicons } from "@expo/vector-icons";
 import { logoutUser } from "../utils/FireBaseFunctions";
 import LogoutModal from "./LogoutModal";
 
 const CustomDrawer = ({ userId, fullName, ...props }) => {
-  console.log("fullName=>", fullName);
+  const [isOrderToggleOn, setIsOrderToggleOn] = useState(true);
   const navigation = useNavigation();
+
   const handlePress = () => {
-    // Navigate to the ProfileScreen within the stack navigator
     navigation.navigate("ProfileScreen");
   };
+
+  const handleToggleChange = () => {
+    setIsOrderToggleOn(!isOrderToggleOn);
+    console.log(`Toggle is ${!isOrderToggleOn ? "on" : "off"}`);
+  };
+
+  const handleSignOut = async () => {
+    Alert.alert(
+      "Log Out",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            await logoutUser().then(() =>
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Login" }],
+              })
+            );
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <View style={{ flex: 1 }}>
-      <DrawerContentScrollView
-        {...props}
-        contentContainerStyle={styles.drawerContent}
-      >
+      <DrawerContentScrollView {...props} contentContainerStyle={styles.drawerContent}>
         <ImageBackground
           source={require("../assets/images/background.jpg")}
           style={{
@@ -42,29 +66,19 @@ const CustomDrawer = ({ userId, fullName, ...props }) => {
               source={require("../assets/images/Avatar.png")}
               style={styles.avatar}
             />
-            <View
-              style={{
-                flexDirection: "column",
-              }}
-            >
-              <Text
-                style={styles.userName}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
+            <View style={{ flexDirection: "column" }}>
+              <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
                 {fullName}
               </Text>
               <Text style={{ color: "#fff", marginTop: -10, marginBottom: 10 }}>
                 {userId}
               </Text>
             </View>
-
-            {/* <Text style={styles.userCoins}>300 Coins</Text> */}
           </View>
           <TouchableOpacity
             style={{
               borderRadius: 20,
-              overflow: "hidden", // Make sure to add this to prevent gradient overflow
+              overflow: "hidden",
             }}
             onPress={handlePress}
           >
@@ -79,126 +93,50 @@ const CustomDrawer = ({ userId, fullName, ...props }) => {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
             >
-              <Text
-                style={{
-                  color: "white",
-                  fontFamily: "Comfortaa",
-                }}
-              >
-                My Profile
-              </Text>
+              <Text style={{ color: "white", fontFamily: "Comfortaa" }}>My Profile</Text>
             </LinearGradient>
           </TouchableOpacity>
+          <View style={styles.toggleContainer}>
+            <Text style={styles.toggleText}>Want to receive orders?</Text>
+            <Switch
+              trackColor={{ false: "#ff0000", true: "#00ff00" }}
+              thumbColor="#f4f3f4"
+              onValueChange={handleToggleChange}
+              value={isOrderToggleOn}
+            />
+          </View>
         </ImageBackground>
-        <View
-          style={{
-            flexDirection: "row",
-            backgroundColor: "#fff",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <View style={{ flexDirection: "row", backgroundColor: "#fff", alignItems: "center", justifyContent: "center" }}>
           <TouchableOpacity>
-            <View
-              style={{
-                flexDirection: "column",
-                alignItems: "center",
-                padding: Spacing * 2,
-              }}
-            >
-              <FontAwesome5
-                name="trophy"
-                size={30}
-                color="gold"
-                style={{ marginRight: 8 }}
-              />
-              <Text style={{ fontSize: 24, marginRight: 8, color: "#000" }}>
-                5
-              </Text>
-              <Text style={{ fontSize: 12, marginRight: 8, color: "#a6a6a6" }}>
-                Achievements
-              </Text>
+            <View style={{ flexDirection: "column", alignItems: "center", padding: Spacing * 2 }}>
+              <FontAwesome5 name="trophy" size={30} color="gold" style={{ marginRight: 8 }} />
+              <Text style={{ fontSize: 24, marginRight: 8, color: "#000" }}>5</Text>
+              <Text style={{ fontSize: 12, marginRight: 8, color: "#a6a6a6" }}>Achievements</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity>
-            <View
-              style={{
-                flexDirection: "column",
-                alignItems: "center",
-                padding: Spacing * 2,
-              }}
-            >
-              <FontAwesome
-                name="calendar"
-                size={30}
-                color="black"
-                style={{ marginRight: 8 }}
-              />
-
-              <Text style={{ fontSize: 24, marginRight: 8, color: "#000" }}>
-                11m 14d{" "}
-              </Text>
-              <Text style={{ fontSize: 12, marginRight: 8, color: "#a6a6a6" }}>
-                Vertex Age
-              </Text>
+            <View style={{ flexDirection: "column", alignItems: "center", padding: Spacing * 2 }}>
+              <FontAwesome name="calendar" size={30} color="black" style={{ marginRight: 8 }} />
+              <Text style={{ fontSize: 24, marginRight: 8, color: "#000" }}>11m 14d</Text>
+              <Text style={{ fontSize: 12, marginRight: 8, color: "#a6a6a6" }}>Vertex Age</Text>
             </View>
           </TouchableOpacity>
-          {/* <TouchableOpacity>
-            <View style={{ flexDirection: "column", alignItems: "center" ,padding: Spacing*2}}>
-            <FontAwesome5 name="coins" size={30} color="black" style={{ marginRight: 8 }} />
-
-              <Text style={{ fontSize: 24, marginRight: 8,color: '#000' }}>23 coins </Text>
-              <Text style={{ fontSize: 12, marginRight: 8,color: '#a6a6a6' }}>Vertex Age</Text>
-            </View>
-          </TouchableOpacity> */}
         </View>
-
         <View style={styles.drawerItemsContainer}>
           <DrawerItemList {...props} />
         </View>
       </DrawerContentScrollView>
       <View style={styles.footer}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Settings");
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: Spacing * 2,
-            }}
-          >
+        <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: Spacing * 2 }}>
             <Ionicons name="settings" color={"black"} size={24} />
-            <Text style={{ fontFamily: "Comfortaa", marginLeft: 10 }}>
-              {" "}
-              Settings
-            </Text>
+            <Text style={{ fontFamily: "Comfortaa", marginLeft: 10 }}>Settings</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={async () => {
-            await logoutUser().then(() =>
-              navigation.reset({
-                index: 0, // Set the index of the screen to navigate to
-                routes: [{ name: "Login" }], // Set the route to navigate to (Login screen)
-              })
-            );
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: Spacing * 2,
-            }}
-          >
+        <TouchableOpacity onPress={handleSignOut}>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: Spacing * 2 }}>
             <Ionicons name="log-out" color={"black"} size={24} />
-            <Text style={{ fontFamily: "Comfortaa", marginLeft: 10 }}>
-              {" "}
-              Sign Out
-            </Text>
+            <Text style={{ fontFamily: "Comfortaa", marginLeft: 10 }}>Sign Out</Text>
           </View>
         </TouchableOpacity>
         <Text style={styles.footerText}>Made With ❤️ In JNTU</Text>
@@ -213,8 +151,6 @@ const styles = StyleSheet.create({
   },
   drawerHeader: {
     padding: Spacing * 2,
-    // justifyContent: "center",
-    // alignItems: "center",
   },
   avatar: {
     borderRadius: Spacing * 20,
@@ -229,12 +165,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     width: 150,
   },
-  userCoins: {
-    marginTop: -10,
-    fontFamily: "Comfortaa",
-    fontSize: Spacing * 2,
-    color: "#fff",
-  },
   drawerItemsContainer: {
     backgroundColor: "#fff",
     paddingTop: Spacing * 2,
@@ -246,6 +176,18 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontFamily: "Comfortaa",
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  toggleText: {
+    color: "#fff",
+    fontFamily: "Comfortaa",
+    fontSize: 16,
   },
 });
 
