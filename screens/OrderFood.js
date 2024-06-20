@@ -7,6 +7,7 @@ import {
   Dimensions,
   ImageBackground,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import {
   ScrollView,
@@ -17,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import { Skeleton } from 'moti/skeleton';
 
 const screenWidth = Dimensions.get("window").width;
 export const vegItems = [
@@ -455,7 +457,27 @@ price : 85,
 
 export default function OrderFood({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState("Bakery");
+  const [loading, setLoading] = useState(true);
+  useEffect(()=>{
+
+
+    async function waitForSometime(){
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate 3 seconds loading
+
+      setLoading(false);
+
+
+
+    }
+    waitForSometime()
+
+
+
+
+
+  },[])
   const [searchQuery, setSearchQuery] = useState("");
+  
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
@@ -532,6 +554,21 @@ export default function OrderFood({ navigation }) {
       console.log(error);
       Alert.alert("Error", "Failed to add item to cart");
     }
+  };
+
+  const SkeletonLoader = () => {
+    return (
+      <View style={styles.skeletonContainer}>
+      {[...Array(6)].map((_, index) => (
+        <View key={index} style={styles.skeletonItemContainer}>
+          <Skeleton colorMode="light" radius={10} width="100%" height={150} />
+          <Skeleton colorMode="light" radius={4} width="60%" height={20} style={{ marginTop: 8 }} />
+          <Skeleton colorMode="light" radius={4} width="40%" height={20} style={{ marginTop: 8 }} />
+          <Skeleton colorMode="light" radius={4} width="80%" height={40} style={{ marginTop: 8 }} />
+        </View>
+      ))}
+    </View>
+    );
   };
 
   return (
@@ -687,42 +724,48 @@ export default function OrderFood({ navigation }) {
         </ScrollView>
 
         <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollView}
-        >
-          {itemsInRows.map((row, rowIndex) => (
-            <View key={rowIndex} style={styles.rowContainer}>
-              {row.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.itemContainer}
-                  onPress={() => navigation.navigate("FoodDetail", { item })}
-                >
-                  <ImageBackground
-                    source={item.image}
-                    style={[styles.itemImage, { borderRadius: 50 }]}
-                  >
-                    {/* <TouchableOpacity
-                      style={[styles.button, styles.favoriteButton]}
-                    >
-                      <Ionicons name="heart-outline" size={21} color="white" />
-                    </TouchableOpacity> */}
-                  </ImageBackground>
-                  <Text style={styles.itemText} numberOfLines={1}>{item.name}</Text>
-                  <Text style={styles.itemPrice}>₹{item.price}</Text>
-                  <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                      style={[styles.button, styles.addToCartButton]}
-                      onPress={() => addToCart(item)}
-                    >
-                      <Text style={styles.buttonText}>Add to Cart</Text>
-                    </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
-              ))}
+  showsVerticalScrollIndicator={false}
+  contentContainerStyle={styles.scrollView}
+>
+  {loading ? (
+    
+    <SkeletonLoader/>
+  ) : (
+    itemsInRows.map((row, rowIndex) => (
+      <View key={rowIndex} style={styles.rowContainer}>
+        {row.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.itemContainer}
+            onPress={() => navigation.navigate("FoodDetail", { item })}
+          >
+            <ImageBackground
+              source={item.image}
+              style={[styles.itemImage, { borderRadius: 50 }]}
+            >
+              {/* <TouchableOpacity
+                style={[styles.button, styles.favoriteButton]}
+              >
+                <Ionicons name="heart-outline" size={21} color="white" />
+              </TouchableOpacity> */}
+            </ImageBackground>
+            <Text style={styles.itemText} numberOfLines={1}>{item.name}</Text>
+            <Text style={styles.itemPrice}>₹{item.price}</Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.addToCartButton]}
+                onPress={() => addToCart(item)}
+              >
+                <Text style={styles.buttonText}>Add to Cart</Text>
+              </TouchableOpacity>
             </View>
-          ))}
-        </ScrollView>
+          </TouchableOpacity>
+        ))}
+      </View>
+    ))
+  )}
+</ScrollView>
+
         {/* <View style={{ margin: 15 }}>
           <Text style={{ fontFamily: "Poppins-SemiBold", fontSize: 20 }}>
             Popular Items
@@ -910,5 +953,15 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.6)",
     borderRadius: 50,
     padding: 10,
+  },
+
+  skeletonContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  skeletonItemContainer: {
+    width: '48%',
+    marginBottom: 16,
   },
 });

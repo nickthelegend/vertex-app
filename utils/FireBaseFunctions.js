@@ -79,7 +79,8 @@ export async function registerUser(userInfo) {
       bio: '',
       chatHistoryUsers: [], // New field for chat history users
       notificationToken: userInfo.notificationToken || '', // Add notification token to user data object
-
+      commmunityList: [],
+      deliveredOrders: []
     };
     
     // Set user information in the document
