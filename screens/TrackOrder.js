@@ -14,11 +14,12 @@ import * as Location from 'expo-location';
 const GOOGLE_MAPS_APIKEY = 'AIzaSyACn5LbHpFrDZrJ9pkg1OLc4EkntvcmNsA'; // Replace with your actual API key
 
 export default function TrackOrder({ route }) {
-  const { orderId } = route.params;
+  const { orderId ,phoneNumber} = route.params;
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
   const [agentLocation, setAgentLocation] = useState(null);
+  const [agentPhoneNumber, setAgentPhoneNumber] = useState(null); // New state for phone number
   const db = getFirestore(app);
   const rtdb = getDatabase(app);
   const navigation = useNavigation();
@@ -28,6 +29,7 @@ export default function TrackOrder({ route }) {
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   });
+
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
@@ -42,6 +44,7 @@ export default function TrackOrder({ route }) {
         if (docSnap.exists()) {
           console.log("Order details found:", docSnap.data());
           setOrderDetails(docSnap.data());
+          setAgentPhoneNumber(phoneNumber); // Set phone number
         } else {
           console.log("No such document!");
         }
@@ -126,6 +129,7 @@ export default function TrackOrder({ route }) {
         <Text style={styles.headerText}>Track Order</Text>
         <View></View>
       </View>
+
       <MapView 
         style={styles.map}
         initialRegion={{
@@ -135,7 +139,6 @@ export default function TrackOrder({ route }) {
           longitudeDelta: 0.0421,
         }}
         region={region}
-
         rotateEnabled={false} // Disabling map rotation
       >
         <Marker coordinate={userLocation} title={"Your Location"}>
@@ -152,6 +155,13 @@ export default function TrackOrder({ route }) {
           strokeColor="#1c40bd"
         />
       </MapView>
+
+      {agentPhoneNumber && ( // Conditionally render phone number section
+        <View style={styles.phoneNumberContainer}>
+          <Text style={styles.phoneNumberText}>Delivery Agent Phone:</Text>
+          <Text style={styles.phoneNumber}>{agentPhoneNumber}</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -183,5 +193,21 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  phoneNumberContainer: { // New style for phone number section
+    padding: 15,
+    backgroundColor: "#f8f8f8",
+    borderTopWidth: 1,
+    borderTopColor: "#dddddd",
+    alignItems: "center",
+  },
+  phoneNumberText: {
+    fontSize: 18,
+    fontFamily: "ComfortaaRegular",
+  },
+  phoneNumber: {
+    fontSize: 20,
+    fontFamily: "ComfortaaBold",
+    color: "#1c40bd",
   },
 });

@@ -15,6 +15,7 @@ export default function DeliveryStatus({ route }) {
   const [nearbyUser, setNearbyUser] = useState(null);
   const [notifiedUsers, setNotifiedUsers] = useState(new Set());
   const [deliveryAccepted, setDeliveryAccepted] = useState(false);
+  const [deliveryAgentPhone, setDeliveryAgentPhone] = useState(null);
   const navigation = useNavigation();
   const database = getDatabase();
   const firestore = getFirestore();
@@ -42,14 +43,12 @@ export default function DeliveryStatus({ route }) {
       for (const userId in users) {
         const user = users[userId];
         if (user.isNearCanteen && !notifiedUsers.has(userId)) {
-          setNearbyUser(user);
-
           try {
             const userDoc = await getDoc(doc(firestore, 'users', userId));
             if (userDoc.exists()) {
               const userData = userDoc.data();
               const expoPushToken = userData.notificationToken;
-
+              const phoneNumber = userData.phonenumber;
               console.log('Expo Push Token:', expoPushToken);
 
               const deliveryRequestId = uuid.v4();
@@ -93,11 +92,12 @@ export default function DeliveryStatus({ route }) {
                 if (deliveryRequest.status === 'accepted') {
                   console.log('Delivery accepted');
                   setDeliveryAccepted(true);
+                  setNearbyUser(user); // Set nearby user only if the delivery is accepted
+                  setDeliveryAgentPhone(phoneNumber);
                   off(usersRef, 'value', handleUserUpdate); // Stop the listener
                   clearInterval(notificationTimerRef.current); // Clear the timer
                 } else if (deliveryRequest.status === 'declined') {
                   console.log('Delivery declined');
-                  setNearbyUser(null);
                   clearInterval(notificationTimerRef.current); // Clear the timer
                 }
               });
@@ -171,8 +171,9 @@ export default function DeliveryStatus({ route }) {
           <Text style={styles.nearbyUserText}>User ID: {nearbyUser.userId}</Text>
           <Text style={styles.nearbyUserText}>Latitude: {nearbyUser.latitude}</Text>
           <Text style={styles.nearbyUserText}>Longitude: {nearbyUser.longitude}</Text>
+          <Text style={styles.nearbyUserText}>PhoneNumber: {deliveryAgentPhone}</Text>
 
-          <TouchableOpacity style={styles.confirmButton} onPress={() => { navigation.navigate("TrackOrder", { orderId: orderDetails.orderId, deliveryAddress: region }) }}>
+          <TouchableOpacity style={styles.confirmButton} onPress={() => { navigation.navigate("TrackOrder", { orderId: orderDetails.orderId, deliveryAddress: region, phoneNumber: deliveryAgentPhone }) }}>
             <Text style={styles.confirmButtonText}>Track Order</Text>
           </TouchableOpacity>
         </View>
