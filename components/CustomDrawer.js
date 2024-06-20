@@ -1,30 +1,18 @@
-import React, { useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { View, Image, Text, ImageBackground, StyleSheet, Switch, Alert } from "react-native";
 import { DrawerContentScrollView, DrawerItemList } from "@react-navigation/drawer";
 import Spacing from "../utils/Spacing";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { logoutUser } from "../utils/FireBaseFunctions";
-import LogoutModal from "./LogoutModal";
 import * as Notifications from "expo-notifications";
 import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getDatabase, ref, set } from "firebase/database";
 import { app } from "../services/config";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  onSnapshot,
-  updateDoc
-} from "firebase/firestore";
 import * as geolib from "geolib";
 
 const database = getDatabase(app);
@@ -61,7 +49,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
           userId: currentUser.userId,
           userFullName: currentUser.fullName,
           isNearCanteen,
-          // acceptingOrders:true
+          acceptingOrders: true, // Ensure this field is set correctly
         });
       }
     }
@@ -69,26 +57,14 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 });
 
 const CustomDrawer = ({ userId, fullName, ...props }) => {
-  const [isOrderToggleOn, setIsOrderToggleOn] = useState(true);
-  // if (!isOrderToggleOn) {
-  //   Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-  //     accuracy: Location.Accuracy.High,
-  //     timeInterval: 10000, // Update every 10 seconds
-  //     distanceInterval: 0, // Update for every meter
-  //   });
-  //   // await set(ref(database, "users/" + userId + "/acceptingOrders"), true);
-
-  //   console.log("Location tracking started");
-  // }
-
+  const [isOrderToggleOn, setIsOrderToggleOn] = useState(false);
   const navigation = useNavigation();
-
 
   useEffect(() => {
     const checkIfTaskIsRunning = async () => {
       const isTaskRunning = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
       setIsOrderToggleOn(isTaskRunning);
-      console.log("isTaskRunning=>",isTaskRunning)
+      console.log("isTaskRunning=>", isTaskRunning);
     };
     checkIfTaskIsRunning();
   }, []);
@@ -101,34 +77,27 @@ const CustomDrawer = ({ userId, fullName, ...props }) => {
     const newToggleState = !isOrderToggleOn;
     setIsOrderToggleOn(newToggleState);
     const userData = await AsyncStorage.getItem("user");
-        const currentUser = userData ? JSON.parse(userData) : null;
+    const currentUser = userData ? JSON.parse(userData) : null;
 
-    if (!isOrderToggleOn) {
+    if (newToggleState) {
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
         accuracy: Location.Accuracy.High,
-        timeInterval: 10000, // Update every 10 seconds
-        distanceInterval: 0, // Update for every meter
+        timeInterval: 10000, // 10 seconds in milliseconds
+        distanceInterval: 0, // Minimum distance in meters between location updates
+        foregroundService: {
+          notificationTitle: "Location Tracking",
+          notificationBody: "We are tracking your location in the background",
+          notificationColor: "#1d40bd",
+        },
       });
       await set(ref(database, "users/" + currentUser.userId + "/acceptingOrders"), true);
-
       console.log("Location tracking started");
     } else {
-
-      try {
-
-        
-        if (currentUser) {
-          await set(ref(database, "users/" + currentUser.userId + "/acceptingOrders"), false);
-
-          await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-          console.log("Location tracking stopped");
-
-        }
-
-      } catch (error) {
-        console.log(error)
+      if (currentUser) {
+        await set(ref(database, "users/" + currentUser.userId + "/acceptingOrders"), false);
+        await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+        console.log("Location tracking stopped");
       }
-      
     }
   };
 
@@ -257,44 +226,49 @@ const styles = StyleSheet.create({
     backgroundColor: "#1d40bd",
   },
   drawerHeader: {
-    padding: Spacing * 2,
+    padding: 20,
+    paddingTop: 60,
   },
   avatar: {
-    borderRadius: Spacing * 20,
-    height: Spacing * 10,
-    width: Spacing * 10,
-    marginBottom: Spacing * 2,
-    marginRight: Spacing,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    marginBottom: 10,
+    marginRight: 20,
   },
   userName: {
-    fontFamily: "Comfortaa",
-    fontSize: Spacing * 4,
     color: "#fff",
-    width: 150,
-  },
-  drawerItemsContainer: {
-    backgroundColor: "#fff",
-    paddingTop: Spacing * 2,
-  },
-  footer: {
-    padding: Spacing * 2,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-  footerText: {
-    fontFamily: "Comfortaa",
+    fontFamily: "ComfortaaBold",
+    fontSize: 20,
+    marginBottom: 5,
   },
   toggleContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     marginTop: 10,
-    marginBottom: 10,
   },
   toggleText: {
     color: "#fff",
     fontFamily: "Comfortaa",
     fontSize: 16,
+    marginRight: 10,
+  },
+  drawerItemsContainer: {
+    backgroundColor: "#fff",
+    paddingTop: 10,
+  },
+  footer: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+    backgroundColor: "#fff",
+  },
+  footerText: {
+    textAlign: "center",
+    color: "#a6a6a6",
+    fontFamily: "Comfortaa",
+    fontSize: 12,
+    marginBottom: 20,
   },
 });
 
