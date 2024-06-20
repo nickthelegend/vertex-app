@@ -723,7 +723,7 @@ export default function OrderFood({ navigation }) {
             </View>
           ))}
         </ScrollView>
-        <View style={{ margin: 15 }}>
+        {/* <View style={{ margin: 15 }}>
           <Text style={{ fontFamily: "Poppins-SemiBold", fontSize: 20 }}>
             Popular Items
           </Text>
@@ -784,7 +784,7 @@ export default function OrderFood({ navigation }) {
               </View>
             </TouchableOpacity>
           </ScrollView>
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -840,7 +840,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   rowContainer: {
-    // flexDirection: "row",
+    flexDirection: "row",
     marginBottom: 10,
   },
   itemContainer: {
@@ -870,13 +870,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   itemText: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: "ComfortaaBold",
     marginTop: 10,
     color: "#007bff",
     textAlign:'center',
-    width:'50%',
-    // textAlign:'center'
+    width:100,
+    textAlign:'center'
   },
   itemPrice: {
     fontSize: 35,
