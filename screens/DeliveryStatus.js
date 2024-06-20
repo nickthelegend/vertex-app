@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { getDatabase, ref, onValue, off } from 'firebase/database';
-import { getFirestore, doc, getDoc, setDoc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { sendPushNotification } from '../utils/sendPushNotification';
 import uuid from 'react-native-uuid';
 
-export default function DeliveryStatus({route}) {
-  const {region} = route.params;
-  // console.log(region)
-
-
+export default function DeliveryStatus({ route }) {
+  const { region } = route.params;
   const [orderDetails, setOrderDetails] = useState(null);
   const [nearbyUser, setNearbyUser] = useState(null);
   const [notifiedUsers, setNotifiedUsers] = useState(new Set());
@@ -21,6 +18,7 @@ export default function DeliveryStatus({route}) {
   const navigation = useNavigation();
   const database = getDatabase();
   const firestore = getFirestore();
+  const notificationTimerRef = useRef(null);
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -65,20 +63,29 @@ export default function DeliveryStatus({route}) {
 
               console.log('Delivery request created:', deliveryRequestId);
 
-              await sendPushNotification(
-                expoPushToken,
-                'Delivery Request',
-                'Would you like to deliver this order?',
-                { deliveryRequestId , orderId : orderDetails.orderId}
-              );
+              const sendNotification = async () => {
+                await sendPushNotification(
+                  expoPushToken,
+                  'Delivery Request',
+                  'Would you like to deliver this order?',
+                  { deliveryRequestId, orderId: orderDetails.orderId }
+                );
 
-              console.log('Push notification sent');
+                console.log('Push notification sent');
 
-              setNotifiedUsers((prevSet) => {
-                const updatedSet = new Set(prevSet);
-                updatedSet.add(userId);
-                return updatedSet;
-              });
+                setNotifiedUsers((prevSet) => {
+                  const updatedSet = new Set(prevSet);
+                  updatedSet.add(userId);
+                  return updatedSet;
+                });
+              };
+
+              sendNotification();
+
+              // Set an interval to resend the notification every 30 seconds
+              notificationTimerRef.current = setInterval(() => {
+                sendNotification();
+              }, 30000);
 
               const deliveryRequestRef = doc(firestore, 'deliveryRequests', deliveryRequestId);
               const unsubscribeRequest = onSnapshot(deliveryRequestRef, (docSnapshot) => {
@@ -87,13 +94,18 @@ export default function DeliveryStatus({route}) {
                   console.log('Delivery accepted');
                   setDeliveryAccepted(true);
                   off(usersRef, 'value', handleUserUpdate); // Stop the listener
+                  clearInterval(notificationTimerRef.current); // Clear the timer
                 } else if (deliveryRequest.status === 'declined') {
                   console.log('Delivery declined');
                   setNearbyUser(null);
+                  clearInterval(notificationTimerRef.current); // Clear the timer
                 }
               });
 
-              return () => unsubscribeRequest();
+              return () => {
+                unsubscribeRequest();
+                clearInterval(notificationTimerRef.current); // Clear the timer on cleanup
+              };
             } else {
               console.log('User document does not exist:', userId);
             }
@@ -108,6 +120,7 @@ export default function DeliveryStatus({route}) {
 
     return () => {
       off(usersRef, 'value', handleUserUpdate);
+      clearInterval(notificationTimerRef.current); // Clear the timer on cleanup
     };
   }, [database, firestore, orderDetails, notifiedUsers]);
 
