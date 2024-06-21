@@ -9,21 +9,29 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
-  Alert
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Spacing from "../utils/Spacing";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import { FontAwesome } from "@expo/vector-icons";
-import { getFirestore, collection, setDoc, doc, getDocs } from "firebase/firestore";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import {
+  getFirestore,
+  collection,
+  setDoc,
+  doc,
+  getDocs,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import uuid from "react-native-uuid";
 import * as ImagePicker from "expo-image-picker";
-import { Ionicons } from "@expo/vector-icons";
+import { Skeleton } from "moti/skeleton";
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get("window").width;
 const database = getFirestore();
 const storage = getStorage();
 
@@ -35,20 +43,39 @@ export default function CommunityScreen() {
   const [tags, setTags] = useState([]);
   const [theme, setTheme] = useState("");
   const [image, setImage] = useState(null);
-  const [communities, setCommunities] = useState([]);
+  const [allCommunities, setAllCommunities] = useState([]);
+  const [joinedCommunities, setJoinedCommunities] = useState([]);
+  const [userId, setUserId] = useState("");
+  const [loading, setLoading] = useState(true); // Add loading state
 
   const handleOpenDrawer = () => {
     navigation.openDrawer();
   };
 
   useEffect(() => {
-    fetchCommunities();
+    fetchUserAndCommunities();
   }, []);
 
-  const fetchCommunities = async () => {
-    const querySnapshot = await getDocs(collection(database, "communities"));
-    const communityList = querySnapshot.docs.map((doc) => doc.data());
-    setCommunities(communityList);
+  const fetchUserAndCommunities = async () => {
+    setLoading(true); // Start loading
+    const userData = await AsyncStorage.getItem("user");
+    if (userData) {
+      const jsonObj = JSON.parse(userData);
+      if (jsonObj.userId) {
+        setUserId(jsonObj.userId);
+        const querySnapshot = await getDocs(collection(database, "communities"));
+        const communityList = querySnapshot.docs.map((doc) => doc.data());
+
+        const userCommunities = jsonObj.communitiesIds || [];
+        setJoinedCommunities(
+          communityList.filter((c) => userCommunities.includes(c.communityId))
+        );
+        setAllCommunities(
+          communityList.filter((c) => !userCommunities.includes(c.communityId))
+        );
+      }
+    }
+    setTimeout(() => setLoading(false), 3000); // Stop loading after 3 seconds
   };
 
   const handlePickImage = async () => {
@@ -103,8 +130,28 @@ export default function CommunityScreen() {
         });
 
         setModalVisible(false);
-        fetchCommunities();  // Refresh the community list
+        fetchUserAndCommunities(); // Refresh the community list
       }
+    }
+  };
+
+  const handleJoinCommunity = async (community) => {
+    if (userId) {
+      const communityRef = doc(database, "communities", community.communityId);
+      const userRef = doc(database, "users", userId);
+
+      // Update community data
+      await updateDoc(communityRef, {
+        memberIds: arrayUnion(userId),
+      });
+
+      // Update user data
+      await updateDoc(userRef, {
+        communitiesIds: arrayUnion(community.communityId),
+      });
+
+      fetchUserAndCommunities(); // Refresh the community list
+      console.log("Joined Community=>", community.communityName);
     }
   };
 
@@ -113,14 +160,19 @@ export default function CommunityScreen() {
       <ScrollView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={handleOpenDrawer}>
-            <Image source={require("../assets/images/Avatar.png")} style={styles.profilePic} />
+            <Image
+              source={require("../assets/images/Avatar.png")}
+              style={styles.profilePic}
+            />
           </TouchableOpacity>
           <Text style={styles.headerText}>Communities</Text>
           <TouchableOpacity
             style={styles.createCommunityButton}
             onPress={() => setModalVisible(true)}
           >
-            <Text style={styles.createCommunityButtonText}>Create Community</Text>
+            <Text style={styles.createCommunityButtonText}>
+              Create Community
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -132,20 +184,31 @@ export default function CommunityScreen() {
             </TouchableOpacity>
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.communityList}>
-            {["Spirituality", "Art & Craft", "Anime", "Coding", "Games", "News"].map((topic) => (
-              <TouchableOpacity key={topic}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.communityList}
+            pagingEnabled
+          >
+            {allCommunities.map((community) => (
+              <TouchableOpacity
+                key={community.communityId}
+                onPress={() => handleJoinCommunity(community)}
+              >
                 <View style={styles.communityCard}>
                   <View style={styles.communityCardInner}>
                     <View style={styles.communityCardIcon}>
-                      <View style={styles.communityCardAddIcon}>
+                      <TouchableOpacity
+                        style={styles.communityCardAddIcon}
+                        onPress={() => handleJoinCommunity(community)}
+                      >
                         <Image
                           source={require("../assets/icons/add.png")}
                           style={styles.communityCardAddImage}
                         />
-                      </View>
+                      </TouchableOpacity>
                     </View>
-                    <Text>{topic}</Text>
+                    <Text>{community.communityName}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -154,38 +217,47 @@ export default function CommunityScreen() {
 
           <View>
             <Text style={styles.myCommunitiesTitle}>My Communities</Text>
-            <View style={styles.myCommunityCard}>
-              <Text style={styles.myCommunityTitle}>Reiki Healing</Text>
-              <View style={styles.myCommunityRating}>
-                <FontAwesome name="star" size={24} color="#ffcc01" />
-                <Text style={styles.myCommunityRatingText}>4.3</Text>
-                <Text style={styles.myCommunityMembers}>(10K+ members)</Text>
-              </View>
-              <TouchableOpacity style={styles.viewCommunityButton}>
-                <LinearGradient colors={["#1d40bd", "#5075FA"]} style={styles.viewCommunityGradient}>
-                  <Text style={styles.viewCommunityText}>View Community</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View>
-            <Text style={styles.communitySectionTitle}>Community List</Text>
-            {communities.map((community) => (
-              <View key={community.communityId} style={styles.communityItem}>
-                <View style={styles.communityItemHeader}>
-                  <Image
-                    source={community.imageUrl ? { uri: community.imageUrl } : require("../assets/images/Avatar.png")}
-                    style={styles.communityAvatar}
+            {loading
+              ? Array.from({ length: 3 }).map((_, index) => (
+                  <Skeleton
+                    key={index}
+                    width="100%"
+                    height={150}
+                    colorMode="light"
+                    show={loading}
+                    backgroundColor="#f2f2f2"
+                    radius={12}
+                    style={styles.skeletonCard}
                   />
-                  <View style={styles.communityInfo}>
-                    <Text style={styles.communityTitle}>{community.communityName}</Text>
-                    <Text>{community.memberIds.length} members</Text>
+                ))
+              : joinedCommunities.map((community) => (
+                  <View key={community.communityId} style={styles.myCommunityCard}>
+                    <Text style={styles.myCommunityTitle}>
+                      {community.communityName}
+                    </Text>
+                    <View style={styles.myCommunityRating}>
+                      <FontAwesome
+                        name="star"
+                        size={24}
+                        color="#ffcc01"
+                      />
+                      <Text style={styles.myCommunityRatingText}>4.3</Text>
+                      <Text style={styles.myCommunityMembers}>
+                        ({community.memberIds.length} members)
+                      </Text>
+                    </View>
+                    <TouchableOpacity style={styles.viewCommunityButton}>
+                      <LinearGradient
+                        colors={["#1d40bd", "#5075FA"]}
+                        style={styles.viewCommunityGradient}
+                      >
+                        <Text style={styles.viewCommunityText}>
+                          View Community
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
                   </View>
-                </View>
-                <Text>{community.description}</Text>
-              </View>
-            ))}
+                ))}
           </View>
         </View>
       </ScrollView>
@@ -197,26 +269,28 @@ export default function CommunityScreen() {
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}
-      > 
-      
+      >
         <View style={styles.modalView}>
           <ScrollView>
-          <View style={{flexDirection:'row', alignItems:"center", justifyContent:"space-between",marginBottom:20}}>
-          <TouchableOpacity onPress={()=>{setModalVisible(false)}} style={styles.backButton}>
-
-        <Ionicons name="arrow-back" size={30} color="black" />
-
-        </TouchableOpacity>
-
-
-
-        <Text style={styles.headerText}>Create Community</Text>
-          <View>
-
-          </View>
-          </View>
-          
-            
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 20,
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(false);
+                }}
+                style={styles.backButton}
+              >
+                <Ionicons name="arrow-back" size={30} color="black" />
+              </TouchableOpacity>
+              <Text style={styles.headerText}>Create Community</Text>
+              <View></View>
+            </View>
             <TextInput
               placeholder="Name of the community"
               value={communityName}
@@ -233,7 +307,9 @@ export default function CommunityScreen() {
             <TextInput
               placeholder="Tags (comma separated)"
               value={tags.join(", ")}
-              onChangeText={(text) => setTags(text.split(",").map(tag => tag.trim()))}
+              onChangeText={(text) =>
+                setTags(text.split(",").map((tag) => tag.trim()))
+              }
               style={styles.input}
             />
             <TextInput
@@ -242,14 +318,17 @@ export default function CommunityScreen() {
               onChangeText={setTheme}
               style={styles.input}
             />
-
             <Text style={styles.sectionTitle}>Community Picture</Text>
-
-            {!image &&<TouchableOpacity onPress={handlePickImage} style={styles.addImageButton}>
-              <Ionicons name="add" size={24} color="#000" />
-            </TouchableOpacity>}
+            {!image && (
+              <TouchableOpacity onPress={handlePickImage} style={styles.addImageButton}>
+                <Ionicons name="add" size={24} color="#000" />
+              </TouchableOpacity>
+            )}
             {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
-            <TouchableOpacity style={styles.createButton} onPress={handleCreateCommunity}>
+            <TouchableOpacity
+              style={styles.createButton}
+              onPress={handleCreateCommunity}
+            >
               <Text style={styles.createButtonText}>Create</Text>
             </TouchableOpacity>
           </ScrollView>
@@ -259,7 +338,6 @@ export default function CommunityScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     paddingVertical: Spacing,
@@ -268,9 +346,8 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 25,
-    fontFamily: 'ComfortaaBold',
-    // marginBottom:20,
-
+    fontFamily: "ComfortaaBold",
+    marginBottom: 20,
   },
   header: {
     flexDirection: "row",
@@ -385,29 +462,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "Comfortaa",
   },
-  communityItem: {
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 10,
-    borderColor: "#000",
-    borderRadius: 15,
-  },
-  communityItemHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  communityAvatar: {
-    width: 35,
-    height: 35,
-    borderRadius: 20,
-    marginRight: 5,
-  },
-  communityInfo: {
-    flexDirection: "column",
-  },
-  communityTitle: {
-    fontWeight: "700",
-  },
   modalView: {
     flex: 1,
     justifyContent: "flex-end",
@@ -422,22 +476,22 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     fontSize: 16,
     fontFamily: "ComfortaaBold",
   },
   createButton: {
     flex: 1,
-    backgroundColor: '#1c40bd',
+    backgroundColor: "#1c40bd",
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
-    marginTop:20
+    alignItems: "center",
+    marginTop: 20,
   },
   createButtonGradient: {
     paddingHorizontal: 20,
@@ -448,7 +502,7 @@ const styles = StyleSheet.create({
   },
   createButtonText: {
     fontSize: 18,
-    color: '#fff',
+    color: "#fff",
     fontFamily: "ComfortaaBold",
   },
   imagePreview: {
@@ -457,21 +511,22 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
-
   addImageButton: {
     width: screenWidth / 3 - 20,
     height: screenWidth / 3 - 20,
     borderRadius: 10,
-    backgroundColor: '#e0e0e0',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#e0e0e0",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 10,
   },
-
-
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'ComfortaaBold',
+    fontFamily: "ComfortaaBold",
     marginBottom: 10,
+  },
+  skeletonCard: {
+    backgroundColor: "#e0e0e0",
+    marginBottom: 12,
   },
 });
