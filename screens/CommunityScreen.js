@@ -47,7 +47,7 @@ export default function CommunityScreen() {
   const [joinedCommunities, setJoinedCommunities] = useState([]);
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true); // Add loading state
-
+  console.log(joinedCommunities)
   const handleOpenDrawer = () => {
     navigation.openDrawer();
   };
@@ -57,7 +57,7 @@ export default function CommunityScreen() {
   }, []);
 
   const fetchUserAndCommunities = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     const userData = await AsyncStorage.getItem("user");
     if (userData) {
       const jsonObj = JSON.parse(userData);
@@ -75,8 +75,11 @@ export default function CommunityScreen() {
         );
       }
     }
-    setTimeout(() => setLoading(false), 3000); // Stop loading after 3 seconds
+    setTimeout(() => setLoading(false), 3000);
   };
+
+
+  
 
   const handlePickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -130,7 +133,7 @@ export default function CommunityScreen() {
         });
         const userRef = doc(database, "users", userId);
         await updateDoc(userRef, {
-          communitiesIds: arrayUnion(community.communityId),
+          communitiesIds: arrayUnion(communityId),
         });
   
         setModalVisible(false);
@@ -192,20 +195,33 @@ export default function CommunityScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.communityList}
-            pagingEnabled
+            // pagingEnabled
           >
             {loading
               ? Array.from({ length: 3 }).map((_, index) => (
-                <View key={index} style={{ marginRight: 20 }}>
+                <View key={index} style={{ marginRight: 20,alignItems:"center" }}>
                   <Skeleton
-                    width={150}
-                    height={150}
+                    width={100}
+                    height={100}
                     colorMode="light"
                     show={loading}
                     backgroundColor="#f2f2f2"
-                    radius={12}
+                    radius={50}
                     style={styles.skeletonCard}
                   />
+                <View style={{marginTop:20}}>
+                <Skeleton
+                    width={100}
+                    height={20}
+                    colorMode="light"
+                    show={loading}
+                    backgroundColor="#f2f2f2"
+                    radius={50}
+                    style={styles.skeletonCard}
+                  />
+
+                </View>
+                
                 </View>
               ))
               : allCommunities.map((community) => (
