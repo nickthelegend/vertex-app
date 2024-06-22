@@ -57,7 +57,7 @@ export default function CommunityScreen() {
   }, []);
 
   const fetchUserAndCommunities = async () => {
-    setLoading(true);
+    setLoading(true); // Start loading
     const userData = await AsyncStorage.getItem("user");
     if (userData) {
       const jsonObj = JSON.parse(userData);
@@ -75,12 +75,7 @@ export default function CommunityScreen() {
         );
       }
     }
-    setTimeout(() => setLoading(false), 3000);
-  };
-
-
-  const handleViewCommunity = (community) => {
-    navigation.navigate("CommunityPage", { community });
+    setTimeout(() => setLoading(false), 3000); // Stop loading after 3 seconds
   };
 
   const handlePickImage = async () => {
