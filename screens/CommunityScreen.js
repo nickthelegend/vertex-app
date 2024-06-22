@@ -57,7 +57,7 @@ export default function CommunityScreen() {
   }, []);
 
   const fetchUserAndCommunities = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     const userData = await AsyncStorage.getItem("user");
     if (userData) {
       const jsonObj = JSON.parse(userData);
@@ -75,7 +75,12 @@ export default function CommunityScreen() {
         );
       }
     }
-    setTimeout(() => setLoading(false), 3000); // Stop loading after 3 seconds
+    setTimeout(() => setLoading(false), 3000);
+  };
+
+
+  const handleViewCommunity = (community) => {
+    navigation.navigate("CommunityPage", { community });
   };
 
   const handlePickImage = async () => {
@@ -111,7 +116,7 @@ export default function CommunityScreen() {
           await uploadBytes(imageRef, blob);
           imageUrl = await getDownloadURL(imageRef);
         }
-
+        
         await setDoc(doc(collection(database, "communities"), communityId), {
           communityId,
           communityName,
@@ -128,7 +133,11 @@ export default function CommunityScreen() {
           createdByUserId,
           imageUrl,
         });
-
+        const userRef = doc(database, "users", userId);
+        await updateDoc(userRef, {
+          communitiesIds: arrayUnion(community.communityId),
+        });
+  
         setModalVisible(false);
         fetchUserAndCommunities(); // Refresh the community list
       }
@@ -150,7 +159,7 @@ export default function CommunityScreen() {
         communitiesIds: arrayUnion(community.communityId),
       });
 
-      fetchUserAndCommunities(); // Refresh the community list
+      await fetchUserAndCommunities(); // Refresh the community list
       console.log("Joined Community=>", community.communityName);
     }
   };
@@ -190,38 +199,11 @@ export default function CommunityScreen() {
             contentContainerStyle={styles.communityList}
             pagingEnabled
           >
-            {allCommunities.map((community) => (
-              <TouchableOpacity
-                key={community.communityId}
-                onPress={() => handleJoinCommunity(community)}
-              >
-                <View style={styles.communityCard}>
-                  <View style={styles.communityCardInner}>
-                    <View style={styles.communityCardIcon}>
-                      <TouchableOpacity
-                        style={styles.communityCardAddIcon}
-                        onPress={() => handleJoinCommunity(community)}
-                      >
-                        <Image
-                          source={require("../assets/icons/add.png")}
-                          style={styles.communityCardAddImage}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <Text>{community.communityName}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <View>
-            <Text style={styles.myCommunitiesTitle}>My Communities</Text>
             {loading
               ? Array.from({ length: 3 }).map((_, index) => (
+                <View key={index} style={{ marginRight: 20 }}>
                   <Skeleton
-                    key={index}
-                    width="100%"
+                    width={150}
                     height={150}
                     colorMode="light"
                     show={loading}
@@ -229,6 +211,48 @@ export default function CommunityScreen() {
                     radius={12}
                     style={styles.skeletonCard}
                   />
+                </View>
+              ))
+              : allCommunities.map((community) => (
+                <TouchableOpacity
+                  key={community.communityId}
+                  onPress={() => handleJoinCommunity(community)}
+                >
+                  <View style={styles.communityCard}>
+                    <View style={styles.communityCardInner}>
+                      <View style={styles.communityCardIcon}>
+                        <TouchableOpacity
+                          style={styles.communityCardAddIcon}
+                          onPress={() => handleJoinCommunity(community)}
+                        >
+                          <Image
+                            source={require("../assets/icons/add.png")}
+                            style={styles.communityCardAddImage}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      <Text>{community.communityName}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+          </ScrollView>
+
+          <View>
+            <Text style={styles.myCommunitiesTitle}>My Communities</Text>
+            {loading
+              ? Array.from({ length: 3 }).map((_, index) => (
+                <View key={index} style={{ marginBottom: 12 }}>
+        <Skeleton
+          width="100%"
+          height={150}
+          colorMode="light"
+          show={loading}
+          backgroundColor="#f2f2f2"
+          radius={12}
+          style={styles.skeletonCard}
+        />
+      </View>
                 ))
               : joinedCommunities.map((community) => (
                   <View key={community.communityId} style={styles.myCommunityCard}>
