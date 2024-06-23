@@ -46,6 +46,8 @@ import CategoryGadgets from './components/CategoryGadgets';
 import CategoryMisc from './screens/CategoryMisc';
 import CategoryResources from './screens/CategoryResources';
 import FilterScreenResources from './screens/FilterScreenResources';
+import SearchPage from './screens/SearchPage';
+import NotificationsPage from './screens/NotificationsPage';
 
 const Stack = createStackNavigator();
 
@@ -121,6 +123,8 @@ export default function App() {
         <Stack.Screen name="CategoryMisc" component={CategoryMisc} />
         <Stack.Screen name="CategoryResources" component={CategoryResources} />
         <Stack.Screen name="FilterScreenResources" component={FilterScreenResources} />
+        <Stack.Screen name="SearchPage" component={SearchPage} />
+        <Stack.Screen name="NotificationsPage" component={NotificationsPage} />
 
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>

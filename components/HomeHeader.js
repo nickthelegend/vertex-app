@@ -79,6 +79,7 @@ Home            </Text>}
               style={{
                 marginRight: SPACING * 2,
               }}
+              onPress={()=>{handleSearchPress}}
             >
               <Image
                 source={require("../assets/icons/search.png")}
@@ -94,6 +95,8 @@ Home            </Text>}
               style={{
                 marginRight: SPACING * 2,
               }}
+              onPress={()=>{handleNotificationsPress}}
+
             >
               <Ionicons name="notifications" size={24} color="black" />
             </TouchableOpacity>
