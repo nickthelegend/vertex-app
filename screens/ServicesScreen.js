@@ -8,7 +8,8 @@ import mapImage from '../images/map.png';
 import deliveryMan from '../images/delivery-man.png';
 import opportunity from '../images/opportunity.png';
 import ads from '../images/ads.png';
-import campus from '../images/campus.png';
+import myorders from '../images/myorders.png';
+import mydelivery from '../images/mydelivery.jpg'
 import { useNavigation } from "@react-navigation/native";
 
 // import other images as needed
@@ -18,8 +19,11 @@ const servicesData = [
   { id: '2', title: 'Order Food', uri: deliveryMan , route: "OrderFood" },
   { id: '3', title: 'Opportunities', uri: opportunity, route: "OpportunitiesScreen" },
   { id: '4', title: 'Marketplace', uri: ads, route: "MarketPlace" },
-  // { id: '5', title: 'Alumni Connection', uri: campus , route: "Alumini"},
+  { id: '5', title: 'My Orders', uri: myorders , route: "MyOrders"},
+  { id: '5', title: 'My Delivery', uri: mydelivery , route: "MyDelivery"},
+
 ];
+
 
 export default function ServicesScreen() {
 
