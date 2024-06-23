@@ -8,8 +8,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome } from "@expo/vector-icons";
 
 
-export default function CommunityPage() {
-
+export default function CommunityPage({route}) {
+    const { community, joinedCommunity } = route.params
     const [activeButton, setActiveButton] = useState('about'); // State to track active button
     const handleAbout = () => {
         setActiveButton('about'); // Set active button to 'inbox' when Inbox button is clicked
@@ -54,12 +54,13 @@ export default function CommunityPage() {
   const navigation = useNavigation();
   return (
     <SafeAreaView style={{ padding: 10, flex: 1 }}>
-      <ScrollView contentContainerStyle={{ flex: 1 }}>
+
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginBottom: 10,
+            marginBottom: 20,
+            justifyContent: "space-between"
           }}
         >
           <TouchableOpacity
@@ -80,7 +81,11 @@ export default function CommunityPage() {
               Reiki Healing Community
             </Text>
           </View>
+
+          <View></View>
         </View>
+      <ScrollView contentContainerStyle={{ flex: 1 }}>
+       
 
         <View
           style={{
@@ -100,7 +105,7 @@ export default function CommunityPage() {
                 marginBottom: 5,
               }}
             >
-              Reiki Healing
+              {community.communityName}
             </Text>
 
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -110,15 +115,18 @@ export default function CommunityPage() {
               </Text>
 
               <Text style={{ color: "#fff", fontSize: 20, marginLeft: 5 }}>
-                (10K+ members)
+              ({community.memberIds.length} members)
               </Text>
+
+              
             </View>
-            <View style={{ marginTop: 20, flexDirection: "row" }}>
-              <TouchableOpacity>
-                <Text style={{ marginBottom: 30, fontSize: 18, color: "#fff" }}>
-                  Relki healing channels universal energy, restoring balance and
-                  promoting holistic well-being.
+            <Text style={{ marginBottom: 30, fontSize: 18, color: "#fff" }}>
+                  {community.description}
                 </Text>
+            <View style={{ marginTop: 20, flexDirection: "row" }}>
+              
+              {!joinedCommunity && <TouchableOpacity>
+                
                 <LinearGradient
                   colors={["#1d40bd", "#5075FA"]}
                   style={{
@@ -143,7 +151,7 @@ export default function CommunityPage() {
                   </Text>
                   <Ionicons name="arrow-forward" size={23} color="#fff" />
                 </LinearGradient>
-              </TouchableOpacity>
+              </TouchableOpacity>}
             </View>
           </View>
         </View>

@@ -22,6 +22,7 @@ import {
   setDoc,
   doc,
   getDocs,
+  getDoc,
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
@@ -47,7 +48,7 @@ export default function CommunityScreen() {
   const [joinedCommunities, setJoinedCommunities] = useState([]);
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true); // Add loading state
-  console.log(joinedCommunities)
+  // console.log(joinedCommunities)
   const handleOpenDrawer = () => {
     navigation.openDrawer();
   };
@@ -58,26 +59,41 @@ export default function CommunityScreen() {
 
   const fetchUserAndCommunities = async () => {
     setLoading(true);
-    const userData = await AsyncStorage.getItem("user");
-    if (userData) {
-      const jsonObj = JSON.parse(userData);
-      if (jsonObj.userId) {
-        setUserId(jsonObj.userId);
-        const querySnapshot = await getDocs(collection(database, "communities"));
-        const communityList = querySnapshot.docs.map((doc) => doc.data());
 
-        const userCommunities = jsonObj.communitiesIds || [];
-        setJoinedCommunities(
-          communityList.filter((c) => userCommunities.includes(c.communityId))
-        );
-        setAllCommunities(
-          communityList.filter((c) => !userCommunities.includes(c.communityId))
-        );
+    try {
+      const userData = await AsyncStorage.getItem("user");
+
+      if (userData) {
+        const jsonObj = JSON.parse(userData);
+
+        if (jsonObj.userId) {
+          setUserId(jsonObj.userId);
+
+          // Fetch user document to get the communitiesIds
+          const userDoc = await getDoc(doc(database, "users", jsonObj.userId));
+          const userCommunities = userDoc.data().communitiesIds || [];
+
+          // Fetch all communities
+          const querySnapshot = await getDocs(collection(database, "communities"));
+          const communityList = querySnapshot.docs.map((doc) => doc.data());
+
+          // Separate the communities into joined and all
+          setJoinedCommunities(
+            communityList.filter((c) => userCommunities.includes(c.communityId))
+          );
+          setAllCommunities(
+            communityList.filter((c) => !userCommunities.includes(c.communityId))
+          );
+        }
       }
+    } catch (error) {
+      console.error("Error fetching user and communities:", error);
+      // Optionally handle the error (e.g., show a message to the user)
+    } finally {
+      setTimeout(() => setLoading(false), 3000);
     }
-    setTimeout(() => setLoading(false), 3000);
   };
-
+  
 
   
 
@@ -184,12 +200,15 @@ export default function CommunityScreen() {
         </View>
 
         <View style={{ marginTop: 10 }}>
+        {allCommunities.length > 0 && (
           <View style={styles.communitySectionHeader}>
             <Text style={styles.communitySectionTitle}>All Communities</Text>
             <TouchableOpacity>
               <Text>View All</Text>
             </TouchableOpacity>
           </View>
+            )}
+
 
           <ScrollView
             horizontal
@@ -197,7 +216,7 @@ export default function CommunityScreen() {
             contentContainerStyle={styles.communityList}
             // pagingEnabled
           >
-            {loading
+            {loading && allCommunities.length > 0
               ? Array.from({ length: 3 }).map((_, index) => (
                 <View key={index} style={{ marginRight: 20,alignItems:"center" }}>
                   <Skeleton
@@ -246,7 +265,9 @@ export default function CommunityScreen() {
                     </View>
                   </View>
                 </TouchableOpacity>
-              ))}
+              ))
+              
+              }
           </ScrollView>
 
           <View>
@@ -281,7 +302,8 @@ export default function CommunityScreen() {
                         ({community.memberIds.length} members)
                       </Text>
                     </View>
-                    <TouchableOpacity style={styles.viewCommunityButton}>
+                    <TouchableOpacity style={styles.viewCommunityButton} onPress={()=> navigation.navigate("CommunityPage", { community,joinedCommunity: true })}
+>
                       <LinearGradient
                         colors={["#1d40bd", "#5075FA"]}
                         style={styles.viewCommunityGradient}
