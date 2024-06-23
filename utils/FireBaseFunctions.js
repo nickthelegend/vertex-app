@@ -2,7 +2,7 @@
 import uuid from 'react-native-uuid'; // Import uuid
 
 // Import Firebase database
-import { getFirestore, collection, doc, setDoc, query, where, getDocs,updateDoc } from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, query, where, getDocs,updateDoc,arrayUnion } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { app } from '../services/config'
@@ -347,3 +347,13 @@ export const fetchPosts = async (lastVisiblePost, pageSize = 10) => {
   const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
   return { posts, lastVisible };
 };
+
+
+export async function addNotification(userId, notification) {
+  const db = getFirestore(app);
+  const userRef = doc(db, 'users', userId);
+
+  await updateDoc(userRef, {
+    notifications: arrayUnion(notification)
+  });
+}

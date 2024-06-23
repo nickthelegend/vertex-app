@@ -4,7 +4,7 @@ import SPACING from '../utils/Spacing';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook for navigation
 import { Ionicons } from "@expo/vector-icons";
 
-export default function HomeHeader({ userFullName, userProfilePic }) {
+export default function HomeHeader({ userFullName, userProfilePic,userId }) {
   const navigation = useNavigation();
 
   const handleSearchPress = () => {
@@ -14,7 +14,7 @@ export default function HomeHeader({ userFullName, userProfilePic }) {
 
   const handleNotificationsPress = () => {
     // Redirect to the notifications page
-    navigation.navigate('NotificationsPage'); // Replace 'NotificationsPage' with the name of your notifications page
+    navigation.navigate('NotificationsPage',{currentUserId: userId}); // Replace 'NotificationsPage' with the name of your notifications page
   };
 
   const handleMessagesPress = () => {

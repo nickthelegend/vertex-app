@@ -18,6 +18,7 @@ import { Skeleton } from 'moti/skeleton';
 
 export default function HomeScreen() {
   const [userFullName, setUserFullName] = useState('');
+  const [currentUserId,setCurrentUserId] = useState(null)
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastVisiblePost, setLastVisiblePost] = useState(null);
@@ -49,6 +50,7 @@ export default function HomeScreen() {
     const fetchUserData = async () => {
       const loggedInUser = await checkUserLoggedIn();
       setUserFullName(loggedInUser.fullName);
+      setCurrentUserId(loggedInUser.userId)
     };
 
     const fetchInitialPosts = async () => {
@@ -171,7 +173,7 @@ export default function HomeScreen() {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1, paddingHorizontal: SPACING * 1, paddingTop: SPACING * 1 }}>
-          <HomeHeader userFullName={userFullName} userProfilePic={currentUserProfilePic} />
+          <HomeHeader userFullName={userFullName} userProfilePic={currentUserProfilePic} userId={currentUserId} />
           <View style={{ flexDirection: "row", flexWrap: "wrap", marginVertical: SPACING * 2 }}>
             {["What's Happening", "Community", "Clubs", "Events", "Opportunities", "Question/Help"].map((tag) => (
               <CategoryButton 
