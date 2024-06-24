@@ -21,24 +21,24 @@ import { useNavigation } from "@react-navigation/native";
 import { Skeleton } from 'moti/skeleton';
 
 const screenWidth = Dimensions.get("window").width;
-export const vegItems = [
-  {
-    name: "Paneer Tikka",
-    image: require("../assets/temp/paneer_tikka.jpg"),
-    price: 150,
-  },
-  {
-    name: "Veg Biryani",
-    image: require("../assets/temp/veg_biryani.jpg"),
-    price: 120,
-  },
-  { name: "Salad", image: require("../assets/temp/salad.jpg"), price: 80 },
-  {
-    name: "Veg Burger",
-    image: require("../assets/temp/veg_burger.jpg"),
-    price: 100,
-  },
-];
+// export const vegItems = [
+//   {
+//     name: "Paneer Tikka",
+//     image: require("../assets/temp/paneer_tikka.jpg"),
+//     price: 150,
+//   },
+//   {
+//     name: "Veg Biryani",
+//     image: require("../assets/temp/veg_biryani.jpg"),
+//     price: 120,
+//   },
+//   { name: "Salad", image: require("../assets/temp/salad.jpg"), price: 80 },
+//   {
+//     name: "Veg Burger",
+//     image: require("../assets/temp/veg_burger.jpg"),
+//     price: 100,
+//   },
+// ];
 
 
 
