@@ -48,6 +48,8 @@ import CategoryResources from './screens/CategoryResources';
 import FilterScreenResources from './screens/FilterScreenResources';
 import SearchPage from './screens/SearchPage';
 import NotificationsPage from './screens/NotificationsPage';
+import MyOrders from './screens/MyOrders';
+import MyDelivery from './screens/MyDelivery';
 
 const Stack = createStackNavigator();
 
@@ -125,6 +127,8 @@ export default function App() {
         <Stack.Screen name="FilterScreenResources" component={FilterScreenResources} />
         <Stack.Screen name="SearchPage" component={SearchPage} />
         <Stack.Screen name="NotificationsPage" component={NotificationsPage} />
+        <Stack.Screen name="MyOrders" component={MyOrders} />
+        <Stack.Screen name="MyDelivery" component={MyDelivery} />
 
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>
