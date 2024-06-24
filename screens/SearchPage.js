@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, FlatList, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, TextInput, FlatList, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { app } from '../services/config';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,9 +7,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 import ProfilePicture from '../components/ProfilePicture';  // Adjust the path as necessary
 import { Skeleton } from 'moti/skeleton';
+import UserPost from '../components/UserPost';  // Adjust the path as necessary
+import SPACING from "../utils/Spacing";
+
+const deviceWidth = Dimensions.get("window").width;
 
 export default function SearchPage() {
-
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState({ users: [], posts: [] });
@@ -73,11 +76,24 @@ export default function SearchPage() {
     </View>
   );
 
-  const renderPost = ({ item }) => (
-    <View style={styles.resultItem}>
-      <Text style={styles.resultText}>{item.caption}</Text>
-    </View>
-  );
+  const renderPost = ({ item }) => {
+    const createdAt = item.createdAt ? new Date(item.createdAt.seconds * 1000) : null;
+    const datePosted = createdAt ? createdAt.toDateString() : "Unknown date";
+
+    return (
+      <UserPost
+        userProfilePic={{ uri: item.profilepic }}
+        postContext={item.caption}
+        userFullName={item.createdByUserFullname}
+        username={item.createdByUserName}
+        datePosted={datePosted}
+        userPostPicture={item.imgUrl ? { uri: item.imgUrl } : null}
+        postLikes={item.likes.length}
+        postComments={item.comments.length}
+        postRetweets={item.retweets ? item.retweets.length : 0}
+      />
+    );
+  };
 
   const renderSkeleton = () => (
     <View style={styles.resultItem}>
@@ -85,6 +101,33 @@ export default function SearchPage() {
       <View style={styles.textContainer}>
         <Skeleton colorMode="light" width={120} height={16} />
         <Skeleton colorMode="light" width={80} height={14} style={{ marginTop: 4 }} />
+      </View>
+    </View>
+  );
+
+  const renderPostSkeleton = () => (
+    <View style={{ backgroundColor: "#f7f7f7", padding: SPACING, marginBottom: SPACING * 1.7 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", marginVertical: SPACING, marginBottom: SPACING * 2 }}>
+        <Skeleton colorMode="light" width={SPACING * 5} height={SPACING * 5} borderRadius={SPACING * 2} style={{ marginRight: SPACING }} />
+        <View>
+          <Skeleton colorMode="light" width={deviceWidth * 0.3} height={SPACING * 2} />
+          <Skeleton colorMode="light" width={deviceWidth * 0.2} height={SPACING * 2} style={{ marginTop: SPACING * 0.3 }} />
+        </View>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <View style={{ flexDirection: "row" }}>
+            <Skeleton colorMode="light" width={deviceWidth * 0.2} height={SPACING * 2} />
+            <Skeleton colorMode="light" width={20} height={20} borderRadius={10} style={{ marginLeft: SPACING * 0.3 }} />
+          </View>
+        </View>
+      </View>
+      <View>
+        <Skeleton colorMode="light" width={deviceWidth - SPACING * 2} height={SPACING * 3} style={{ marginBottom: 10 }} />
+        <Skeleton colorMode="light" width={deviceWidth - SPACING * 2} height={deviceWidth - SPACING * 2} aspectRatio={1} />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: SPACING }}>
+          <Skeleton colorMode="light" width={SPACING * 6} height={SPACING * 3} />
+          <Skeleton colorMode="light" width={SPACING * 6} height={SPACING * 3} />
+          <Skeleton colorMode="light" width={SPACING * 6} height={SPACING * 3} />
+        </View>
       </View>
     </View>
   );
@@ -141,9 +184,20 @@ export default function SearchPage() {
       <View style={styles.resultsContainer}>
         {loading ? (
           <>
-            {Array.from({ length: 6 }).map((_, index) => (
-              renderSkeleton()
-            ))}
+            {selectedCategory === 'Users' && (
+              <>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <View key={index}>{renderSkeleton()}</View>
+                ))}
+              </>
+            )}
+            {selectedCategory === 'Posts' && (
+              <>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <View key={index}>{renderPostSkeleton()}</View>
+                ))}
+              </>
+            )}
           </>
         ) : (
           <>
@@ -154,6 +208,7 @@ export default function SearchPage() {
                   data={searchResults.users}
                   renderItem={renderUser}
                   keyExtractor={(item) => item.id}
+                  showsVerticalScrollIndicator={false}
                 />
               </>
             )}
@@ -164,6 +219,8 @@ export default function SearchPage() {
                   data={searchResults.posts}
                   renderItem={renderPost}
                   keyExtractor={(item) => item.id}
+                  showsVerticalScrollIndicator={false}
+
                 />
               </>
             )}
@@ -195,7 +252,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
   },
   searchBar: {
     height: 40,
