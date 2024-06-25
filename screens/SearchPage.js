@@ -62,18 +62,21 @@ export default function SearchPage() {
   };
 
   const renderUser = ({ item }) => (
-    <View style={styles.resultItem}>
-      {item.profilepic ? (
-        <Image source={{ uri: item.profilepic }} style={styles.profilePic} />
-      ) : (
-        <ProfilePicture fullName={item.fullName} />
-      )}
+    <TouchableOpacity
+    style={styles.resultItem}
+    onPress={() => navigation.navigate('OtherUserProfileScreen', { userId: item.id })} // Navigate to OtherUserProfileScreen with userId
+  >
+    {item.profilepic ? (
+      <Image source={{ uri: item.profilepic }} style={styles.profilePic} />
+    ) : (
+      <ProfilePicture fullName={item.fullName} />
+    )}
 
-      <View style={styles.textContainer}>
-        <Text style={styles.fullNameText}>{item.fullName}</Text>
-        <Text style={styles.usernameText}>@{item.username}</Text>
-      </View>
+    <View style={styles.textContainer}>
+      <Text style={styles.fullNameText}>{item.fullName}</Text>
+      <Text style={styles.usernameText}>@{item.username}</Text>
     </View>
+  </TouchableOpacity>
   );
 
   const renderPost = ({ item }) => {

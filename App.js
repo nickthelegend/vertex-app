@@ -50,6 +50,7 @@ import SearchPage from './screens/SearchPage';
 import NotificationsPage from './screens/NotificationsPage';
 import MyOrders from './screens/MyOrders';
 import MyDelivery from './screens/MyDelivery';
+import OtherUserProfileScreen from './screens/OtherUserProfileScreen';
 
 const Stack = createStackNavigator();
 
@@ -129,6 +130,7 @@ export default function App() {
         <Stack.Screen name="NotificationsPage" component={NotificationsPage} />
         <Stack.Screen name="MyOrders" component={MyOrders} />
         <Stack.Screen name="MyDelivery" component={MyDelivery} />
+        <Stack.Screen name="OtherUserProfileScreen" component={OtherUserProfileScreen} />
 
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>
