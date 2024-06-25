@@ -51,6 +51,7 @@ import NotificationsPage from './screens/NotificationsPage';
 import MyOrders from './screens/MyOrders';
 import MyDelivery from './screens/MyDelivery';
 import OtherUserProfileScreen from './screens/OtherUserProfileScreen';
+import UniversityNavigationScreen from './screens/UniversityNavigationScreen';
 
 const Stack = createStackNavigator();
 
@@ -131,6 +132,7 @@ export default function App() {
         <Stack.Screen name="MyOrders" component={MyOrders} />
         <Stack.Screen name="MyDelivery" component={MyDelivery} />
         <Stack.Screen name="OtherUserProfileScreen" component={OtherUserProfileScreen} />
+        <Stack.Screen name="UniversityNavigationScreen" component={UniversityNavigationScreen} />
 
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>

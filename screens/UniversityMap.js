@@ -228,12 +228,13 @@ export default function UniversityMap() {
                 <Text numberOfLines={1} style={styles.cardTitle}>{marker.title}</Text>
                 <Text numberOfLines={1} style={styles.cardDescription}>{marker.description}</Text>
                 <View style={styles.button}>
-                  <TouchableOpacity
-                    onPress={() => {}}
-                    style={[styles.signIn, { borderColor: '#FF6347', borderWidth: 1 }]}
-                  >
-                    <Text style={[styles.textSign, { color: '#FF6347' }]}>Order Now</Text>
-                  </TouchableOpacity>
+                <TouchableOpacity
+  onPress={() => navigation.navigate('UniversityNavigationScreen')}
+  style={[styles.signIn, { borderColor: '#FF6347', borderWidth: 1 }]}
+>
+  <Text style={[styles.textSign, { color: '#FF6347' }]}>View</Text>
+</TouchableOpacity>
+
                 </View>
               </View>
             </View>
@@ -275,6 +276,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 10,
+    top:100
   },
   searchIcon: { width: 20, height: 20 },
   scrollView: {
