@@ -42,7 +42,7 @@ export default function UniversityMap() {
   let mapAnimation = new Animated.Value(0);
   
   const [searchInput, setSearchInput] = useState("");
-  const [filteredMarkers, setFilteredMarkers] = useState([]);
+  const [filteredMarkers, setFilteredMarkers] = useState(markers);
   const [region, setRegion] = useState({
     latitude: 17.493504,
     longitude: 78.391198,
@@ -59,7 +59,7 @@ export default function UniversityMap() {
 
     const scale = mapAnimation.interpolate({
       inputRange,
-      outputRange: [1, 2, 1],  // Increase the scale to 2 for the selected marker
+      outputRange: [1, 1.5, 1],
       extrapolate: "clamp",
     });
 
