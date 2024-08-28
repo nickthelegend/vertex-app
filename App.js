@@ -1,8 +1,8 @@
 import 'react-native-gesture-handler';
 import 'expo-linear-gradient';
-import React from 'react';
+import React ,{ useEffect,useState }from 'react';
 // import ImagePicker from 'react-native-image-crop-picker';
-import { AppRegistry } from 'react-native';
+import { View, Text, Linking, Alert, ActivityIndicator } from 'react-native';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import SplashScreen from './screens/SplashScreen';
@@ -52,11 +52,20 @@ import MyOrders from './screens/MyOrders';
 import MyDelivery from './screens/MyDelivery';
 import OtherUserProfileScreen from './screens/OtherUserProfileScreen';
 import UniversityNavigationScreen from './screens/UniversityNavigationScreen';
+import Constants from 'expo-constants';
+import checkForUpdate from './utils/CheckForUpdate';
+const currentVersion = Constants.expoConfig.version;
 
+
+console.log("Current Version",currentVersion);
 const Stack = createStackNavigator();
 
 export default function App() {
+  // State to manage whether an update is required
+  const [updateRequired, setUpdateRequired] = useState(false);
+  const [updateCheckCompleted, setUpdateCheckCompleted] = useState(false); // State to track if update check is done
 
+  // Load fonts using useFonts hook
   const [fontsLoaded] = useFonts({
     AudioWideFont: require("./fonts/Audiowide-Regular.ttf"),
     Comfortaa: require("./fonts/Comfortaa-VariableFont_wght.ttf"),
@@ -68,15 +77,69 @@ export default function App() {
     'Lato-Regular': require('./fonts/Lato/Lato-Regular.ttf'),
     NotoSansGrantha: require('./fonts/Noto_Sans_Grantha/NotoSansGrantha-Regular.ttf'),
     NotoSansKawi: require('./fonts/Noto_Sans_Kawi/NotoSansKawi-VariableFont_wght.ttf')
-
-
-
   });
 
+  // Check for updates when the component mounts
+  useEffect(() => {
+    const checkForUpdate = async () => {
+      try {
+        // Fetch the latest version info from your server
+        const response = await fetch('https://appversion.vercel.app/');
+        const { latestVersion, updateUrl } = await response.json();
+        const currentVersion = Constants.expoConfig.version;
+
+        // If an update is required, set the state and show the alert
+        if (latestVersion !== currentVersion) {
+          setUpdateRequired(true);
+          Alert.alert(
+            'Update Available',
+            'A new version of the app is available. Please update to continue.',
+            [
+              {
+                text: 'Update Now',
+                onPress: () => {
+                  Linking.openURL(updateUrl);
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      } catch (error) {
+        console.error('Error checking for updates:', error);
+      } finally {
+        setUpdateCheckCompleted(true); // Mark update check as completed
+      }
+    };
+
+    checkForUpdate(); // Call the update check function
+  }, []);
+
+  // Render a loading indicator while checking for updates
+  if (!updateCheckCompleted) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Checking for updates...</Text>
+      </View>
+    );
+  }
+
+  // Block the app if an update is required
+  if (updateRequired) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ fontSize: 18 }}>Please update the app to continue.</Text>
+      </View>
+    );
+  }
+
+  // Render the loading screen if fonts are still loading
   if (!fontsLoaded) {
-    // Return a loading indicator or null until fonts are loaded
     return null;
   }
+
+  // Render the main navigation of the app
   return (
     <NavigationContainer>
     
