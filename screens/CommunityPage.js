@@ -1,15 +1,18 @@
-import React,{useState} from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React,{useState, useEffect} from "react";
+import { View, Text, TouchableOpacity, ImageBackground, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export default function CommunityPage({route}) {
     const { community, joinedCommunity } = route.params
+    const [currentUser, setCurrentUser] = useState(null);
+
     const [activeButton, setActiveButton] = useState('about'); // State to track active button
     const handleAbout = () => {
         setActiveButton('about'); // Set active button to 'inbox' when Inbox button is clicked
@@ -28,6 +31,21 @@ export default function CommunityPage({route}) {
         setActiveButton('events'); // Set active button to 'community' when Community button is clicked
       };
 
+      const handleEditCommunity = () => {
+        // Navigation to edit screen or toggle edit modal
+        console.log("Edit Community");
+      };
+      const renderEditButton = () => {
+        if (currentUser && currentUser.userId === community.createdByUserId) {
+
+          console.log("Edit Button on")
+          return (
+            <TouchableOpacity onPress={handleEditCommunity} style={styles.editButton}>
+              <Ionicons name="create-outline" size={24} color="white" />
+            </TouchableOpacity>
+          );
+        }
+      };
       const renderButton = (text, onPress, isActive) => (
         <TouchableOpacity
           onPress={onPress}
@@ -52,6 +70,14 @@ export default function CommunityPage({route}) {
         </TouchableOpacity>
       );
   const navigation = useNavigation();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await AsyncStorage.getItem("user");
+      const user = userData ? JSON.parse(userData) : null;
+      setCurrentUser(user);
+    };
+    fetchUserData();
+  }, []);
   return (
     <SafeAreaView style={{ padding: 10, flex: 1 }}>
 
@@ -78,22 +104,33 @@ export default function CommunityPage({route}) {
                 marginRight: 10,
               }}
             >
-              Reiki Healing Community
+              Community Page
             </Text>
+
+            
           </View>
 
-          <View></View>
+          
+
+          <View>
+
+          {renderEditButton()}
+          </View>
         </View>
       <ScrollView contentContainerStyle={{ flex: 1 }}>
        
 
-        <View
-          style={{
-            backgroundColor: "green",
-            borderRadius: 12,
-            padding: 15,
-            marginBottom: 12,
-          }}
+        <ImageBackground
+          // style={{
+          //   backgroundColor: "green",
+          //   borderRadius: 12,
+          //   padding: 15,
+          //   marginBottom: 12,
+          // }}
+
+          source={community.imageUrl ? { uri: community.imageUrl } : null}
+    style={styles.myCommunityCard} // Using the existing style for the full-size effect
+    imageStyle={{ borderRadius: 12 }}
         >
           <View>
             <Text
@@ -154,7 +191,7 @@ export default function CommunityPage({route}) {
               </TouchableOpacity>}
             </View>
           </View>
-        </View>
+        </ImageBackground>
 
 
         <View>
@@ -191,3 +228,20 @@ export default function CommunityPage({route}) {
     </SafeAreaView>
   );
 }
+
+
+
+const styles = StyleSheet.create({
+
+  myCommunityCard: {
+    backgroundColor: "green",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 12,
+  },
+  editButton: {
+    backgroundColor: "#1d40bd",
+    padding: 8,
+    borderRadius: 20
+  }
+})

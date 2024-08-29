@@ -10,6 +10,7 @@ import {
   ScrollView,
   Dimensions,
   Alert,
+  ImageBackground
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Spacing from "../utils/Spacing";
@@ -244,28 +245,39 @@ export default function CommunityScreen() {
                 </View>
               ))
               : allCommunities.map((community) => (
-                <TouchableOpacity
-                  key={community.communityId}
-                  onPress={() => handleJoinCommunity(community)}
-                >
-                  <View style={styles.communityCard}>
-                    <View style={styles.communityCardInner}>
-                      <View style={styles.communityCardIcon}>
-                        <TouchableOpacity
-                          style={styles.communityCardAddIcon}
-                          onPress={() => handleJoinCommunity(community)}
-                        >
-                          <Image
-                            source={require("../assets/icons/add.png")}
-                            style={styles.communityCardAddImage}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                      <Text>{community.communityName}</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))
+  <TouchableOpacity
+    key={community.communityId}
+    onPress={() => handleJoinCommunity(community)}
+  >
+    <View style={styles.communityCard}>
+      <View style={styles.communityCardInner}>
+        <View style={styles.communityCardIcon}>
+          {community.imageUrl ? (
+            <Image
+              source={{ uri: community.imageUrl }}
+              style={styles.communityCardIcon}
+            />
+          ) : (
+            // Display a placeholder or nothing if the image is not available
+            <View style={[styles.communityCardIcon, { backgroundColor: "#e0e0e0" }]}>
+              {/* Optionally, you can add a default icon or text here */}
+            </View>
+          )}
+          <TouchableOpacity
+            style={styles.communityCardAddIcon}
+            onPress={() => handleJoinCommunity(community)}
+          >
+            <Image
+              source={require("../assets/icons/add.png")}
+              style={styles.communityCardAddImage}
+            />
+          </TouchableOpacity>
+        </View>
+        <Text>{community.communityName}</Text>
+      </View>
+    </View>
+  </TouchableOpacity>
+))
               
               }
           </ScrollView>
@@ -287,34 +299,41 @@ export default function CommunityScreen() {
       </View>
                 ))
               : joinedCommunities.map((community) => (
-                  <View key={community.communityId} style={styles.myCommunityCard}>
-                    <Text style={styles.myCommunityTitle}>
-                      {community.communityName}
-                    </Text>
-                    <View style={styles.myCommunityRating}>
-                      <FontAwesome
-                        name="star"
-                        size={24}
-                        color="#ffcc01"
-                      />
-                      <Text style={styles.myCommunityRatingText}>4.3</Text>
-                      <Text style={styles.myCommunityMembers}>
-                        ({community.memberIds.length} members)
-                      </Text>
-                    </View>
-                    <TouchableOpacity style={styles.viewCommunityButton} onPress={()=> navigation.navigate("CommunityPage", { community,joinedCommunity: true })}
->
-                      <LinearGradient
-                        colors={["#1d40bd", "#5075FA"]}
-                        style={styles.viewCommunityGradient}
-                      >
-                        <Text style={styles.viewCommunityText}>
-                          View Community
-                        </Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  </View>
-                ))}
+  <ImageBackground 
+    key={community.communityId}
+    source={community.imageUrl ? { uri: community.imageUrl } : null}
+    style={styles.myCommunityCard} // Using the existing style for the full-size effect
+    imageStyle={{ borderRadius: 12 }} // Apply border radius to the image
+  >
+    <Text style={styles.myCommunityTitle}>
+      {community.communityName}
+    </Text>
+    <View style={styles.myCommunityRating}>
+      <FontAwesome
+        name="star"
+        size={24}
+        color="#ffcc01"
+      />
+      <Text style={styles.myCommunityRatingText}>4.3</Text>
+      <Text style={styles.myCommunityMembers}>
+        ({community.memberIds.length} members)
+      </Text>
+    </View>
+    <TouchableOpacity
+      style={styles.viewCommunityButton}
+      onPress={() => navigation.navigate("CommunityPage", { community, joinedCommunity: true })}
+    >
+      <LinearGradient
+        colors={["#1d40bd", "#5075FA"]}
+        style={styles.viewCommunityGradient}
+      >
+        <Text style={styles.viewCommunityText}>
+          View Community
+        </Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  </ImageBackground>
+))}
           </View>
         </View>
       </ScrollView>
