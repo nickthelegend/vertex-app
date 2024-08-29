@@ -1,5 +1,5 @@
 import React,{useState, useEffect} from "react";
-import { View, Text, TouchableOpacity, ImageBackground, StyleSheet , Modal} from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet , Modal} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -49,6 +49,10 @@ export default function CommunityPage({route}) {
               <Ionicons name="create-outline" size={24} color="white" />
             </TouchableOpacity>
           );
+        } else{
+
+
+          return ( <View></View>)
         }
       };
       const renderButton = (text, onPress, isActive) => (
@@ -86,235 +90,193 @@ export default function CommunityPage({route}) {
 
 
   
-  const renderMembersModal = () => {
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={toggleModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={toggleModal}
-            >
-              <Ionicons name="close" size={30} color="black" />
-            </TouchableOpacity>
-            <ScrollView style={{ padding: 20 }}>
-              {community.memberIds.map((id, index) => (
-                <Text key={index} style={styles.memberText}>{id}</Text>
-              ))}
-            </ScrollView>
-          </View>
+  const renderMembersModal = () => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isModalVisible}
+      onRequestClose={toggleModal}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
+            <Ionicons name="close" size={30} color="black" />
+          </TouchableOpacity>
+          <ScrollView style={{ padding: 20 }}>
+            {community.memberIds.map((id, index) => (
+              <Text key={index} style={styles.memberText}>
+                {id}
+              </Text>
+            ))}
+          </ScrollView>
         </View>
-      </Modal>
-    );
-  };
+      </View>
+    </Modal>
+  );
+
   return (
     <SafeAreaView style={{ padding: 10, flex: 1 }}>
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 20,
-            justifyContent: "space-between"
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-            }}
-          >
-            <Ionicons name="arrow-back" size={30} color="black" />
-          </TouchableOpacity>
-          <View>
-            <Text
-              style={{
-                fontSize: 23,
-                fontFamily: "ComfortaaBold",
-                marginRight: 10,
-              }}
-            >
-              Community Page
-            </Text>
-
-            
-          </View>
-
-          
-
-          <View>
-
-          {renderEditButton()}
-          </View>
-        </View>
-      <ScrollView contentContainerStyle={{ flex: 1 }}>
-       
-
-        <ImageBackground
-          // style={{
-          //   backgroundColor: "green",
-          //   borderRadius: 12,
-          //   padding: 15,
-          //   marginBottom: 12,
-          // }}
-
-          source={community.imageUrl ? { uri: community.imageUrl } : null}
-    style={styles.myCommunityCard} // Using the existing style for the full-size effect
-    imageStyle={{ borderRadius: 12 }}
-        >
-          <View>
-            <Text
-              style={{
-                fontFamily: "Baumans",
-                fontSize: 35,
-                fontWeight: "bold",
-                color: "#fff",
-                marginBottom: 5,
-              }}
-            >
-              {community.communityName}
-            </Text>
-
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <FontAwesome name="star" size={24} color="#ffcc01" />
-              <Text style={{ color: "#fff", fontSize: 20, marginLeft: 5 }}>
-                4.3
-              </Text>
-
-              <Text style={{ color: "#fff", fontSize: 20, marginLeft: 5 }}>
-              ({community.memberIds.length} members)
-              </Text>
-
-              
-            </View>
-            <Text style={{ marginBottom: 30, fontSize: 18, color: "#fff" }}>
-                  {community.description}
-                </Text>
-
-                {currentUser && currentUser.userId === community.createdByUserId && (
-            <TouchableOpacity onPress={toggleModal} style={styles.viewMembersButton}>
-              <Text style={styles.viewMembersButtonText}>View All Members</Text>
-            </TouchableOpacity>
-          )}
-          {renderMembersModal()}
-            <View style={{ marginTop: 20, flexDirection: "row" }}>
-              
-              {!joinedCommunity && <TouchableOpacity>
-                
-                <LinearGradient
-                  colors={["#1d40bd", "#5075FA"]}
-                  style={{
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 20,
-                    flexDirection: "row",
-                  }}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontFamily: "Comfortaa",
-                      marginRight: 5,
-                    }}
-                  >
-                    Join Community
-                  </Text>
-                  <Ionicons name="arrow-forward" size={23} color="#fff" />
-                </LinearGradient>
-              </TouchableOpacity>}
-            </View>
-          </View>
-        </ImageBackground>
-
-
-        <View>
-        <TouchableOpacity>
-        <View>
-        
-</View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
-            
+        <Text style={styles.headerTitle}>Community Page</Text>
+
+        {/* <View></View> */}
+        {renderEditButton()}
+      </View>
+      <ScrollView contentContainerStyle={{ flex: 1 }}>
+        <View style={styles.myCommunityCard}>
+          <View style={styles.imageContainer}>
+            {community.imageUrl ? (
+              <Image source={{ uri: community.imageUrl }} style={styles.communityImage} />
+            ) : (
+              <View style={styles.noImagePlaceholder}>
+                <Text style={styles.noImageText}>No Image</Text>
+              </View>
+            )}
+            <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradientOverlay}>
+              <Text style={styles.myCommunityTitle}>{community.communityName}</Text>
+              <View style={styles.myCommunityRating}>
+                <FontAwesome name="star" size={24} color="#ffcc01" />
+                <Text style={styles.myCommunityRatingText}>4.3</Text>
+                <Text style={styles.myCommunityMembers}>({community.memberIds.length} members)</Text>
+              </View>
+              <Text style={styles.communityDescription}>{community.description}</Text>
+              {currentUser && currentUser.userId === community.createdByUserId && (
+                <TouchableOpacity onPress={toggleModal} style={styles.viewMembersButton}>
+                  <Text style={styles.viewMembersButtonText}>View All Members</Text>
+                </TouchableOpacity>
+              )}
+            </LinearGradient>
+          </View>
         </View>
-
-        <View style={{ flexDirection: 'row',borderBottomWidth:1,borderBottomColor:'#dadbdf' }}>
-      <View style={{}}>
-        {renderButton('About Community', handleAbout, activeButton === 'about')}
-      </View>
-      <View>
-        {renderButton('Feed', handleFeed, activeButton === 'feed')}
-      </View>
-
-      <View>
-        {renderButton('Updates', handleImportant, activeButton === 'important')}
-      </View>
-
-      <View>
-        {renderButton('Events', handleEvents, activeButton === 'events')}
-      </View>
-    </View>
-
-                    {/*you can remote the view below*/}
-    <View>
-        <Text>{community.description}</Text>
-    </View>
+        {renderMembersModal()}
+        <View style={styles.buttonGroup}>
+          {renderButton('About Community', handleAbout, activeButton === 'about')}
+          {renderButton('Feed', handleFeed, activeButton === 'feed')}
+          {renderButton('Updates', handleImportant, activeButton === 'important')}
+          {renderButton('Events', handleEvents, activeButton === 'events')}
+        </View>
+        <View>
+          <Text>{community.description}</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-
-
 const styles = StyleSheet.create({
-
-  myCommunityCard: {
-    backgroundColor: "green",
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 12,
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    justifyContent: "space-between",
   },
-  editButton: {
-    backgroundColor: "#1d40bd",
-    padding: 8,
-    borderRadius: 20
+  headerTitle: {
+    fontSize: 23,
+    fontFamily: "ComfortaaBold",
+    marginRight: 10,
+  },
+  myCommunityCard: {
+    borderRadius: 12,
+    marginBottom: 12,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  imageContainer: {
+    width: '100%',
+    height: 250,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  communityImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  noImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#d9d9d9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noImageText: {
+    color: '#666',
+    fontSize: 18,
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 15,
+    paddingBottom: 20,
+  },
+  myCommunityTitle: {
+    fontFamily: 'Baumans',
+    fontSize: 34,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  myCommunityRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  myCommunityRatingText: {
+    color: '#fff',
+    fontSize: 22,
+    marginLeft: 5,
+    fontWeight: '600',
+  },
+  myCommunityMembers: {
+    color: '#fff',
+    fontSize: 20,
+    marginLeft: 10,
+  },
+  communityDescription: {
+    fontSize: 18,
+    color: '#ddd',
+    lineHeight: 24,
   },
   viewMembersButton: {
-    marginTop: 20,
+    marginTop: 15,
     backgroundColor: "#1d40bd",
-    padding: 10,
-    borderRadius: 10,
-    alignItems: 'center'
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   viewMembersButtonText: {
     color: 'white',
-    fontSize: 16
+    fontSize: 16,
+    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    width: '80%',
+    width: '85%',
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
     elevation: 5,
   },
   closeButton: {
@@ -323,8 +285,19 @@ const styles = StyleSheet.create({
     right: 10,
   },
   memberText: {
-    fontSize: 16,
+    fontSize: 18,
     marginVertical: 10,
     color: 'black',
   },
-})
+  buttonGroup: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#dadbdf',
+  },
+
+  editButton: {
+    backgroundColor: "#1d40bd",
+    padding: 8,
+    borderRadius: 20
+  }
+});

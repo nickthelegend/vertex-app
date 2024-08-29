@@ -10,7 +10,7 @@ import {
   ScrollView,
   Dimensions,
   Alert,
-  ImageBackground
+  ImageBackground,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Spacing from "../utils/Spacing";
@@ -49,7 +49,7 @@ export default function CommunityScreen() {
   const [joinedCommunities, setJoinedCommunities] = useState([]);
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true); // Add loading state
-  // console.log(joinedCommunities)
+
   const handleOpenDrawer = () => {
     navigation.openDrawer();
   };
@@ -89,14 +89,10 @@ export default function CommunityScreen() {
       }
     } catch (error) {
       console.error("Error fetching user and communities:", error);
-      // Optionally handle the error (e.g., show a message to the user)
     } finally {
       setTimeout(() => setLoading(false), 3000);
     }
   };
-  
-
-  
 
   const handlePickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -131,7 +127,8 @@ export default function CommunityScreen() {
           await uploadBytes(imageRef, blob);
           imageUrl = await getDownloadURL(imageRef);
         }
-        
+
+        // Add admins field including the creator's userId
         await setDoc(doc(collection(database, "communities"), communityId), {
           communityId,
           communityName,
@@ -139,6 +136,7 @@ export default function CommunityScreen() {
           tags,
           theme,
           memberIds: [createdByUserId],
+          admins: [createdByUserId], // Include the creator as an admin
           postFeedIds: [],
           eventPostIds: [],
           importTantPostIds: [],
@@ -148,11 +146,12 @@ export default function CommunityScreen() {
           createdByUserId,
           imageUrl,
         });
+
         const userRef = doc(database, "users", userId);
         await updateDoc(userRef, {
           communitiesIds: arrayUnion(communityId),
         });
-  
+
         setModalVisible(false);
         fetchUserAndCommunities(); // Refresh the community list
       }
@@ -201,139 +200,138 @@ export default function CommunityScreen() {
         </View>
 
         <View style={{ marginTop: 10 }}>
-        {allCommunities.length > 0 && (
-          <View style={styles.communitySectionHeader}>
-            <Text style={styles.communitySectionTitle}>All Communities</Text>
-            <TouchableOpacity>
-              <Text>View All</Text>
-            </TouchableOpacity>
-          </View>
-            )}
-
+          {allCommunities.length > 0 && (
+            <View style={styles.communitySectionHeader}>
+              <Text style={styles.communitySectionTitle}>All Communities</Text>
+              <TouchableOpacity>
+                <Text>View All</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.communityList}
-            // pagingEnabled
           >
             {loading && allCommunities.length > 0
               ? Array.from({ length: 3 }).map((_, index) => (
-                <View key={index} style={{ marginRight: 20,alignItems:"center" }}>
-                  <Skeleton
-                    width={100}
-                    height={100}
-                    colorMode="light"
-                    show={loading}
-                    backgroundColor="#f2f2f2"
-                    radius={50}
-                    style={styles.skeletonCard}
-                  />
-                <View style={{marginTop:20}}>
-                <Skeleton
-                    width={100}
-                    height={20}
-                    colorMode="light"
-                    show={loading}
-                    backgroundColor="#f2f2f2"
-                    radius={50}
-                    style={styles.skeletonCard}
-                  />
-
-                </View>
-                
-                </View>
-              ))
+                  <View key={index} style={{ marginRight: 20, alignItems: "center" }}>
+                    <Skeleton
+                      width={120}
+                      height={120}
+                      colorMode="light"
+                      show={loading}
+                      backgroundColor="#f2f2f2"
+                      radius={60}
+                      style={styles.skeletonCard}
+                    />
+                    <View style={{ marginTop: 20 }}>
+                      <Skeleton
+                        width={120}
+                        height={20}
+                        colorMode="light"
+                        show={loading}
+                        backgroundColor="#f2f2f2"
+                        radius={10}
+                        style={styles.skeletonCard}
+                      />
+                    </View>
+                  </View>
+                ))
               : allCommunities.map((community) => (
-  <TouchableOpacity
-    key={community.communityId}
-    onPress={() => handleJoinCommunity(community)}
-  >
-    <View style={styles.communityCard}>
-      <View style={styles.communityCardInner}>
-        <View style={styles.communityCardIcon}>
-          {community.imageUrl ? (
-            <Image
-              source={{ uri: community.imageUrl }}
-              style={styles.communityCardIcon}
-            />
-          ) : (
-            // Display a placeholder or nothing if the image is not available
-            <View style={[styles.communityCardIcon, { backgroundColor: "#e0e0e0" }]}>
-              {/* Optionally, you can add a default icon or text here */}
-            </View>
-          )}
-          <TouchableOpacity
-            style={styles.communityCardAddIcon}
-            onPress={() => handleJoinCommunity(community)}
-          >
-            <Image
-              source={require("../assets/icons/add.png")}
-              style={styles.communityCardAddImage}
-            />
-          </TouchableOpacity>
-        </View>
-        <Text>{community.communityName}</Text>
-      </View>
-    </View>
-  </TouchableOpacity>
-))
-              
-              }
+                  <TouchableOpacity
+                    key={community.communityId}
+                    onPress={() => handleJoinCommunity(community)}
+                  >
+                    <View style={styles.communityCard}>
+                      <View style={styles.communityCardInner}>
+                        <View style={styles.communityCardIcon}>
+                          {community.imageUrl ? (
+                            <Image
+                              source={{ uri: community.imageUrl }}
+                              style={styles.communityCardIcon}
+                            />
+                          ) : (
+                            <View
+                              style={[
+                                styles.communityCardIcon,
+                                { backgroundColor: "#e0e0e0" },
+                              ]}
+                            />
+                          )}
+                          <TouchableOpacity
+                            style={styles.communityCardAddIcon}
+                            onPress={() => handleJoinCommunity(community)}
+                          >
+                            <Image
+                              source={require("../assets/icons/add.png")}
+                              style={styles.communityCardAddImage}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                        <Text style={styles.communityCardTitle}>{community.communityName}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
           </ScrollView>
 
           <View>
             <Text style={styles.myCommunitiesTitle}>My Communities</Text>
             {loading
               ? Array.from({ length: 3 }).map((_, index) => (
-                <View key={index} style={{ marginBottom: 12 }}>
-        <Skeleton
-          width="100%"
-          height={150}
-          colorMode="light"
-          show={loading}
-          backgroundColor="#f2f2f2"
-          radius={12}
-          style={styles.skeletonCard}
-        />
-      </View>
+                  <View key={index} style={{ marginBottom: 12 }}>
+                    <Skeleton
+                      width="100%"
+                      height={180}
+                      colorMode="light"
+                      show={loading}
+                      backgroundColor="#f2f2f2"
+                      radius={12}
+                      style={styles.skeletonCard}
+                    />
+                  </View>
                 ))
               : joinedCommunities.map((community) => (
-  <ImageBackground 
-    key={community.communityId}
-    source={community.imageUrl ? { uri: community.imageUrl } : null}
-    style={styles.myCommunityCard} // Using the existing style for the full-size effect
-    imageStyle={{ borderRadius: 12 }} // Apply border radius to the image
-  >
-    <Text style={styles.myCommunityTitle}>
-      {community.communityName}
-    </Text>
-    <View style={styles.myCommunityRating}>
-      <FontAwesome
-        name="star"
-        size={24}
-        color="#ffcc01"
-      />
-      <Text style={styles.myCommunityRatingText}>4.3</Text>
-      <Text style={styles.myCommunityMembers}>
-        ({community.memberIds.length} members)
-      </Text>
-    </View>
-    <TouchableOpacity
-      style={styles.viewCommunityButton}
-      onPress={() => navigation.navigate("CommunityPage", { community, joinedCommunity: true })}
-    >
-      <LinearGradient
-        colors={["#1d40bd", "#5075FA"]}
-        style={styles.viewCommunityGradient}
-      >
-        <Text style={styles.viewCommunityText}>
-          View Community
-        </Text>
-      </LinearGradient>
-    </TouchableOpacity>
-  </ImageBackground>
-))}
+                  <View key={community.communityId} style={styles.myCommunityCard}>
+                    <View style={styles.imageContainer}>
+                      {community.imageUrl ? (
+                        <Image source={{ uri: community.imageUrl }} style={styles.communityImage} />
+                      ) : (
+                        <View style={styles.noImagePlaceholder}>
+                          <Text style={styles.noImageText}>No Image</Text>
+                        </View>
+                      )}
+                    </View>
+                    <LinearGradient
+                      colors={["rgba(0,0,0,0.6)", "transparent"]}
+                      style={styles.gradientOverlay}
+                    >
+                      <Text style={styles.myCommunityTitle}>{community.communityName}</Text>
+                      <View style={styles.myCommunityRating}>
+                        <FontAwesome name="star" size={24} color="#ffcc01" />
+                        <Text style={styles.myCommunityRatingText}>4.3</Text>
+                        <Text style={styles.myCommunityMembers}>
+                          ({community.memberIds.length} members)
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.viewCommunityButton}
+                        onPress={() =>
+                          navigation.navigate("CommunityPage", { community, joinedCommunity: true })
+                        }
+                      >
+                        <LinearGradient
+                          colors={["#1d40bd", "#5075FA"]}
+                          style={styles.viewCommunityGradient}
+                        >
+                          <Text style={styles.viewCommunityText}>View Community</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    </LinearGradient>
+                  </View>
+                ))}
           </View>
         </View>
       </ScrollView>
@@ -348,14 +346,7 @@ export default function CommunityScreen() {
       >
         <View style={styles.modalView}>
           <ScrollView>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 20,
-              }}
-            >
+            <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={() => {
                   setModalVisible(false);
@@ -383,9 +374,7 @@ export default function CommunityScreen() {
             <TextInput
               placeholder="Tags (comma separated)"
               value={tags.join(", ")}
-              onChangeText={(text) =>
-                setTags(text.split(",").map((tag) => tag.trim()))
-              }
+              onChangeText={(text) => setTags(text.split(",").map((tag) => tag.trim()))}
               style={styles.input}
             />
             <TextInput
@@ -401,10 +390,7 @@ export default function CommunityScreen() {
               </TouchableOpacity>
             )}
             {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
-            <TouchableOpacity
-              style={styles.createButton}
-              onPress={handleCreateCommunity}
-            >
+            <TouchableOpacity style={styles.createButton} onPress={handleCreateCommunity}>
               <Text style={styles.createButtonText}>Create</Text>
             </TouchableOpacity>
           </ScrollView>
@@ -463,6 +449,8 @@ const styles = StyleSheet.create({
   communityCard: {
     alignItems: "center",
     marginRight: 30,
+    // width: 150, // Increased size for a more prominent card appearance
+    // padding: 10, // Added padding for better layout
   },
   communityCardInner: {
     alignItems: "center",
@@ -492,15 +480,53 @@ const styles = StyleSheet.create({
     tintColor: "white",
     resizeMode: "contain",
   },
+  communityCardTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
+  },
   myCommunitiesTitle: {
     fontFamily: "Poppins-SemiBold",
     fontSize: 30,
   },
   myCommunityCard: {
-    backgroundColor: "green",
     borderRadius: 12,
-    padding: 15,
     marginBottom: 12,
+    overflow: "hidden",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  imageContainer: {
+    width: "100%",
+    height: 180, // Increased size for a larger card
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  communityImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  noImagePlaceholder: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#e0e0e0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  noImageText: {
+    color: "#888",
+    fontSize: 16,
+  },
+  gradientOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: 20,
   },
   myCommunityTitle: {
     fontFamily: "Baumans",
@@ -546,9 +572,10 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   input: {
@@ -568,13 +595,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 20,
-  },
-  createButtonGradient: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 20,
   },
   createButtonText: {
     fontSize: 18,
