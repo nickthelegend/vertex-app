@@ -1,5 +1,5 @@
 import React,{useState, useEffect} from "react";
-import { View, Text, TouchableOpacity, ImageBackground, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, ImageBackground, StyleSheet , Modal} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -12,6 +12,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function CommunityPage({route}) {
     const { community, joinedCommunity } = route.params
     const [currentUser, setCurrentUser] = useState(null);
+    const [isModalVisible, setModalVisible] = useState(false);
+
+    const toggleModal = () => {
+      setModalVisible(!isModalVisible);
+    };
 
     const [activeButton, setActiveButton] = useState('about'); // State to track active button
     const handleAbout = () => {
@@ -78,6 +83,35 @@ export default function CommunityPage({route}) {
     };
     fetchUserData();
   }, []);
+
+
+  
+  const renderMembersModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={toggleModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={toggleModal}
+            >
+              <Ionicons name="close" size={30} color="black" />
+            </TouchableOpacity>
+            <ScrollView style={{ padding: 20 }}>
+              {community.memberIds.map((id, index) => (
+                <Text key={index} style={styles.memberText}>{id}</Text>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
   return (
     <SafeAreaView style={{ padding: 10, flex: 1 }}>
 
@@ -160,6 +194,13 @@ export default function CommunityPage({route}) {
             <Text style={{ marginBottom: 30, fontSize: 18, color: "#fff" }}>
                   {community.description}
                 </Text>
+
+                {currentUser && currentUser.userId === community.createdByUserId && (
+            <TouchableOpacity onPress={toggleModal} style={styles.viewMembersButton}>
+              <Text style={styles.viewMembersButtonText}>View All Members</Text>
+            </TouchableOpacity>
+          )}
+          {renderMembersModal()}
             <View style={{ marginTop: 20, flexDirection: "row" }}>
               
               {!joinedCommunity && <TouchableOpacity>
@@ -243,5 +284,47 @@ const styles = StyleSheet.create({
     backgroundColor: "#1d40bd",
     padding: 8,
     borderRadius: 20
-  }
+  },
+  viewMembersButton: {
+    marginTop: 20,
+    backgroundColor: "#1d40bd",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center'
+  },
+  viewMembersButtonText: {
+    color: 'white',
+    fontSize: 16
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  memberText: {
+    fontSize: 16,
+    marginVertical: 10,
+    color: 'black',
+  },
 })
