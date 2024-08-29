@@ -37,9 +37,9 @@ export default function CommunityPage({route}) {
       };
 
       const handleEditCommunity = () => {
-        // Navigation to edit screen or toggle edit modal
-        console.log("Edit Community");
+        navigation.navigate("EditCommunityScreen", { community }); // Pass the community data
       };
+      
       const renderEditButton = () => {
         if (currentUser && currentUser.userId === community.createdByUserId) {
 
