@@ -263,7 +263,7 @@ export default function CommunityPage({route}) {
 
                     {/*you can remote the view below*/}
     <View>
-        <Text>Welcome to Reiki Healing Community.</Text>
+        <Text>{community.description}</Text>
     </View>
       </ScrollView>
     </SafeAreaView>
