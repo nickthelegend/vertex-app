@@ -10,7 +10,7 @@ import {
   ScrollView,
   Dimensions,
   Alert,
-  ImageBackground,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Spacing from "../utils/Spacing";
@@ -48,7 +48,8 @@ export default function CommunityScreen() {
   const [allCommunities, setAllCommunities] = useState([]);
   const [joinedCommunities, setJoinedCommunities] = useState([]);
   const [userId, setUserId] = useState("");
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false); // State for pull-to-refresh
 
   const handleOpenDrawer = () => {
     navigation.openDrawer();
@@ -90,8 +91,14 @@ export default function CommunityScreen() {
     } catch (error) {
       console.error("Error fetching user and communities:", error);
     } finally {
-      setTimeout(() => setLoading(false), 3000);
+      setLoading(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchUserAndCommunities();
+    setRefreshing(false);
   };
 
   const handlePickImage = async () => {
@@ -180,7 +187,12 @@ export default function CommunityScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
         <View style={styles.header}>
           <TouchableOpacity onPress={handleOpenDrawer}>
             <Image
@@ -270,7 +282,9 @@ export default function CommunityScreen() {
                             />
                           </TouchableOpacity>
                         </View>
-                        <Text style={styles.communityCardTitle}>{community.communityName}</Text>
+                        <Text style={styles.communityCardTitle}>
+                          {community.communityName}
+                        </Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -308,7 +322,9 @@ export default function CommunityScreen() {
                       colors={["rgba(0,0,0,0.6)", "transparent"]}
                       style={styles.gradientOverlay}
                     >
-                      <Text style={styles.myCommunityTitle}>{community.communityName}</Text>
+                      <Text style={styles.myCommunityTitle}>
+                        {community.communityName}
+                      </Text>
                       <View style={styles.myCommunityRating}>
                         <FontAwesome name="star" size={24} color="#ffcc01" />
                         <Text style={styles.myCommunityRatingText}>4.3</Text>
@@ -319,14 +335,19 @@ export default function CommunityScreen() {
                       <TouchableOpacity
                         style={styles.viewCommunityButton}
                         onPress={() =>
-                          navigation.navigate("CommunityPage", { community, joinedCommunity: true })
+                          navigation.navigate("CommunityPage", {
+                            community,
+                            joinedCommunity: true,
+                          })
                         }
                       >
                         <LinearGradient
                           colors={["#1d40bd", "#5075FA"]}
                           style={styles.viewCommunityGradient}
                         >
-                          <Text style={styles.viewCommunityText}>View Community</Text>
+                          <Text style={styles.viewCommunityText}>
+                            View Community
+                          </Text>
                         </LinearGradient>
                       </TouchableOpacity>
                     </LinearGradient>
@@ -449,8 +470,6 @@ const styles = StyleSheet.create({
   communityCard: {
     alignItems: "center",
     marginRight: 30,
-    // width: 150, // Increased size for a more prominent card appearance
-    // padding: 10, // Added padding for better layout
   },
   communityCardInner: {
     alignItems: "center",
