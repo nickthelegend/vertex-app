@@ -106,7 +106,10 @@ export default function HomeHeader({ userFullName, userProfilePic,userId }) {
           <Ionicons name="notifications" size={24} color="black" />
         </TouchableOpacity>
 
-        {/* <TouchableOpacity 
+        <TouchableOpacity 
+        style={{
+            marginRight: SPACING * 2,
+          }}
             onPress={handleMessagesPress}
             >
               <Image
@@ -118,7 +121,7 @@ export default function HomeHeader({ userFullName, userProfilePic,userId }) {
                   tintColor: "black",
                 }}
               />
-            </TouchableOpacity> */}
+            </TouchableOpacity>
       </View>
     </View>
   );

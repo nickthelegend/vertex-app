@@ -16,6 +16,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 // import BottomSheetModal from '../components/BottomModalSheet';
 import CreatePostModal from '../components/BottomModalSheet';
 import MessagesPage from './MessagesPage';
+import AluminiPage from './AluminiScreen';
 const Tab = createBottomTabNavigator();
 const CustomTabBarButton = ({ children, onPress }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -214,20 +215,23 @@ export default function BottomTabNavigator() {
 />
 <Tab.Screen
   name="Chat"
-  component={MessagesPage}
+  component={AluminiPage}
   options={({ color, size }) => ({
     tabBarIcon: ({ color, size, focused }) => (
          
       <TouchableOpacity>
         <View style={styles.tabIcon}>
-          <Image
+          {/* <Image
             source={require("../assets/icons/chats.png")}
             style={{
               width: scaleSize(size +2),
               height: scaleSize(size),
               tintColor: focused ? '#1e40bc' : 'black',
             }}
-          />
+          /> */}
+
+<Ionicons name="school-outline" size={scaleSize(24)} style={{color: focused? '#1e40bc' : 'black'}} />
+
           <Text style={[styles.tabText, { color: focused ? '#1e40bc' : 'black' }]}>Chats</Text>
         </View>
       </TouchableOpacity>
