@@ -232,7 +232,7 @@ export default function BottomTabNavigator() {
 
 <Ionicons name="school-outline" size={scaleSize(24)} style={{color: focused? '#1e40bc' : 'black'}} />
 
-          <Text style={[styles.tabText, { color: focused ? '#1e40bc' : 'black' }]}>Chats</Text>
+          <Text style={[styles.tabText, { color: focused ? '#1e40bc' : 'black' }]}>Alumini</Text>
         </View>
       </TouchableOpacity>
     ),
