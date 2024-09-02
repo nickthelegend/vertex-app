@@ -28,7 +28,7 @@ export default function AlumniPage() {
   };
 
   const handleNotificationsPress = () => {
-    navigation.navigate('NotificationsPage', { currentUserId: userId });
+    navigation.navigate('NotificationsPage');
   };
 
   const handleMessagesPress = () => {
@@ -43,6 +43,10 @@ export default function AlumniPage() {
     navigation.navigate(screen);
   };
 
+  const handleCreateEventPress = () => {
+    navigation.navigate('CreateEvents');
+  };
+
   const renderSlide = ({ item }) => (
     <View style={styles.slide}>
       <Image source={item.image} style={styles.slideImage} />
@@ -51,29 +55,30 @@ export default function AlumniPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-    {/* Custom Header */}
-    <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <TouchableOpacity onPress={handleOpenDrawer}>
-              <Image
-                source={require("../assets/images/Avatar.png")}
-                style={styles.avatar}
-              />
-            </TouchableOpacity>
-            <Text style={styles.headerText}>Alumni Connection</Text>
-          </View>
-          <View style={styles.headerRight}>
-            <TouchableOpacity onPress={handleSearchPress}>
-              <Image
-                source={require("../assets/icons/search.png")}
-                style={styles.searchIcon}
-              />
-            </TouchableOpacity>
-          </View>
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <TouchableOpacity onPress={handleOpenDrawer}>
+            <Image
+              source={require("../assets/images/Avatar.png")}
+              style={styles.avatar}
+            />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>Alumni Connection</Text>
         </View>
+        <View style={styles.headerRight}>
+          <TouchableOpacity onPress={handleSearchPress}>
+            <Image
+              source={require("../assets/icons/search.png")}
+              style={styles.searchIcon}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleCreateEventPress}>
+            <Ionicons name="add-circle-outline" size={30} color="black" style={styles.addButton} />
+          </TouchableOpacity>
+        </View>
+      </View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-        
-
         {/* Automatic Slideshow with Pagination in one View */}
         <View style={styles.carouselContainer}>
           <Carousel
@@ -135,9 +140,66 @@ export default function AlumniPage() {
               </View>
             </View>
           )}
-          {selectedCategory === "Events" && <Text>Upcoming Events</Text>}
-          {selectedCategory === "Community" && <Text>Alumni Community Initiatives</Text>}
-          {selectedCategory === "Workshops" && <Text>Available Workshops</Text>}
+          {selectedCategory === "Events" && (
+            <View>
+              <Text style={styles.sectionTitle}>Upcoming Events</Text>
+              {/* Event Card */}
+              <View style={styles.eventCard}>
+                <Image
+                  source={{ uri: 'https://almashines.s3.dualstack.ap-southeast-1.amazonaws.com/assets/images/eventlogos/sizea/27742691713254040.jpg' }}
+                  style={styles.eventImage}
+                />
+                <View style={styles.eventDetails}>
+                  <Text style={styles.eventTitle}>Meet the Achievers program on 15th April, 2024</Text>
+                  <Text style={styles.eventDate}>Apr 15, 2024 - 9:30 AM</Text>
+                  <Text style={styles.eventLocation}>Golden Jubilee Conference Hall, JNTUH Kukatpally, Hyderabad</Text>
+                  <TouchableOpacity style={styles.eventButton} onPress={() => handleSubCategoryPress('EventDetailScreen')}>
+                    <Text style={styles.eventButtonText}>View</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+          {selectedCategory === "Community" && (
+            <View>
+              <Text style={styles.sectionTitle}>Alumni Community Initiatives</Text>
+              {/* Community Details */}
+              <View style={styles.eventCard}>
+                <Image
+                  source={{ uri: 'https://almashines.s3.dualstack.ap-southeast-1.amazonaws.com/assets/images/eventlogos/sizea/27742691713254040.jpg' }}
+                  style={styles.eventImage}
+                />
+                <View style={styles.eventDetails}>
+                  <Text style={styles.eventTitle}>Community Event Example</Text>
+                  <Text style={styles.eventDate}>Apr 15, 2024 - 9:30 AM</Text>
+                  <Text style={styles.eventLocation}>Location Example</Text>
+                  <TouchableOpacity style={styles.eventButton}>
+                    <Text style={styles.eventButtonText}>View</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+          {selectedCategory === "Workshops" && (
+            <View>
+              <Text style={styles.sectionTitle}>Available Workshops</Text>
+              {/* Workshops Details */}
+              <View style={styles.eventCard}>
+                <Image
+                  source={{ uri: 'https://almashines.s3.dualstack.ap-southeast-1.amazonaws.com/assets/images/eventlogos/sizea/27742691713254040.jpg' }}
+                  style={styles.eventImage}
+                />
+                <View style={styles.eventDetails}>
+                  <Text style={styles.eventTitle}>Workshop on Skills Development</Text>
+                  <Text style={styles.eventDate}>May 20, 2024 - 10:00 AM</Text>
+                  <Text style={styles.eventLocation}>Location Example</Text>
+                  <TouchableOpacity style={styles.eventButton}>
+                    <Text style={styles.eventButtonText}>View</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -182,6 +244,9 @@ const styles = StyleSheet.create({
     height: 24,
     resizeMode: "contain",
     tintColor: "black",
+  },
+  addButton: {
+    marginLeft: 15,
   },
   carouselContainer: {
     marginBottom: 20,
@@ -232,17 +297,64 @@ const styles = StyleSheet.create({
     marginVertical: SPACING,
   },
   subCategoryButton: {
-    height: 120, // Increased height for better visibility
+    height: 120,
     width: '100%',
     backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    marginVertical: 10, // Increased vertical margin
+    marginVertical: 10,
   },
   subCategoryText: {
-    fontSize: SPACING * 2, // Increased font size for better visibility
+    fontSize: SPACING * 2,
     color: '#333',
+    fontWeight: 'bold',
+  },
+  eventCard: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    marginBottom: 20,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  eventImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  eventDetails: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  eventTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  eventDate: {
+    fontSize: 14,
+    color: '#777777',
+    marginBottom: 5,
+  },
+  eventLocation: {
+    fontSize: 14,
+    color: '#555555',
+    marginBottom: 10,
+  },
+  eventButton: {
+    backgroundColor: '#1e40bc',
+    paddingVertical: 8,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  eventButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
     fontWeight: 'bold',
   },
 });
