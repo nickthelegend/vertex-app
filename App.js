@@ -56,6 +56,9 @@ import Constants from 'expo-constants';
 import checkForUpdate from './utils/CheckForUpdate';
 import EditCommunityScreen from './screens/EditCommunityScreen';
 import AluminiPage from './screens/AluminiScreen';
+import JobScreen from './screens/JobScreen';
+import InternshipScreen from './screens/InternshipScreen';
+import MentorshipScreen from './screens/MentorshipScreen';
 const currentVersion = Constants.expoConfig.version;
 
 
@@ -200,6 +203,9 @@ export default function App() {
         <Stack.Screen name="UniversityNavigationScreen" component={UniversityNavigationScreen} />
         <Stack.Screen name="EditCommunityScreen" component={EditCommunityScreen} />
         <Stack.Screen name="AluminiScreen" component={AluminiPage} />
+        <Stack.Screen name="JobScreen" component={JobScreen} />
+        <Stack.Screen name="InternshipScreen" component={InternshipScreen} />
+        <Stack.Screen name="MentorshipScreen" component={MentorshipScreen} />
 
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>
