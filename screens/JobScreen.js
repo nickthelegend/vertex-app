@@ -1,11 +1,42 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
+import { app } from '../services/config';  // Make sure to have Firebase config imported correctly
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+
+const db = getFirestore(app);
 
 export default function JobScreen() {
   const navigation = useNavigation();
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    setLoading(true);
+    try {
+      const jobsCollection = collection(db, 'jobs');
+      const jobSnapshot = await getDocs(jobsCollection);
+      const jobList = jobSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setJobs(jobList);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchJobs();
+    setRefreshing(false);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -26,38 +57,52 @@ export default function JobScreen() {
         <Text style={styles.opportunityText}>
           Is your organization hiring new talent? Share the career opportunity with a huge talent pool within Vertex.
         </Text>
-        <TouchableOpacity style={styles.postButton}>
+        {/* Navigation to CreateJob Screen */}
+        <TouchableOpacity 
+          style={styles.postButton}
+          onPress={() => navigation.navigate('CreateJob')}
+        >
           <Text style={styles.postButtonText}>Post an Opportunity</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Job Details Section */}
-      <ScrollView style={styles.jobDetailsContainer}>
-        <View style={styles.jobCard}>
-          <Text style={styles.jobTitle}>Nino Training - Engineer Intern</Text>
-          <Text style={styles.companyName}>Sirena Technologies Pvt Ltd</Text>
-          <View style={styles.jobInfoContainer}>
-            <View style={styles.jobInfo}>
-              <Text style={styles.infoLabel}>Location:</Text>
-              <Text style={styles.infoValue}>Bangalore</Text>
+      {/* Loading Indicator */}
+      {loading && <ActivityIndicator size="large" color="#1e40bc" style={styles.loading} />}
+
+      {/* Job Details Section with Pull-to-Refresh */}
+      <ScrollView
+        style={styles.jobDetailsContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {jobs.map(job => (
+          <View key={job.id} style={styles.jobCard}>
+            <Text style={styles.jobTitle}>{job.jobTitle}</Text>
+            <Text style={styles.companyName}>{job.companyName}</Text>
+            <View style={styles.jobInfoContainer}>
+              <View style={styles.jobInfo}>
+                <Text style={styles.infoLabel}>Location:</Text>
+                <Text style={styles.infoValue}>{job.location}</Text>
+              </View>
+              <View style={styles.jobInfo}>
+                <Text style={styles.infoLabel}>Deadline:</Text>
+                <Text style={styles.infoValue}>{job.deadline}</Text>
+              </View>
+              <View style={styles.jobInfo}>
+                <Text style={styles.infoLabel}>Salary:</Text>
+                <Text style={styles.infoValue}>{job.salary}</Text>
+              </View>
+              <View style={styles.jobInfo}>
+                <Text style={styles.infoLabel}>Applicants:</Text>
+                <Text style={styles.infoValue}>0</Text>
+              </View>
             </View>
-            <View style={styles.jobInfo}>
-              <Text style={styles.infoLabel}>Deadline:</Text>
-              <Text style={styles.infoValue}>Sep 07, 2024</Text>
-            </View>
-            <View style={styles.jobInfo}>
-              <Text style={styles.infoLabel}>Stipend:</Text>
-              <Text style={styles.infoValue}>0</Text>
-            </View>
-            <View style={styles.jobInfo}>
-              <Text style={styles.infoLabel}>Applicants:</Text>
-              <Text style={styles.infoValue}>0</Text>
-            </View>
+            <TouchableOpacity style={styles.viewButton}>
+              <Text style={styles.viewButtonText}>View Job Post</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.viewButton}>
-            <Text style={styles.viewButtonText}>View Job Post</Text>
-          </TouchableOpacity>
-        </View>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -81,14 +126,17 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontFamily: "ComfortaaBold",
   },
+  backButton: {
+    marginRight: 10,
+  },
   addOpportunitySection: {
     padding: 16,
     backgroundColor: '#FFFFFF',
     marginVertical: 10,
     marginHorizontal: 20,
     borderRadius: 10,
-    elevation: 2, // Adds shadow for Android
-    shadowColor: '#000', // Adds shadow for iOS
+    elevation: 2,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -109,6 +157,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  loading: {
+    marginVertical: 20,
+  },
   jobDetailsContainer: {
     flex: 1,
     paddingHorizontal: 20,
@@ -119,8 +170,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 16,
     marginBottom: 20,
-    elevation: 2, // Adds shadow for Android
-    shadowColor: '#000', // Adds shadow for iOS
+    elevation: 2,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -142,7 +193,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   jobInfo: {
-    width: '50%', // Two items per row
+    width: '50%',
     marginBottom: 10,
   },
   infoLabel: {

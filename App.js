@@ -59,6 +59,10 @@ import AluminiPage from './screens/AluminiScreen';
 import JobScreen from './screens/JobScreen';
 import InternshipScreen from './screens/InternshipScreen';
 import MentorshipScreen from './screens/MentorshipScreen';
+import CreateJob from './screens/CreateJob';
+import CreateInternship from './screens/CreateInternship';
+import BecomeMentorScreen from './screens/BecomeMentorScreen';
+// import SeekMentorshipScreen from './screens/SeekMentorshipScreen';
 const currentVersion = Constants.expoConfig.version;
 
 
@@ -206,6 +210,10 @@ export default function App() {
         <Stack.Screen name="JobScreen" component={JobScreen} />
         <Stack.Screen name="InternshipScreen" component={InternshipScreen} />
         <Stack.Screen name="MentorshipScreen" component={MentorshipScreen} />
+        <Stack.Screen name="CreateJob" component={CreateJob} />
+        <Stack.Screen name="CreateInternship" component={CreateInternship} />
+        <Stack.Screen name="BecomeMentorScreen" component={BecomeMentorScreen} />
+        {/* <Stack.Screen name="SeekMentorshipScreen" component={SeekMentorshipScreen} /> */}
 
         {/* <Stack.Screen name="PostScreen" compornt */}
       </Stack.Navigator>
